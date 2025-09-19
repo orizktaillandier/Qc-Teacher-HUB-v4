@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Card,
   CardBody,
@@ -58,6 +58,7 @@ const exerciseTypes = [
 
 export function QuebecTeacherHubInterface() {
   const { theme, setTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
   const [formData, setFormData] = useState<FormData>({
     cycle: "",
     grade: "",
@@ -71,6 +72,11 @@ export function QuebecTeacherHubInterface() {
   });
 
   const [isGenerating, setIsGenerating] = useState(false);
+
+  // Prevent hydration mismatch for theme
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const handleSelectionChange = (key: keyof FormData) => (value: string) => {
     setFormData(prev => ({ ...prev, [key]: value }));
@@ -91,7 +97,7 @@ export function QuebecTeacherHubInterface() {
     <div className="min-h-screen bg-background">
       {/* Header */}
       <header className="border-b border-border-color bg-card-background">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="w-full px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center space-x-4">
               <div className="text-2xl font-bold quebec-gradient bg-clip-text text-transparent">
@@ -107,7 +113,7 @@ export function QuebecTeacherHubInterface() {
                 variant="ghost"
                 onPress={() => setTheme(theme === "dark" ? "light" : "dark")}
               >
-                {theme === "dark" ? <SunIcon /> : <MoonIcon />}
+                {mounted ? (theme === "dark" ? <SunIcon /> : <MoonIcon />) : <div className="w-5 h-5" />}
               </Button>
             </div>
           </div>
@@ -115,7 +121,7 @@ export function QuebecTeacherHubInterface() {
       </header>
 
       {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <main className="w-full px-4 sm:px-6 lg:px-8 py-8">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
 
           {/* Form Panel */}
@@ -144,7 +150,7 @@ export function QuebecTeacherHubInterface() {
                     isRequired
                   >
                     {cycles.map((cycle) => (
-                      <SelectItem key={cycle.key} value={cycle.key}>
+                      <SelectItem key={cycle.key} value={cycle.key} textValue={cycle.label}>
                         {cycle.label}
                       </SelectItem>
                     ))}
@@ -161,7 +167,7 @@ export function QuebecTeacherHubInterface() {
                     isRequired
                   >
                     {subjects.map((subject) => (
-                      <SelectItem key={subject.key} value={subject.key}>
+                      <SelectItem key={subject.key} value={subject.key} textValue={subject.label}>
                         {subject.icon} {subject.label}
                       </SelectItem>
                     ))}
@@ -188,7 +194,7 @@ export function QuebecTeacherHubInterface() {
                     }}
                   >
                     {exerciseTypes.map((type) => (
-                      <SelectItem key={type.key} value={type.key}>
+                      <SelectItem key={type.key} value={type.key} textValue={type.label}>
                         {type.label}
                       </SelectItem>
                     ))}
