@@ -10,13 +10,22 @@ app/out/
 app/build/
 dist/
 
-# Environment variables
-app/.env*.local
+# Environment variables - CRITICAL: Never commit these files
+app/.env.local
+app/.env.development.local
+app/.env.test.local
+app/.env.production.local
 .env
 .env.local
 .env.development.local
 .env.test.local
 .env.production.local
+
+# SECURITY: Explicitly exclude common .env patterns (but allow .env.example)
+**/.env.local
+**/.env.*.local
+**/.*env
+!**/.env.example
 
 # Logs
 npm-debug.log*
