@@ -44,7 +44,6 @@ export async function POST(request: Request) {
     // 2. Generate variety seed to avoid repetition
     const varietySeed = {
       timestamp: Date.now(),
-      randomContext: generateQuebecContext(),
       sessionId: `card_v2_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
     };
 
@@ -73,7 +72,7 @@ IMPORTANT: Retourne UNIQUEMENT un objet JSON valide, sans texte avant ou après.
             },
             {
               role: 'user',
-              content: buildStructuredPrompt(knowledge, body, varietySeed, knowledgeContext)
+              content: buildStructuredPrompt(knowledge, body, knowledgeContext)
             }
           ],
           max_completion_tokens: 8000, // Increased for better generation
@@ -95,7 +94,7 @@ IMPORTANT: Retourne UNIQUEMENT un objet JSON valide, sans texte avant ou après.
             },
             {
               role: 'user',
-              content: buildStructuredPrompt(knowledge, body, varietySeed, knowledgeContext)
+              content: buildStructuredPrompt(knowledge, body, knowledgeContext)
             }
           ],
           max_tokens: 4000, // GPT-4o uses max_tokens
@@ -164,27 +163,8 @@ IMPORTANT: Retourne UNIQUEMENT un objet JSON valide, sans texte avant ou après.
   }
 }
 
-function generateQuebecContext(): string {
-  const contexts = [
-    'dans une cabane à sucre',
-    'pendant le Carnaval de Québec',
-    'au marché Jean-Talon',
-    'lors d\'une partie de hockey',
-    'à la Ronde',
-    'sur les Plaines d\'Abraham',
-    'dans le Vieux-Québec',
-    'pendant une tempête de neige',
-    'au Centre Bell',
-    'au Biodôme de Montréal',
-    'lors de la Saint-Jean-Baptiste',
-    'à l\'érablière',
-    'au Mont-Royal',
-    'sur le fleuve Saint-Laurent'
-  ];
-  return contexts[Math.floor(Math.random() * contexts.length)];
-}
 
-function buildStructuredPrompt(knowledge: any, request: CardRequest, varietySeed: any, knowledgeContext: string): string {
+function buildStructuredPrompt(knowledge: any, request: CardRequest, knowledgeContext: string): string {
   // Map notion to proper PFEQ terminology
   const notionMapping: Record<string, string> = {
     // Mathematics sub-notions
@@ -231,7 +211,7 @@ function buildStructuredPrompt(knowledge: any, request: CardRequest, varietySeed
 
   return `Crée 8 cartes à tâches pour ${request.grade}e année, matière: ${request.subject}, notion spécifique: ${notionDisplay}.
 
-IMPORTANT: Les questions doivent être TRÈS SPÉCIFIQUEMENT liées à "${notionDisplay}" selon le PFEQ du Québec.
+IMPORTANT: Les questions doivent être SIMPLES et DIRECTES, sans contexte. Aller droit au but avec des questions pédagogiques claires.
 
 INSTRUCTIONS POUR LES VISUELS:
 Pour les questions de mathématiques ou sciences nécessitant des visuels, utilise ces codes:
@@ -245,12 +225,12 @@ Pour les questions de mathématiques ou sciences nécessitant des visuels, utili
 - [visual:shape:type:taille] pour une forme (ex: [visual:shape:hexagon:100])
 - [visual:graph:valeurs] pour un graphique (ex: [visual:graph:2,4,3,5])
 
-Exemples d'utilisation:
-- "Quel est l'angle formé? [visual:angle:60:100]"
-- "Quelle fraction est colorée? [visual:fraction:2:3:2]"
-- "Trouve l'angle manquant dans ce triangle [visual:triangle:50:60:x]"
-- Pour angles inconnus, utilise 'x' au lieu de '?'
-- "Place le nombre sur la droite: [visual:numberline:0:20:7]"
+Exemples de questions SIMPLES et DIRECTES:
+- "Calcule: 45 + 27 = ?"
+- "Quel est l'angle manquant? [visual:triangle:50:60:x]"
+- "Quelle fraction est représentée? [visual:fraction:2:3:2]"
+- "Conjugue le verbe 'finir' au présent, 3e personne du singulier."
+- "Identifie l'état de la matière: la vapeur d'eau."
 
 Retourne un JSON avec exactement 8 cartes. Voici le format EXACT à suivre:
 
@@ -258,13 +238,11 @@ Retourne un JSON avec exactement 8 cartes. Voici le format EXACT à suivre:
   "cards": [
     {
       "number": 1,
-      "title": "Titre de la carte 1",
-      "context": "Contexte québécois (ex: ${varietySeed.randomContext})",
-      "question": "Question claire sur ${notionDisplay} adaptée au niveau ${request.grade}e année",
-      "answer": "Réponse détaillée avec explication",
+      "title": "Carte ${notionDisplay}",
+      "question": "Question simple et directe sur ${notionDisplay}, niveau ${request.grade}e année",
+      "answer": "Réponse claire avec explication si nécessaire",
       "difficulty": "${difficulty[0]}",
-      "theme": "${notionDisplay}",
-      "icon": "🍁"
+      "theme": "${notionDisplay}"
     }
   ]
 }
@@ -273,13 +251,14 @@ Note: Génère 8 cartes au total (numéros 1 à 8) avec le même format
 
 RÈGLES STRICTES:
 - 8 cartes EXACTEMENT, numérotées de 1 à 8
-- TOUTES les questions doivent porter sur "${notionDisplay}"
+- TOUTES les questions doivent être SIMPLES et DIRECTES
+- PAS de contexte, PAS de mise en situation
+- Questions pédagogiques claires, droit au but
 - Difficultés progressives: 2 easy, 3 medium, 3 hard
-- Contextes québécois variés (Carnaval, érablière, hockey, etc.)
 - Questions alignées PFEQ pour ${request.grade}e année
 - Pour les triangles avec angles, utilise [visual:triangle:angle1:angle2:angle3]
 - Pour les triangles avec côtés, utilise [visual:triangle-sides:côté1:côté2:côté3:type]
-- Réponses avec étapes et explications détaillées
+- Réponses claires et concises
 
-${knowledgeContext ? `CONTENU PFEQ PERTINENT:\n${knowledgeContext.substring(0, 2000)}` : ''}`;
+${knowledgeContext ? `CONTENU PFEQ PERTINENT:\n${knowledgeContext.substring(0, 2000)}` : ''}`);
 }

@@ -223,11 +223,6 @@ export default function CardsV2Page() {
               </h3>
             )}
 
-            {card.context && (
-              <p className="text-xs italic text-gray-600">
-                📍 {card.context}
-              </p>
-            )}
           </div>
 
           {/* Main content area - takes remaining space */}
