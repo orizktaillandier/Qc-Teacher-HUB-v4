@@ -260,5 +260,5 @@ RÈGLES STRICTES:
 - Pour les triangles avec côtés, utilise [visual:triangle-sides:côté1:côté2:côté3:type]
 - Réponses claires et concises
 
-${knowledgeContext ? `CONTENU PFEQ PERTINENT:\n${knowledgeContext.substring(0, 2000)}` : ''}`);
+${knowledgeContext ? `CONTENU PFEQ PERTINENT:\n${knowledgeContext.substring(0, 2000)}` : ''}`;
 }

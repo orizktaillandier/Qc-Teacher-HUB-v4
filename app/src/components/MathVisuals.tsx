@@ -61,7 +61,6 @@ const AngleVisual = ({ params }: { params: string }) => {
     <svg
       viewBox={`${minX} ${minY} ${viewBoxWidth} ${viewBoxHeight}`}
       className="w-full h-full"
-      style={{ maxWidth: '100%', maxHeight: '100%' }}
       preserveAspectRatio="xMidYMid meet"
     >
       {/* Horizontal reference line from origin */}
@@ -129,7 +128,7 @@ const TriangleVisual = ({ params }: { params: string }) => {
 
   // Create triangle using angles
   const baseLength = 100;
-  const padding = 25;
+  const padding = 35; // Increased padding to account for labels outside triangle
 
   // Calculate the third vertex position using angles
   const angle1Rad = (drawAngle1 * Math.PI) / 180;
@@ -138,11 +137,12 @@ const TriangleVisual = ({ params }: { params: string }) => {
   const height = baseLength * Math.sin(angle1Rad);
   const xOffset = baseLength * Math.cos(angle1Rad);
 
-  // Calculate viewBox to fit triangle
-  const minX = Math.min(0, xOffset) - padding;
-  const maxX = Math.max(baseLength, xOffset) + padding;
-  const minY = -height - padding - 10; // Extra space for labels
-  const maxY = padding + 10;
+  // Calculate viewBox to fit triangle with labels
+  const labelSpace = 25; // Extra space for labels outside triangle
+  const minX = Math.min(0, xOffset) - padding - labelSpace;
+  const maxX = Math.max(baseLength, xOffset) + padding + labelSpace;
+  const minY = -height - padding - labelSpace; // Extra space for top label
+  const maxY = padding + labelSpace; // Extra space for bottom labels
 
   const viewWidth = maxX - minX;
   const viewHeight = maxY - minY;
@@ -158,36 +158,38 @@ const TriangleVisual = ({ params }: { params: string }) => {
         stroke="black"
         strokeWidth="2"
       />
-      {/* Angle A - bottom left */}
+      {/* Angle A - bottom left - positioned outside */}
       <text
-        x={labelOffset}
-        y={-8}
+        x={-20}
+        y={15}
         fontSize="14"
         fill="blue"
         fontWeight="bold"
+        textAnchor="middle"
       >
         {isAngleAKnown ? `${angleA}°` : '?'}
       </text>
 
-      {/* Angle B - bottom right */}
+      {/* Angle B - bottom right - positioned outside */}
       <text
-        x={baseLength - labelOffset - 10}
-        y={-8}
+        x={baseLength + 20}
+        y={15}
         fontSize="14"
         fill="blue"
         fontWeight="bold"
+        textAnchor="middle"
       >
         {isAngleBKnown ? `${angleB}°` : '?'}
       </text>
 
-      {/* Angle C - top */}
+      {/* Angle C - top - positioned above the vertex */}
       <text
-        x={xOffset + (xOffset < 50 ? -labelOffset : labelOffset)}
-        y={-height + (height > 40 ? 20 : 15)}
+        x={xOffset}
+        y={-height - 15}
         fontSize="14"
         fill="blue"
         fontWeight="bold"
-        textAnchor={xOffset < 50 ? "end" : "start"}
+        textAnchor="middle"
       >
         {isAngleCKnown ? `${angleC}°` : '?'}
       </text>
@@ -212,7 +214,7 @@ const TriangleSidesVisual = ({ params }: { params: string }) => {
   const centerX = width / 2;
 
   return (
-    <svg viewBox={`0 0 ${width} ${height}`} className="w-full h-full">
+    <svg viewBox={`0 0 ${width} ${height}`} className="w-full h-full" preserveAspectRatio="xMidYMid meet">
       <polygon
         points={`${leftX},${bottomY} ${rightX},${bottomY} ${centerX},${topY}`}
         fill="none"
@@ -243,7 +245,7 @@ const FractionVisual = ({ params }: { params: string }) => {
   const radius = size * 0.4; // Increased from 0.35
 
   return (
-    <svg viewBox={`0 0 ${size} ${size}`} className="w-full h-full">
+    <svg viewBox={`0 0 ${size} ${size}`} className="w-full h-full" preserveAspectRatio="xMidYMid meet">
       {/* Circle background */}
       <circle cx={center} cy={center} r={radius} fill="white" stroke="black" strokeWidth="2" />
 
@@ -296,7 +298,7 @@ const NumberLineVisual = ({ params }: { params: string }) => {
   const lineLength = lineEndX - lineStartX;
 
   return (
-    <svg viewBox={`0 0 ${width} ${height}`} className="w-full h-full">
+    <svg viewBox={`0 0 ${width} ${height}`} className="w-full h-full" preserveAspectRatio="xMidYMid meet">
       {/* Main line */}
       <line x1={lineStartX} y1={lineY} x2={lineEndX} y2={lineY} stroke="black" strokeWidth="2" />
 
@@ -342,7 +344,7 @@ const GridVisual = ({ params }: { params: string }) => {
   const viewHeight = rowNum * (cellSize + gap) + padding * 2;
 
   return (
-    <svg viewBox={`0 0 ${viewWidth} ${viewHeight}`} className="w-full h-full">
+    <svg viewBox={`0 0 ${viewWidth} ${viewHeight}`} className="w-full h-full" preserveAspectRatio="xMidYMid meet">
       {Array.from({ length: rowNum }).map((_, row) =>
         Array.from({ length: colNum }).map((_, col) => {
           const index = row * colNum + col;
@@ -383,7 +385,7 @@ const ClockVisual = ({ params }: { params: string }) => {
   const minuteHandLength = clockRadius * 0.7;
 
   return (
-    <svg viewBox={`0 0 ${size} ${size}`} className="w-full h-full">
+    <svg viewBox={`0 0 ${size} ${size}`} className="w-full h-full" preserveAspectRatio="xMidYMid meet">
       {/* Clock face */}
       <circle cx={center} cy={center} r={clockRadius} fill="white" stroke="black" strokeWidth="2" />
 
@@ -499,7 +501,7 @@ const ShapeVisual = ({ params }: { params: string }) => {
   };
 
   return (
-    <svg viewBox={`0 0 ${size} ${size}`} className="w-full h-full">
+    <svg viewBox={`0 0 ${size} ${size}`} className="w-full h-full" preserveAspectRatio="xMidYMid meet">
       {shapes[type] || shapes.square}
     </svg>
   );
@@ -520,7 +522,7 @@ const BarGraphVisual = ({ params }: { params: string }) => {
   const barGap = 5;
 
   return (
-    <svg viewBox={`0 0 ${width} ${height}`} className="w-full h-full">
+    <svg viewBox={`0 0 ${width} ${height}`} className="w-full h-full" preserveAspectRatio="xMidYMid meet">
       {/* Y axis */}
       <line x1={padding} y1={padding} x2={padding} y2={height - padding} stroke="black" strokeWidth="2" />
       {/* X axis */}
@@ -569,7 +571,7 @@ export const parseQuestionWithVisuals = (text: string): { questionText: string; 
     // Extract the visual component
     const visualCode = match[1];
     visuals.push(
-      <div key={matchIndex} style={{ maxWidth: '200px', maxHeight: '200px', width: '100%', height: '100%' }}>
+      <div key={matchIndex} style={{ width: '100%', height: '100%' }}>
         {renderMathVisual(visualCode)}
       </div>
     );

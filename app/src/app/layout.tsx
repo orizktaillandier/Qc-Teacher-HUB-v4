@@ -26,6 +26,14 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="fr" suppressHydrationWarning>
+      <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link
+          href="https://fonts.googleapis.com/css2?family=Kalam:wght@400;700&family=Fredoka:wght@400;600&family=Bubblegum+Sans&family=Indie+Flower&family=Permanent+Marker&family=Caveat:wght@400;700&family=Patrick+Hand&family=Schoolbell&family=Architects+Daughter&family=Amatic+SC:wght@400;700&family=Shadows+Into+Light&family=Gloria+Hallelujah&family=Baloo+2:wght@400;700&family=Comfortaa:wght@400;700&family=Quicksand:wght@400;600&family=Mali:wght@400;600&family=Kaushan+Script&family=Pacifico&family=Dancing+Script:wght@400;700&family=Satisfy&display=swap"
+          rel="stylesheet"
+        />
+      </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >

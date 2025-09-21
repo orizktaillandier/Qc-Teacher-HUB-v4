@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Loader2, Sparkles, FileText, Download, Printer, Palette } from "lucide-react";
+import { Loader2, Sparkles, FileText, Download, Printer, Palette, Bold, Italic, Type } from "lucide-react";
 import { PFEQ_STRUCTURE, getNotionsForSubject, getSubNotionsForNotion } from '@/lib/pfeq-structure';
 import { FunIllustrations, GradientBackgrounds, PastelGradients } from '@/components/TaskCardThemes';
 import { parseQuestionWithVisuals } from '@/components/MathVisuals';
@@ -34,6 +34,70 @@ interface GeneratedCardsData {
 
 export default function CardsV2Page() {
   const [cardStyle, setCardStyle] = useState<'professional' | 'fun' | 'gradient'>('professional');
+
+  // Font customization states
+  const [fontSettings, setFontSettings] = useState({
+    fontFamily: 'system-ui',
+    fontSize: 14,
+    isBold: false,
+    isItalic: false
+  });
+
+  // Editable cards state - stores edited versions of cards
+  const [editedCards, setEditedCards] = useState<Record<number, CardData>>({});
+
+  // Available fonts organized by category
+  const fontCategories = [
+    {
+      name: '🎨 Polices Amusantes',
+      fonts: [
+        { value: '"Fredoka", sans-serif', label: 'Fredoka (Arrondi & Amical)' },
+        { value: '"Bubblegum Sans", cursive', label: 'Bubblegum Sans (Bulle de gomme)' },
+        { value: '"Baloo 2", cursive', label: 'Baloo (Joueur)' },
+        { value: '"Comfortaa", cursive', label: 'Comfortaa (Moderne & Doux)' },
+        { value: '"Quicksand", sans-serif', label: 'Quicksand (Léger & Fun)' },
+        { value: '"Mali", cursive', label: 'Mali (Mignon)' },
+        { value: '"Comic Sans MS", cursive', label: 'Comic Sans' },
+      ]
+    },
+    {
+      name: '✏️ Écriture Manuscrite',
+      fonts: [
+        { value: '"Kalam", cursive', label: 'Kalam (Crayon)' },
+        { value: '"Indie Flower", cursive', label: 'Indie Flower (Décontracté)' },
+        { value: '"Patrick Hand", cursive', label: 'Patrick Hand (Main écrite)' },
+        { value: '"Caveat", cursive', label: 'Caveat (Craie)' },
+        { value: '"Architects Daughter", cursive', label: 'Architects Daughter' },
+        { value: '"Schoolbell", cursive', label: 'Schoolbell (École)' },
+        { value: '"Gloria Hallelujah", cursive', label: 'Gloria Hallelujah' },
+        { value: '"Shadows Into Light", cursive', label: 'Shadows Into Light' },
+        { value: '"Permanent Marker", cursive', label: 'Permanent Marker (Marqueur)' },
+        { value: '"Amatic SC", cursive', label: 'Amatic SC (Tableau)' },
+      ]
+    },
+    {
+      name: '🌟 Polices Décoratives',
+      fonts: [
+        { value: '"Pacifico", cursive', label: 'Pacifico (Plage)' },
+        { value: '"Kaushan Script", cursive', label: 'Kaushan Script (Script)' },
+        { value: '"Dancing Script", cursive', label: 'Dancing Script (Danse)' },
+        { value: '"Satisfy", cursive', label: 'Satisfy (Élégant)' },
+      ]
+    },
+    {
+      name: '📚 Polices Classiques',
+      fonts: [
+        { value: 'Arial, sans-serif', label: 'Arial' },
+        { value: 'Georgia, serif', label: 'Georgia' },
+        { value: '"Times New Roman", serif', label: 'Times New Roman' },
+        { value: 'Verdana, sans-serif', label: 'Verdana' },
+        { value: 'system-ui', label: 'System Default' },
+      ]
+    }
+  ];
+
+  // Flatten fonts for easy access
+  const allFonts = fontCategories.flatMap(cat => cat.fonts);
   // Add print styles
   React.useEffect(() => {
     const style = document.createElement('style');
@@ -189,6 +253,23 @@ export default function CardsV2Page() {
       >
         {svgPattern}
 
+        {/* Card number in circle - at outer container level */}
+        <div
+          className="absolute w-10 h-10 rounded-full text-white font-bold text-lg shadow-md"
+          style={{
+            top: '10px',
+            right: '10px',
+            backgroundColor: theme.primary,
+            fontSize: '18px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 2
+          }}
+        >
+          {card.number}
+        </div>
+
         {/* White content area */}
         <div
           className="relative bg-white shadow-md"
@@ -197,63 +278,86 @@ export default function CardsV2Page() {
             width: '100%',
             height: '100%',
             border: `2px solid ${theme.primary}`,
-            display: 'grid',
-            gridTemplateRows: 'auto 1fr auto',
             padding: '15px',
             zIndex: 1,
-            gap: '8px'
+            boxSizing: 'border-box',
+            overflow: 'hidden'
           }}
         >
-          {/* Card number in circle */}
-          <div
-            className="absolute -top-2 -right-2 w-10 h-10 rounded-full flex items-center justify-center text-white font-bold text-lg shadow-md"
-            style={{
-              backgroundColor: theme.primary,
-              fontSize: '18px'
-            }}
-          >
-            {card.number}
-          </div>
 
-          {/* Header section - auto height */}
-          <div>
-            {card.title && (
-              <h3 className="text-base font-bold mb-1" style={{ color: theme.primary }}>
-                {card.title}
-              </h3>
-            )}
 
-          </div>
-
-          {/* Main content area - takes remaining space */}
-          <div className="h-full flex flex-col">
+          {/* Main content area */}
+          <div style={{ height: '100%', position: 'relative' }}>
             {(() => {
-              const { questionText, visuals } = parseQuestionWithVisuals(card.question);
+              // Use edited version if available, otherwise original
+              const currentCard = editedCards[card.number] || card;
+              const { questionText, visuals } = parseQuestionWithVisuals(currentCard.question);
 
               if (visuals.length > 0) {
                 return (
                   <>
                     {/* Question text area - compact when there are visuals */}
-                    <div className="text-sm leading-tight text-gray-800 mb-2">
+                    <div
+                      contentEditable
+                      suppressContentEditableWarning
+                      onBlur={(e) => {
+                        const newText = e.currentTarget.textContent || '';
+                        const visualsMatch = currentCard.question.match(/\[visual:.*?\]/g);
+                        const updatedQuestion = visualsMatch ? `${newText} ${visualsMatch.join(' ')}` : newText;
+                        const updatedCard = { ...currentCard, question: updatedQuestion };
+                        setEditedCards(prev => ({ ...prev, [card.number]: updatedCard }));
+                      }}
+                      className="text-sm leading-tight text-gray-800 outline-none focus:ring-2 focus:ring-blue-300 rounded px-1"
+                      style={{
+                        fontFamily: fontSettings.fontFamily,
+                        fontSize: `${fontSettings.fontSize}px`,
+                        fontWeight: fontSettings.isBold ? 'bold' : 'normal',
+                        fontStyle: fontSettings.isItalic ? 'italic' : 'normal'
+                      }}
+                    >
                       {questionText}
                     </div>
 
-                    {/* Visual area - dedicated space with proper aspect ratio */}
-                    <div className="flex-grow flex justify-center items-center"
-                         style={{
-                           minHeight: '150px',
-                           maxHeight: '250px',
-                           width: '100%',
-                           padding: '10px'
-                         }}>
-                      {visuals}
+                    {/* Visual area - fills remaining height */}
+                    <div style={{
+                      position: 'absolute',
+                      top: '50px',  // Below question text with some spacing
+                      left: 0,
+                      right: 0,
+                      bottom: 0,
+                      padding: '10px'
+                    }}>
+                      <div style={{
+                        width: '100%',
+                        height: '100%',
+                        maxWidth: '250px',
+                        margin: '0 auto',
+                        position: 'relative'
+                      }}>
+                        {visuals}
+                      </div>
                     </div>
                   </>
                 );
               } else {
                 // No visuals - text can use all space
                 return (
-                  <div className="text-sm leading-snug text-gray-800">
+                  <div
+                    contentEditable
+                    suppressContentEditableWarning
+                    onBlur={(e) => {
+                      const newText = e.currentTarget.textContent || '';
+                      const updatedCard = { ...currentCard, question: newText };
+                      setEditedCards(prev => ({ ...prev, [card.number]: updatedCard }));
+                    }}
+                    className="text-sm leading-snug text-gray-800 outline-none focus:ring-2 focus:ring-blue-300 rounded px-1"
+                    style={{
+                      fontFamily: fontSettings.fontFamily,
+                      fontSize: `${fontSettings.fontSize}px`,
+                      fontWeight: fontSettings.isBold ? 'bold' : 'normal',
+                      fontStyle: fontSettings.isItalic ? 'italic' : 'normal'
+                    }}
+                  >
                     {questionText}
                   </div>
                 );
@@ -275,12 +379,14 @@ export default function CardsV2Page() {
     return (
       <div
         key={index}
-        className="relative p-3"
+        className="relative"
         style={{
           background: gradient,
           height: '100%',
           boxSizing: 'border-box',
-          borderRadius: '8px'
+          borderRadius: '8px',
+          padding: '8px',
+          overflow: 'hidden'
         }}
       >
         {/* Fun illustration */}
@@ -291,12 +397,14 @@ export default function CardsV2Page() {
           className="relative bg-white shadow-lg"
           style={{
             borderRadius: '20px',
-            width: '100%',
-            height: '100%',
-            display: 'flex',
-            flexDirection: 'column',
-            padding: '20px',
-            border: '2px dashed rgba(0,0,0,0.1)'
+            width: 'calc(100% - 16px)',
+            height: 'calc(100% - 16px)',
+            padding: '15px',
+            border: '2px dashed rgba(0,0,0,0.1)',
+            position: 'relative',
+            margin: '8px',
+            boxSizing: 'border-box',
+            overflow: 'hidden'
           }}
         >
           {/* Large card number */}
@@ -305,50 +413,59 @@ export default function CardsV2Page() {
           </div>
 
           {/* Content with consistent layout */}
-          <div className="flex flex-col h-full pt-8">
-            {/* Header section */}
-            <div>
-              {card.title && (
-                <h3 className="text-lg font-bold mb-2 text-gray-800">
-                  {card.title}
-                </h3>
-              )}
-
-              {card.context && (
-                <p className="text-xs mb-2 text-gray-600">
-                  {card.context}
-                </p>
-              )}
-            </div>
-
-            {/* Question and visual section - takes remaining space */}
-            <div className="flex-grow flex flex-col">
-              {(() => {
-                const { questionText, visuals } = parseQuestionWithVisuals(card.question);
+          <div style={{ paddingTop: '30px', height: 'calc(100% - 30px)', position: 'relative' }}>
+            {(() => {
+                // Use edited version if available, otherwise original
+                const currentCard = editedCards[card.number] || card;
+                const { questionText, visuals } = parseQuestionWithVisuals(currentCard.question);
                 return (
                   <>
                     {/* Question text */}
-                    <div className="text-sm leading-snug text-gray-700 mb-2">
+                    <div
+                      contentEditable
+                      suppressContentEditableWarning
+                      onBlur={(e) => {
+                        const newText = e.currentTarget.textContent || '';
+                        const visualsMatch = currentCard.question.match(/\[visual:.*?\]/g);
+                        const updatedQuestion = visualsMatch ? `${newText} ${visualsMatch.join(' ')}` : newText;
+                        const updatedCard = { ...currentCard, question: updatedQuestion };
+                        setEditedCards(prev => ({ ...prev, [card.number]: updatedCard }));
+                      }}
+                      className="text-sm leading-snug text-gray-700 outline-none focus:ring-2 focus:ring-blue-300 rounded px-1"
+                      style={{
+                        fontFamily: fontSettings.fontFamily,
+                        fontSize: `${fontSettings.fontSize}px`,
+                        fontWeight: fontSettings.isBold ? 'bold' : 'normal',
+                        fontStyle: fontSettings.isItalic ? 'italic' : 'normal'
+                      }}
+                    >
                       {questionText}
                     </div>
 
-                    {/* Visual area - dedicated space with proper sizing */}
+                    {/* Visual area - fills remaining height */}
                     {visuals.length > 0 && (
-                      <div className="flex-grow flex justify-center items-center"
-                           style={{
-                             minHeight: '140px',
-                             maxHeight: '220px',
-                             width: '100%',
-                             padding: '8px'
-                           }}>
-                        {visuals}
+                      <div style={{
+                        position: 'absolute',
+                        top: '50px',  // Below question text with some spacing
+                        left: 0,
+                        right: 0,
+                        bottom: 0,
+                        padding: '10px'
+                      }}>
+                        <div style={{
+                          width: '100%',
+                          height: '100%',
+                          maxWidth: '220px',
+                          margin: '0 auto',
+                          position: 'relative'
+                        }}>
+                          {visuals}
+                        </div>
                       </div>
                     )}
                   </>
                 );
-              })()}
-            </div>
-
+            })()}
           </div>
         </div>
       </div>
@@ -647,6 +764,82 @@ export default function CardsV2Page() {
         {/* Generated Cards Display */}
         {generatedCards && (
           <div className="space-y-8">
+            {/* Font Customization Controls */}
+            <Card className="no-print">
+              <CardHeader>
+                <CardTitle>Personnalisation de la police</CardTitle>
+                <CardDescription>
+                  Modifiez l'apparence du texte de vos cartes
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="flex flex-wrap gap-4 items-center">
+                  <div className="flex items-center gap-2">
+                    <Type className="h-4 w-4" />
+                    <Select
+                      value={fontSettings.fontFamily}
+                      onValueChange={(value) => setFontSettings(prev => ({ ...prev, fontFamily: value }))}
+                    >
+                      <SelectTrigger className="w-64">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent className="max-h-96 overflow-y-auto">
+                        {fontCategories.map(category => (
+                          <div key={category.name}>
+                            <div className="px-2 py-1.5 text-xs font-semibold text-gray-600 bg-gray-100 sticky top-0">
+                              {category.name}
+                            </div>
+                            {category.fonts.map(font => (
+                              <SelectItem key={font.value} value={font.value}>
+                                <span style={{ fontFamily: font.value, fontSize: '16px' }}>
+                                  {font.label}
+                                </span>
+                              </SelectItem>
+                            ))}
+                          </div>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    <Label htmlFor="fontSize">Taille:</Label>
+                    <input
+                      id="fontSize"
+                      type="range"
+                      min="10"
+                      max="24"
+                      value={fontSettings.fontSize}
+                      onChange={(e) => setFontSettings(prev => ({ ...prev, fontSize: parseInt(e.target.value) }))}
+                      className="w-24"
+                    />
+                    <span className="w-12 text-sm">{fontSettings.fontSize}px</span>
+                  </div>
+
+                  <div className="flex gap-2">
+                    <Button
+                      variant={fontSettings.isBold ? "default" : "outline"}
+                      size="sm"
+                      onClick={() => setFontSettings(prev => ({ ...prev, isBold: !prev.isBold }))}
+                    >
+                      <Bold className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      variant={fontSettings.isItalic ? "default" : "outline"}
+                      size="sm"
+                      onClick={() => setFontSettings(prev => ({ ...prev, isItalic: !prev.isItalic }))}
+                    >
+                      <Italic className="h-4 w-4" />
+                    </Button>
+                  </div>
+
+                  <div className="flex items-center gap-2 text-sm text-gray-600">
+                    <span>💡 Cliquez sur le texte des cartes pour l'éditer directement</span>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
             <div className="flex justify-between items-center no-print">
               <h2 className="text-2xl font-bold">Cartes générées</h2>
               <div className="flex gap-2">

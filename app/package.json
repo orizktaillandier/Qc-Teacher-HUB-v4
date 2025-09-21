@@ -1,7 +1,10 @@
 {
-  "name": "app",
-  "version": "0.1.0",
+  "name": "quebec-teacher-hub-v4",
+  "version": "1.0.0",
+  "description": "Advanced educational task card generation system for Quebec teachers with PFEQ alignment",
   "private": true,
+  "author": "Quebec Teacher Hub",
+  "keywords": ["education", "quebec", "PFEQ", "task cards", "teaching", "AI"],
   "scripts": {
     "dev": "next dev --turbopack",
     "build": "next build --turbopack",
