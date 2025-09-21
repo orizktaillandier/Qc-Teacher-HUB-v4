@@ -113,4 +113,4 @@ ehthumbs.db
 Thumbs.db
 
 # Quebec Teacher Hub v4 specific
-app/package-lock.json
+app/package-lock.json*.zip
