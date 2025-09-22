@@ -38,26 +38,54 @@ export default function CardsV2Page() {
   // Font customization states
   const [fontSettings, setFontSettings] = useState({
     fontFamily: 'system-ui',
-    fontSize: 14,
+    fontSize: 21,
     isBold: false,
     isItalic: false
   });
 
+  // Illustration size state (percentage)
+  const [illustrationScale, setIllustrationScale] = useState(100);
+
   // Editable cards state - stores edited versions of cards
   const [editedCards, setEditedCards] = useState<Record<number, CardData>>({});
 
-  // Available fonts organized by category
+  // Available fonts organized by category - EXPANDED WITH MORE FUN OPTIONS!
   const fontCategories = [
     {
-      name: '🎨 Polices Amusantes',
+      name: '🎨 Polices Super Amusantes',
       fonts: [
         { value: '"Fredoka", sans-serif', label: 'Fredoka (Arrondi & Amical)' },
         { value: '"Bubblegum Sans", cursive', label: 'Bubblegum Sans (Bulle de gomme)' },
         { value: '"Baloo 2", cursive', label: 'Baloo (Joueur)' },
+        { value: '"Chewy", cursive', label: 'Chewy (Bonbon)' },
+        { value: '"Luckiest Guy", cursive', label: 'Luckiest Guy (BD)' },
+        { value: '"Boogaloo", cursive', label: 'Boogaloo (Groovy)' },
+        { value: '"Modak", cursive', label: 'Modak (Épais & Fun)' },
+        { value: '"Titan One", cursive', label: 'Titan One (Héros)' },
+        { value: '"Shrikhand", cursive', label: 'Shrikhand (Bollywood)' },
         { value: '"Comfortaa", cursive', label: 'Comfortaa (Moderne & Doux)' },
         { value: '"Quicksand", sans-serif', label: 'Quicksand (Léger & Fun)' },
         { value: '"Mali", cursive', label: 'Mali (Mignon)' },
+        { value: '"Sniglet", cursive', label: 'Sniglet (Arrondi)' },
+        { value: '"Cherry Cream Soda", cursive', label: 'Cherry Cream Soda' },
         { value: '"Comic Sans MS", cursive', label: 'Comic Sans' },
+      ]
+    },
+    {
+      name: '🦄 Polices Fantaisie',
+      fonts: [
+        { value: '"Creepster", cursive', label: 'Creepster (Halloween)' },
+        { value: '"Griffy", cursive', label: 'Griffy (Conte de fées)' },
+        { value: '"Mystery Quest", cursive', label: 'Mystery Quest (Mystère)' },
+        { value: '"Rye", cursive', label: 'Rye (Western)' },
+        { value: '"Pirata One", cursive', label: 'Pirata One (Pirate)' },
+        { value: '"Bungee", cursive', label: 'Bungee (Urbain)' },
+        { value: '"Bungee Shade", cursive', label: 'Bungee Shade (3D)' },
+        { value: '"Rubik Mono One", sans-serif', label: 'Rubik Mono (Pixels)' },
+        { value: '"Press Start 2P", cursive', label: 'Press Start (Jeu vidéo)' },
+        { value: '"Bangers", cursive', label: 'Bangers (Comics)' },
+        { value: '"Freckle Face", cursive', label: 'Freckle Face (Taches de rousseur)' },
+        { value: '"Lakki Reddy", cursive', label: 'Lakki Reddy (Indien)' },
       ]
     },
     {
@@ -73,6 +101,26 @@ export default function CardsV2Page() {
         { value: '"Shadows Into Light", cursive', label: 'Shadows Into Light' },
         { value: '"Permanent Marker", cursive', label: 'Permanent Marker (Marqueur)' },
         { value: '"Amatic SC", cursive', label: 'Amatic SC (Tableau)' },
+        { value: '"Gochi Hand", cursive', label: 'Gochi Hand (Manga)' },
+        { value: '"Rock Salt", cursive', label: 'Rock Salt (Sel gemme)' },
+        { value: '"Reenie Beanie", cursive', label: 'Reenie Beanie (Stylo)' },
+        { value: '"Covered By Your Grace", cursive', label: 'Covered By Your Grace' },
+        { value: '"Just Me Again Down Here", cursive', label: 'Just Me Again (Cahier)' },
+      ]
+    },
+    {
+      name: '🎭 Polices Rigolotes',
+      fonts: [
+        { value: '"Bowlby One", cursive', label: 'Bowlby One (Ballon)' },
+        { value: '"Sigmar One", cursive', label: 'Sigmar One (Grosse)' },
+        { value: '"Coiny", cursive', label: 'Coiny (Pièce de monnaie)' },
+        { value: '"Chango", cursive', label: 'Chango (Mexicain)' },
+        { value: '"Lemon", cursive', label: 'Lemon (Citron)' },
+        { value: '"Chicle", cursive', label: 'Chicle (Gomme)' },
+        { value: '"Ribeye", cursive', label: 'Ribeye (Steak)' },
+        { value: '"Wendy One", sans-serif', label: 'Wendy One' },
+        { value: '"Flavors", cursive', label: 'Flavors (Saveurs)' },
+        { value: '"Emilys Candy", cursive', label: 'Emilys Candy (Bonbons)' },
       ]
     },
     {
@@ -82,6 +130,10 @@ export default function CardsV2Page() {
         { value: '"Kaushan Script", cursive', label: 'Kaushan Script (Script)' },
         { value: '"Dancing Script", cursive', label: 'Dancing Script (Danse)' },
         { value: '"Satisfy", cursive', label: 'Satisfy (Élégant)' },
+        { value: '"Lobster", cursive', label: 'Lobster (Homard)' },
+        { value: '"Righteous", cursive', label: 'Righteous (Justice)' },
+        { value: '"Acme", sans-serif', label: 'Acme (Cartoon)' },
+        { value: '"Alfaslab One", cursive', label: 'Alfa Slab (Épais)' },
       ]
     },
     {
@@ -408,12 +460,12 @@ export default function CardsV2Page() {
           }}
         >
           {/* Large card number */}
-          <div className="absolute -top-3 -left-3 text-6xl font-black opacity-20">
+          <div className="absolute -top-2 -right-2 text-5xl font-black opacity-20">
             {card.number}
           </div>
 
           {/* Content with consistent layout */}
-          <div style={{ paddingTop: '30px', height: 'calc(100% - 30px)', position: 'relative' }}>
+          <div style={{ paddingTop: '10px', paddingRight: '35px', height: 'calc(100% - 10px)', position: 'relative' }}>
             {(() => {
                 // Use edited version if available, otherwise original
                 const currentCard = editedCards[card.number] || card;
@@ -431,7 +483,7 @@ export default function CardsV2Page() {
                         const updatedCard = { ...currentCard, question: updatedQuestion };
                         setEditedCards(prev => ({ ...prev, [card.number]: updatedCard }));
                       }}
-                      className="text-sm leading-snug text-gray-700 outline-none focus:ring-2 focus:ring-blue-300 rounded px-1"
+                      className="text-sm leading-snug text-gray-700 outline-none focus:ring-2 focus:ring-blue-300 rounded px-1 block"
                       style={{
                         fontFamily: fontSettings.fontFamily,
                         fontSize: `${fontSettings.fontSize}px`,
@@ -457,7 +509,9 @@ export default function CardsV2Page() {
                           height: '100%',
                           maxWidth: '220px',
                           margin: '0 auto',
-                          position: 'relative'
+                          position: 'relative',
+                          transform: `scale(${illustrationScale / 100})`,
+                          transformOrigin: 'center center'
                         }}>
                           {visuals}
                         </div>
@@ -831,6 +885,20 @@ export default function CardsV2Page() {
                     >
                       <Italic className="h-4 w-4" />
                     </Button>
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    <Label htmlFor="illustrationSize" className="text-sm">📐 Illustrations:</Label>
+                    <input
+                      id="illustrationSize"
+                      type="range"
+                      min="50"
+                      max="150"
+                      value={illustrationScale}
+                      onChange={(e) => setIllustrationScale(parseInt(e.target.value))}
+                      className="w-24"
+                    />
+                    <span className="w-12 text-sm">{illustrationScale}%</span>
                   </div>
 
                   <div className="flex items-center gap-2 text-sm text-gray-600">

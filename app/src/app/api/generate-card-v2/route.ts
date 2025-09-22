@@ -28,11 +28,21 @@ export async function POST(request: Request) {
     // 1. Retrieve relevant knowledge from our PFEQ database
     console.log('🔍 Retrieving knowledge...');
     const knowledgeRetriever = new KnowledgeRetriever();
+
+    // Map frontend subject keys to database keys
+    const subjectKeyMapping: Record<string, string> = {
+      'mathematiques': 'mathematique',  // Database uses singular form
+      'francais-langue-enseignement': 'francais-langue-enseignement',
+      'science-et-technologie': 'science-et-technologie'
+    };
+
+    const dbSubjectKey = subjectKeyMapping[subject] || subject;
+
     const knowledge = knowledgeRetriever.retrieveKnowledge({
-      subjectKey: subject,
+      subjectKey: dbSubjectKey,
       notionKey: notion,
       cycleKeys: [cycle],
-      maxTokens: 4000
+      maxTokens: 8000  // Increased from 4000 to get more comprehensive knowledge
     });
 
     console.log('📚 Knowledge retrieved:', {
@@ -75,13 +85,13 @@ IMPORTANT: Retourne UNIQUEMENT un objet JSON valide, sans texte avant ou après.
               content: buildStructuredPrompt(knowledge, body, knowledgeContext)
             }
           ],
-          max_completion_tokens: 8000, // Increased for better generation
-          temperature: 0.8, // Add creativity
+          max_completion_tokens: 8000, // GPT-5 uses max_completion_tokens
+          // Temperature omitted - GPT-5 enforces default value of 1.0
           response_format: { type: "json_object" } // Force JSON output
         });
       } catch (primaryError) {
         console.log('⚠️ Primary model failed, trying fallback...');
-        modelUsed = 'gpt-4o';
+        modelUsed = 'gpt-5-mini';
 
         completion = await openai.chat.completions.create({
           model: modelUsed,
@@ -97,8 +107,8 @@ IMPORTANT: Retourne UNIQUEMENT un objet JSON valide, sans texte avant ou après.
               content: buildStructuredPrompt(knowledge, body, knowledgeContext)
             }
           ],
-          max_tokens: 4000, // GPT-4o uses max_tokens
-          temperature: 0.8,
+          max_completion_tokens: 4000, // GPT-5-mini uses max_completion_tokens
+          // Temperature omitted - GPT-5-mini enforces default value of 1.0
           response_format: { type: "json_object" }
         });
       }
@@ -165,36 +175,117 @@ IMPORTANT: Retourne UNIQUEMENT un objet JSON valide, sans texte avant ou après.
 
 
 function buildStructuredPrompt(knowledge: any, request: CardRequest, knowledgeContext: string): string {
-  // Map notion to proper PFEQ terminology
+  // Comprehensive PFEQ notion mapping - ALL subjects and notions
   const notionMapping: Record<string, string> = {
-    // Mathematics sub-notions
+    // === MATHÉMATIQUES - Arithmétique ===
     'nombres-naturels': 'Nombres naturels (lecture, écriture, comparaison, valeur de position)',
+    'nombres-entiers': 'Nombres entiers (positifs et négatifs)',
     'fractions': 'Fractions (équivalentes, comparaison, addition/soustraction)',
     'nombres-decimaux': 'Nombres décimaux (lecture, écriture, comparaison)',
+    'pourcentages': 'Pourcentages (calcul, application)',
+
+    // === MATHÉMATIQUES - Opérations ===
     'addition-soustraction': 'Addition et soustraction',
     'multiplication-division': 'Multiplication et division',
-    'figures-planes': 'Figures planes (polygones, angles, symétrie)',
+    'calcul-mental': 'Calcul mental et stratégies',
+    'estimation': 'Estimation et arrondissement',
+    'priorite-operations': 'Priorité des opérations',
+
+    // === MATHÉMATIQUES - Géométrie ===
+    'figures-planes': 'Figures planes (polygones, cercle, propriétés)',
     'solides': 'Solides (polyèdres, développement)',
+    'angles': 'Angles (types, mesure, construction)',
+    'symetrie': 'Symétrie et réflexion',
+    'transformation': 'Transformations géométriques (rotation, translation)',
+    'reperage-espace': 'Repérage dans l\'espace et plan cartésien',
+
+    // === MATHÉMATIQUES - Mesure ===
+    'longueur': 'Longueur et unités de mesure',
     'perimetre': 'Périmètre de figures planes',
-    'aire': 'Aire de figures planes (rectangle, triangle)',
+    'aire': 'Aire de figures planes (rectangle, triangle, cercle)',
     'volume': 'Volume de solides',
+    'masse': 'Masse et unités',
+    'temps': 'Temps (lecture, calcul de durée)',
+    'temperature': 'Température',
+    'angles-mesure': 'Mesure d\'angles en degrés',
 
-    // French sub-notions
-    'strategies-lecture': 'Stratégies de lecture (prédiction, inférence)',
+    // === MATHÉMATIQUES - Statistique ===
+    'collecte-donnees': 'Collecte et organisation de données',
+    'tableaux': 'Tableaux de données',
+    'diagrammes': 'Diagrammes (bandes, pictogrammes, circulaires)',
+    'moyenne': 'Moyenne arithmétique',
+    'mode': 'Mode statistique',
+
+    // === MATHÉMATIQUES - Probabilité ===
+    'evenements': 'Événements possibles et impossibles',
+    'prediction': 'Prédiction et probabilité',
+    'equiprobable': 'Événements équiprobables',
+
+    // === FRANÇAIS - Lecture ===
+    'strategies-lecture': 'Stratégies de lecture (prédiction, inférence, visualisation)',
     'comprehension': 'Compréhension de texte',
-    'classes-mots': 'Classes de mots (nom, verbe, adjectif, déterminant)',
-    'groupe-nom': 'Groupe du nom et ses accords',
-    'present': 'Conjugaison au présent de l\'indicatif',
-    'imparfait': 'Conjugaison à l\'imparfait',
-    'accord-gn': 'Accord dans le groupe du nom',
-    'accord-sujet-verbe': 'Accord sujet-verbe',
+    'inference': 'Inférence et déduction',
+    'texte-narratif': 'Texte narratif (récit, conte)',
+    'texte-descriptif': 'Texte descriptif',
+    'texte-informatif': 'Texte informatif et explicatif',
 
-    // Science sub-notions
+    // === FRANÇAIS - Écriture ===
+    'planification': 'Planification du texte',
+    'redaction': 'Rédaction et mise en texte',
+    'revision': 'Révision et correction',
+    'schema-narratif': 'Schéma narratif (situation initiale, péripéties, dénouement)',
+    'paragraphe': 'Structure du paragraphe',
+
+    // === FRANÇAIS - Grammaire ===
+    'classes-mots': 'Classes de mots (nom, verbe, adjectif, déterminant, pronom)',
+    'groupe-nom': 'Groupe du nom et ses expansions',
+    'groupe-verbe': 'Groupe du verbe',
+    'fonctions': 'Fonctions syntaxiques (sujet, prédicat, complément)',
+    'phrase-types': 'Types et formes de phrases',
+
+    // === FRANÇAIS - Conjugaison ===
+    'present': 'Présent de l\'indicatif',
+    'imparfait': 'Imparfait de l\'indicatif',
+    'passe-compose': 'Passé composé',
+    'futur-simple': 'Futur simple',
+    'conditionnel': 'Conditionnel présent',
+    'imperatif': 'Impératif présent',
+    'participe': 'Participe passé et présent',
+
+    // === FRANÇAIS - Accords ===
+    'accord-gn': 'Accord dans le groupe du nom',
+    'accord-sujet-verbe': 'Accord du verbe avec le sujet',
+    'participe-passe-etre': 'Accord du participe passé avec être',
+    'participe-passe-avoir': 'Accord du participe passé avec avoir',
+
+    // === FRANÇAIS - Orthographe ===
+    'mots-frequents': 'Mots fréquents et vocabulaire',
+    'homophones': 'Homophones grammaticaux',
+    'accents': 'Accents et signes orthographiques',
+    'familles-mots': 'Familles de mots et formation',
+
+    // === SCIENCE - Univers matériel ===
     'etats-matiere': 'États de la matière (solide, liquide, gaz)',
+    'changements-etat': 'Changements d\'état (fusion, évaporation, solidification)',
+    'melanges-solutions': 'Mélanges et solutions',
+    'forces-mouvements': 'Forces et mouvements',
+    'energie': 'Formes d\'énergie et transformations',
+
+    // === SCIENCE - Univers vivant ===
+    'besoins-essentiels': 'Besoins essentiels des êtres vivants',
     'cycle-vie': 'Cycle de vie des êtres vivants',
-    'chaine-alimentaire': 'Chaîne alimentaire',
-    'systeme-solaire': 'Système solaire',
+    'chaine-alimentaire': 'Chaîne alimentaire et réseau trophique',
+    'habitat': 'Habitat et écosystème',
+    'adaptation': 'Adaptation des êtres vivants',
+    'systemes-corps': 'Systèmes du corps humain',
+
+    // === SCIENCE - Terre et espace ===
+    'systeme-solaire': 'Système solaire et planètes',
+    'rotation-revolution': 'Rotation et révolution de la Terre',
+    'saisons': 'Saisons et inclinaison terrestre',
     'cycle-eau': 'Cycle de l\'eau',
+    'phenomenes-meteo': 'Phénomènes météorologiques',
+    'phases-lune': 'Phases de la Lune',
 
     // Fallback to original notion name
   };
@@ -213,10 +304,21 @@ function buildStructuredPrompt(knowledge: any, request: CardRequest, knowledgeCo
 
 IMPORTANT: Les questions doivent être SIMPLES et DIRECTES, sans contexte. Aller droit au but avec des questions pédagogiques claires.
 
+RÈGLES DE GRAMMAIRE FRANÇAISE OBLIGATOIRES:
+- TOUJOURS utiliser une grammaire française complète et correcte
+- Pour les questions "Combien", utilise "Combien y a-t-il de..." au lieu de "Combien de..."
+- Pour les angles inconnus, TOUJOURS utiliser "?" et JAMAIS "x"
+- Exemples corrects:
+  ✓ "Combien y a-t-il d'angles droits dans un carré?"
+  ✓ "Quelle est la mesure de l'angle marqué par ??"
+  ✓ "Quel est le périmètre de cette figure?"
+  ✗ "Combien d'angles dans un triangle?" (incorrect)
+  ✗ "Trouve l'angle x" (incorrect - utilise ? pas x)
+
 INSTRUCTIONS POUR LES VISUELS:
 Pour les questions de mathématiques ou sciences nécessitant des visuels, utilise ces codes:
 - [visual:angle:degrés:taille] pour un angle (ex: [visual:angle:45:100])
-- [visual:triangle:angleA:angleB:angleC] pour un triangle avec angles (ex: [visual:triangle:50:60:70] ou [visual:triangle:50:60:x] pour angle manquant)
+- [visual:triangle:angleA:angleB:angleC] pour un triangle avec angles (ex: [visual:triangle:50:60:70] ou [visual:triangle:50:60:?] pour angle manquant)
 - [visual:triangle-sides:a:b:c:type] pour un triangle avec côtés (ex: [visual:triangle-sides:3:4:5:right])
 - [visual:fraction:numérateur:dénominateur:parties_colorées] (ex: [visual:fraction:3:4:3])
 - [visual:numberline:min:max:points] (ex: [visual:numberline:0:10:3,5,7])
@@ -225,12 +327,14 @@ Pour les questions de mathématiques ou sciences nécessitant des visuels, utili
 - [visual:shape:type:taille] pour une forme (ex: [visual:shape:hexagon:100])
 - [visual:graph:valeurs] pour un graphique (ex: [visual:graph:2,4,3,5])
 
-Exemples de questions SIMPLES et DIRECTES:
+Exemples de questions SIMPLES et DIRECTES avec GRAMMAIRE CORRECTE:
 - "Calcule: 45 + 27 = ?"
-- "Quel est l'angle manquant? [visual:triangle:50:60:x]"
+- "Quelle est la mesure de l'angle manquant? [visual:triangle:50:60:?]"
 - "Quelle fraction est représentée? [visual:fraction:2:3:2]"
 - "Conjugue le verbe 'finir' au présent, 3e personne du singulier."
-- "Identifie l'état de la matière: la vapeur d'eau."
+- "Quel est l'état de la matière de la vapeur d'eau?"
+- "Combien y a-t-il de côtés dans un hexagone?"
+- "Trouve la mesure de l'angle marqué par ? [visual:triangle:40:70:?]"
 
 Retourne un JSON avec exactement 8 cartes. Voici le format EXACT à suivre:
 
@@ -252,13 +356,16 @@ Note: Génère 8 cartes au total (numéros 1 à 8) avec le même format
 RÈGLES STRICTES:
 - 8 cartes EXACTEMENT, numérotées de 1 à 8
 - TOUTES les questions doivent être SIMPLES et DIRECTES
+- GRAMMAIRE FRANÇAISE IMPECCABLE (utilise "y a-t-il", "quel est", "quelle est")
+- TOUJOURS utiliser ? pour les angles inconnus, JAMAIS x
+- LIMITER les visuels à 25% des cartes (2-3 cartes sur 8 maximum)
 - PAS de contexte, PAS de mise en situation
 - Questions pédagogiques claires, droit au but
 - Difficultés progressives: 2 easy, 3 medium, 3 hard
 - Questions alignées PFEQ pour ${request.grade}e année
-- Pour les triangles avec angles, utilise [visual:triangle:angle1:angle2:angle3]
+- Pour les triangles avec angles, utilise [visual:triangle:angle1:angle2:angle3] avec ? pour l'inconnu
 - Pour les triangles avec côtés, utilise [visual:triangle-sides:côté1:côté2:côté3:type]
 - Réponses claires et concises
 
-${knowledgeContext ? `CONTENU PFEQ PERTINENT:\n${knowledgeContext.substring(0, 2000)}` : ''}`;
+${knowledgeContext ? `CONTENU PFEQ PERTINENT:\n${knowledgeContext}` : ''}`;
 }
