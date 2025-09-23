@@ -43,9 +43,12 @@ quebec-teacher-hub-v4/
 │   │   ├── components/        # React components
 │   │   │   ├── MathVisuals.tsx      # Mathematical visualizations
 │   │   │   ├── TaskCardThemes.tsx   # Card theming
+│   │   │   ├── CardIllustration.tsx # Kawaii character illustrations
+│   │   │   ├── DraggableIllustration.tsx # Draggable/resizable wrapper
 │   │   │   └── ui/                  # UI components
 │   │   └── lib/              # Core libraries
-│   │       └── knowledge-retrieval.ts # PFEQ knowledge system
+│   │       ├── knowledge-retrieval.ts # PFEQ knowledge system
+│   │       └── illustration-service.ts # Character theme management
 │   └── data/
 │       └── kb_index.sqlite    # Knowledge base (1.7MB)
 ├── PROJECT_ROADMAP.md         # Comprehensive documentation
@@ -83,6 +86,18 @@ Visual components that render inline with questions:
 - **Text Styling**: Bold and italic toggles
 - **Inline Editing**: Click any text to edit directly
 - **Theme Selection**: Multiple gradient backgrounds
+
+#### Interactive Illustrations 🎨 NEW!
+- **Kawaii Characters**: Fun, educational illustrations using React Kawaii library
+- **Character Themes**: 13 different character styles (Cat, Ghost, Planet, Ice Cream, etc.)
+- **Consistent Themes**: Option to use the same character across all cards
+- **Interactive Controls**:
+  - Drag & drop illustrations anywhere on the card
+  - Resize illustrations with visual handles
+  - Rotate illustrations to any angle
+  - Scale illustrations from 50% to 200%
+- **Transparent Background**: Option to remove colored background behind characters
+- **Smart Positioning**: Illustrations adapt to card layout without overlapping text
 
 #### Knowledge Base Integration
 - **346 Curriculum Chunks**: From Quebec PFEQ
@@ -145,6 +160,17 @@ npm run typecheck    # TypeScript type checking
 # Testing
 npm test            # Run tests (when configured)
 ```
+
+## 📝 Recent Updates
+
+### December 2024 - Interactive Illustrations Release
+- ✨ Added React Kawaii character illustrations to task cards
+- 🎨 13 different character themes (Cat, Ghost, Planet, Ice Cream, etc.)
+- 🔄 Consistent character theme option across all cards
+- 🖱️ Drag & drop illustrations with resize and rotate capabilities
+- 🎯 Transparent background option for cleaner designs
+- 🐛 Fixed illustration randomization on slider adjustments
+- ⚡ Improved Turbopack compatibility by removing styled-jsx
 
 ## 🎯 Next Steps
 

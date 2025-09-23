@@ -79,9 +79,7 @@ export async function POST(request: Request) {
             content: buildCardPrompt(knowledge, body, varietySeed, knowledgeContext)
           }
         ],
-        max_completion_tokens: 8000, // High limit for testing capabilities
-        // temperature: 0.8, // GPT-5 only supports default temperature of 1
-        // response_format: { type: "json_object" } // Removed to reduce reasoning tokens
+        max_completion_tokens: 8000 // GPT-5 enforces default temperature = 1.0, no sampling controls needed
       });
 
       console.log('✅ GPT-5 response received, tokens used:', completion.usage?.total_tokens);

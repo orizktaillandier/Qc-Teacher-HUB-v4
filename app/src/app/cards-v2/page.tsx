@@ -10,6 +10,8 @@ import { Loader2, Sparkles, FileText, Download, Printer, Palette, Bold, Italic, 
 import { PFEQ_STRUCTURE, getNotionsForSubject, getSubNotionsForNotion } from '@/lib/pfeq-structure';
 import { FunIllustrations, GradientBackgrounds, PastelGradients } from '@/components/TaskCardThemes';
 import { parseQuestionWithVisuals } from '@/components/MathVisuals';
+import { CardIllustration } from '@/components/CardIllustration';
+import { IllustrationService, type CharacterTheme } from '@/lib/illustration-service';
 
 interface CardData {
   number: number;
@@ -46,8 +48,42 @@ export default function CardsV2Page() {
   // Illustration size state (percentage)
   const [illustrationScale, setIllustrationScale] = useState(100);
 
+  // Show/hide illustrations state
+  const [showIllustrations, setShowIllustrations] = useState(true);
+
+  // Draggable illustrations state
+  const [isDraggableIllustrations, setIsDraggableIllustrations] = useState(false);
+  const [transparentBackground, setTransparentBackground] = useState(false);
+  const [characterTheme, setCharacterTheme] = useState<CharacterTheme>('random');
+
+  // Illustration transforms per card (cardIndex -> transform)
+  const [illustrationTransforms, setIllustrationTransforms] = useState<Record<number, {
+    x: number;
+    y: number;
+    scale: number;
+    rotation: number;
+  }>>({});
+
   // Editable cards state - stores edited versions of cards
   const [editedCards, setEditedCards] = useState<Record<number, CardData>>({});
+
+  // Helper function to handle illustration transform changes
+  const handleIllustrationTransformChange = (cardIndex: number, transform: {
+    x: number;
+    y: number;
+    scale: number;
+    rotation: number;
+  }) => {
+    setIllustrationTransforms(prev => ({
+      ...prev,
+      [cardIndex]: transform
+    }));
+  };
+
+  // Helper function to reset illustration transforms
+  const resetIllustrationTransforms = () => {
+    setIllustrationTransforms({});
+  };
 
   // Available fonts organized by category - EXPANDED WITH MORE FUN OPTIONS!
   const fontCategories = [
@@ -333,7 +369,7 @@ export default function CardsV2Page() {
             padding: '15px',
             zIndex: 1,
             boxSizing: 'border-box',
-            overflow: 'hidden'
+            overflow: isDraggableIllustrations ? 'visible' : 'hidden'
           }}
         >
 
@@ -394,24 +430,46 @@ export default function CardsV2Page() {
               } else {
                 // No visuals - text can use all space
                 return (
-                  <div
-                    contentEditable
-                    suppressContentEditableWarning
-                    onBlur={(e) => {
-                      const newText = e.currentTarget.textContent || '';
-                      const updatedCard = { ...currentCard, question: newText };
-                      setEditedCards(prev => ({ ...prev, [card.number]: updatedCard }));
-                    }}
-                    className="text-sm leading-snug text-gray-800 outline-none focus:ring-2 focus:ring-blue-300 rounded px-1"
-                    style={{
-                      fontFamily: fontSettings.fontFamily,
-                      fontSize: `${fontSettings.fontSize}px`,
-                      fontWeight: fontSettings.isBold ? 'bold' : 'normal',
-                      fontStyle: fontSettings.isItalic ? 'italic' : 'normal'
-                    }}
-                  >
-                    {questionText}
-                  </div>
+                  <>
+                    <div
+                      contentEditable
+                      suppressContentEditableWarning
+                      onBlur={(e) => {
+                        const newText = e.currentTarget.textContent || '';
+                        const updatedCard = { ...currentCard, question: newText };
+                        setEditedCards(prev => ({ ...prev, [card.number]: updatedCard }));
+                      }}
+                      className="text-sm leading-snug text-gray-800 outline-none focus:ring-2 focus:ring-blue-300 rounded px-1"
+                      style={{
+                        fontFamily: fontSettings.fontFamily,
+                        fontSize: `${fontSettings.fontSize}px`,
+                        fontWeight: fontSettings.isBold ? 'bold' : 'normal',
+                        fontStyle: fontSettings.isItalic ? 'italic' : 'normal'
+                      }}
+                    >
+                      {questionText}
+                    </div>
+
+                    {/* Add fun illustration if enabled */}
+                    {showIllustrations && (
+                      <CardIllustration
+                        question={questionText}
+                        subject={formData.subject}
+                        difficulty={currentCard.difficulty as 'easy' | 'medium' | 'hard' | undefined}
+                        size={60}
+                        showIllustration={showIllustrations}
+                        illustrationScale={illustrationScale}
+                        themeColor={theme.primary}
+                        cardIndex={index}
+                        isDraggable={isDraggableIllustrations}
+                        initialTransform={illustrationTransforms[index]}
+                        onTransformChange={(transform) => handleIllustrationTransformChange(index, transform)}
+                        containerBounds={{ width: 520, height: 350 }}
+                        transparentBackground={transparentBackground}
+                        characterTheme={characterTheme}
+                      />
+                    )}
+                  </>
                 );
               }
             })()}
@@ -428,6 +486,19 @@ export default function CardsV2Page() {
     const gradient = gradients[index % gradients.length];
     const illustration = illustrations[index % illustrations.length];
 
+    // Extract primary color from gradient for illustration matching
+    const funColors = [
+      '#ffecd2', // peach
+      '#a1c4fd', // light blue
+      '#d4fc79', // lime green
+      '#cfd9df', // gray
+      '#fccb90', // orange
+      '#f6d365', // yellow
+      '#fbc2eb', // pink
+      '#fdcbf1'  // light pink
+    ];
+    const primaryColor = funColors[index % funColors.length];
+
     return (
       <div
         key={index}
@@ -438,7 +509,7 @@ export default function CardsV2Page() {
           boxSizing: 'border-box',
           borderRadius: '8px',
           padding: '8px',
-          overflow: 'hidden'
+          overflow: isDraggableIllustrations ? 'visible' : 'hidden'
         }}
       >
         {/* Fun illustration */}
@@ -456,13 +527,37 @@ export default function CardsV2Page() {
             position: 'relative',
             margin: '8px',
             boxSizing: 'border-box',
-            overflow: 'hidden'
+            overflow: isDraggableIllustrations ? 'visible' : 'hidden'
           }}
         >
           {/* Large card number */}
           <div className="absolute -top-2 -right-2 text-5xl font-black opacity-20">
             {card.number}
           </div>
+
+          {/* Add fun illustration if enabled and no visuals */}
+          {showIllustrations && (() => {
+            const currentCard = editedCards[card.number] || card;
+            const { questionText, visuals } = parseQuestionWithVisuals(currentCard.question);
+            return visuals.length === 0 && (
+              <CardIllustration
+                question={questionText}
+                subject={formData.subject}
+                difficulty={currentCard.difficulty as 'easy' | 'medium' | 'hard' | undefined}
+                size={60}
+                showIllustration={showIllustrations}
+                illustrationScale={illustrationScale}
+                themeColor={primaryColor}
+                cardIndex={index}
+                isDraggable={isDraggableIllustrations}
+                initialTransform={illustrationTransforms[index]}
+                onTransformChange={(transform) => handleIllustrationTransformChange(index, transform)}
+                containerBounds={{ width: 520, height: 350 }}
+                transparentBackground={transparentBackground}
+                characterTheme={characterTheme}
+              />
+            );
+          })()}
 
           {/* Content with consistent layout */}
           <div style={{ paddingTop: '10px', paddingRight: '35px', height: 'calc(100% - 10px)', position: 'relative' }}>
@@ -900,6 +995,76 @@ export default function CardsV2Page() {
                     />
                     <span className="w-12 text-sm">{illustrationScale}%</span>
                   </div>
+
+                  <div className="flex items-center gap-2">
+                    <input
+                      id="showIllustrations"
+                      type="checkbox"
+                      checked={showIllustrations}
+                      onChange={(e) => setShowIllustrations(e.target.checked)}
+                      className="w-4 h-4"
+                    />
+                    <label htmlFor="showIllustrations" className="text-sm font-medium cursor-pointer">
+                      🎨 Afficher les illustrations amusantes
+                    </label>
+                  </div>
+
+                  {showIllustrations && (
+                    <>
+                      <div className="flex items-center gap-2">
+                        <input
+                          id="draggableIllustrations"
+                          type="checkbox"
+                          checked={isDraggableIllustrations}
+                          onChange={(e) => setIsDraggableIllustrations(e.target.checked)}
+                          className="w-4 h-4"
+                        />
+                        <label htmlFor="draggableIllustrations" className="text-sm font-medium cursor-pointer">
+                          ✋ Illustrations interactives (glisser, redimensionner, pivoter)
+                        </label>
+                        {isDraggableIllustrations && Object.keys(illustrationTransforms).length > 0 && (
+                          <button
+                            onClick={resetIllustrationTransforms}
+                            className="ml-2 px-2 py-1 text-xs bg-gray-200 hover:bg-gray-300 rounded"
+                            title="Remettre à zéro les positions"
+                          >
+                            Réinitialiser
+                          </button>
+                        )}
+                      </div>
+
+                      <div className="flex items-center gap-2">
+                        <input
+                          id="transparentBackground"
+                          type="checkbox"
+                          checked={transparentBackground}
+                          onChange={(e) => setTransparentBackground(e.target.checked)}
+                          className="w-4 h-4"
+                        />
+                        <label htmlFor="transparentBackground" className="text-sm font-medium cursor-pointer">
+                          🎯 Fond transparent (sans arrière-plan coloré)
+                        </label>
+                      </div>
+
+                      <div className="flex items-center gap-2">
+                        <label htmlFor="characterTheme" className="text-sm font-medium">
+                          🎨 Thème de personnage :
+                        </label>
+                        <Select value={characterTheme} onValueChange={(value) => setCharacterTheme(value as CharacterTheme)}>
+                          <SelectTrigger className="w-[200px]">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {IllustrationService.getAvailableCharacters().map(character => (
+                              <SelectItem key={character.value} value={character.value}>
+                                <span>{character.icon} {character.label}</span>
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </>
+                  )}
 
                   <div className="flex items-center gap-2 text-sm text-gray-600">
                     <span>💡 Cliquez sur le texte des cartes pour l'éditer directement</span>
