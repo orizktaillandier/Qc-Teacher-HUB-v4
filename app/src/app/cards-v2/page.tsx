@@ -45,8 +45,14 @@ export default function CardsV2Page() {
     isItalic: false
   });
 
-  // Illustration size state (percentage)
+  // Global character illustration size state (percentage) - applies to ALL characters
+  const [globalCharacterScale, setGlobalCharacterScale] = useState(100);
+
+  // Individual illustration size adjustment (percentage)
   const [illustrationScale, setIllustrationScale] = useState(100);
+
+  // Global visual/math elements size state (percentage)
+  const [visualScale, setVisualScale] = useState(100);
 
   // Show/hide illustrations state
   const [showIllustrations, setShowIllustrations] = useState(true);
@@ -420,7 +426,9 @@ export default function CardsV2Page() {
                         height: '100%',
                         maxWidth: '250px',
                         margin: '0 auto',
-                        position: 'relative'
+                        position: 'relative',
+                        transform: `scale(${visualScale / 100})`,
+                        transformOrigin: 'center center'
                       }}>
                         {visuals}
                       </div>
@@ -458,7 +466,7 @@ export default function CardsV2Page() {
                         difficulty={currentCard.difficulty as 'easy' | 'medium' | 'hard' | undefined}
                         size={60}
                         showIllustration={showIllustrations}
-                        illustrationScale={illustrationScale}
+                        illustrationScale={globalCharacterScale}
                         themeColor={theme.primary}
                         cardIndex={index}
                         isDraggable={isDraggableIllustrations}
@@ -546,7 +554,7 @@ export default function CardsV2Page() {
                 difficulty={currentCard.difficulty as 'easy' | 'medium' | 'hard' | undefined}
                 size={60}
                 showIllustration={showIllustrations}
-                illustrationScale={illustrationScale}
+                illustrationScale={globalCharacterScale}
                 themeColor={primaryColor}
                 cardIndex={index}
                 isDraggable={isDraggableIllustrations}
@@ -605,7 +613,7 @@ export default function CardsV2Page() {
                           maxWidth: '220px',
                           margin: '0 auto',
                           position: 'relative',
-                          transform: `scale(${illustrationScale / 100})`,
+                          transform: `scale(${visualScale / 100})`,
                           transformOrigin: 'center center'
                         }}>
                           {visuals}
@@ -761,17 +769,17 @@ export default function CardsV2Page() {
         </div>
 
         {/* Generation Form */}
-        <Card className="mb-8">
+        <Card className="mb-8 bg-gray-800 text-white border-gray-700">
           <CardHeader>
             <CardTitle>Paramètres de génération</CardTitle>
-            <CardDescription>
+            <CardDescription className="text-gray-300">
               Configurez les paramètres pour générer vos cartes à tâches
             </CardDescription>
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-2 gap-4 mb-4">
               <div className="space-y-2">
-                <Label htmlFor="cycle">Cycle</Label>
+                <Label htmlFor="cycle" className="text-white">Cycle</Label>
                 <Select
                   value={formData.cycle}
                   onValueChange={(value) => setFormData({ ...formData, cycle: value, grade: '' })}
@@ -790,7 +798,7 @@ export default function CardsV2Page() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="grade">Année</Label>
+                <Label htmlFor="grade" className="text-white">Année</Label>
                 <Select
                   value={formData.grade}
                   onValueChange={(value) => setFormData({ ...formData, grade: value })}
@@ -823,7 +831,7 @@ export default function CardsV2Page() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="subject">Matière</Label>
+                <Label htmlFor="subject" className="text-white">Matière</Label>
                 <Select
                   value={formData.subject}
                   onValueChange={(value) => setFormData({ ...formData, subject: value, notion: '' })}
@@ -842,7 +850,7 @@ export default function CardsV2Page() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="notion">Notion principale</Label>
+                <Label htmlFor="notion" className="text-white">Notion principale</Label>
                 <Select
                   value={formData.notion}
                   onValueChange={(value) => setFormData({ ...formData, notion: value, subNotion: '' })}
@@ -862,7 +870,7 @@ export default function CardsV2Page() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="subNotion">Sous-notion spécifique</Label>
+                <Label htmlFor="subNotion" className="text-white">Sous-notion spécifique</Label>
                 <Select
                   value={formData.subNotion}
                   onValueChange={(value) => setFormData({ ...formData, subNotion: value })}
@@ -913,18 +921,23 @@ export default function CardsV2Page() {
         {/* Generated Cards Display */}
         {generatedCards && (
           <div className="space-y-8">
-            {/* Font Customization Controls */}
-            <Card className="no-print">
-              <CardHeader>
-                <CardTitle>Personnalisation de la police</CardTitle>
-                <CardDescription>
-                  Modifiez l'apparence du texte de vos cartes
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="flex flex-wrap gap-4 items-center">
-                  <div className="flex items-center gap-2">
-                    <Type className="h-4 w-4" />
+            {/* Customization Controls - Organized into sections */}
+            <div className="grid grid-cols-3 gap-4 no-print">
+              {/* Typography Section */}
+              <Card className="bg-gray-800 text-white border-gray-700">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Type className="h-5 w-5" />
+                    Typographie
+                  </CardTitle>
+                  <CardDescription className="text-gray-300">
+                    Personnalisez la police et le style du texte
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  {/* Font Selection */}
+                  <div className="flex items-center gap-3">
+                    <Label className="w-20 text-white">Police:</Label>
                     <Select
                       value={fontSettings.fontFamily}
                       onValueChange={(value) => setFontSettings(prev => ({ ...prev, fontFamily: value }))}
@@ -951,52 +964,105 @@ export default function CardsV2Page() {
                     </Select>
                   </div>
 
-                  <div className="flex items-center gap-2">
-                    <Label htmlFor="fontSize">Taille:</Label>
+                  {/* Font Size */}
+                  <div className="flex items-center gap-3">
+                    <Label className="w-20 text-white">Taille:</Label>
                     <input
                       id="fontSize"
                       type="range"
                       min="10"
-                      max="24"
+                      max="25"
                       value={fontSettings.fontSize}
                       onChange={(e) => setFontSettings(prev => ({ ...prev, fontSize: parseInt(e.target.value) }))}
-                      className="w-24"
+                      className="w-32"
                     />
-                    <span className="w-12 text-sm">{fontSettings.fontSize}px</span>
+                    <span className="w-12 text-sm font-medium">{fontSettings.fontSize}px</span>
                   </div>
 
-                  <div className="flex gap-2">
-                    <Button
-                      variant={fontSettings.isBold ? "default" : "outline"}
-                      size="sm"
-                      onClick={() => setFontSettings(prev => ({ ...prev, isBold: !prev.isBold }))}
-                    >
-                      <Bold className="h-4 w-4" />
-                    </Button>
-                    <Button
-                      variant={fontSettings.isItalic ? "default" : "outline"}
-                      size="sm"
-                      onClick={() => setFontSettings(prev => ({ ...prev, isItalic: !prev.isItalic }))}
-                    >
-                      <Italic className="h-4 w-4" />
-                    </Button>
+                  {/* Font Style */}
+                  <div className="flex items-center gap-3">
+                    <Label className="w-20 text-white">Style:</Label>
+                    <div className="flex gap-2">
+                      <Button
+                        variant={fontSettings.isBold ? "default" : "outline"}
+                        size="sm"
+                        onClick={() => setFontSettings(prev => ({ ...prev, isBold: !prev.isBold }))}
+                        title="Gras"
+                      >
+                        <Bold className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        variant={fontSettings.isItalic ? "default" : "outline"}
+                        size="sm"
+                        onClick={() => setFontSettings(prev => ({ ...prev, isItalic: !prev.isItalic }))}
+                        title="Italique"
+                      >
+                        <Italic className="h-4 w-4" />
+                      </Button>
+                    </div>
                   </div>
+                </CardContent>
+              </Card>
 
-                  <div className="flex items-center gap-2">
-                    <Label htmlFor="illustrationSize" className="text-sm">📐 Illustrations:</Label>
-                    <input
-                      id="illustrationSize"
-                      type="range"
-                      min="50"
-                      max="150"
-                      value={illustrationScale}
-                      onChange={(e) => setIllustrationScale(parseInt(e.target.value))}
-                      className="w-24"
-                    />
-                    <span className="w-12 text-sm">{illustrationScale}%</span>
+              {/* Visual Elements Section */}
+              <Card className="bg-gray-800 text-white border-gray-700">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Sparkles className="h-5 w-5" />
+                    Éléments visuels
+                  </CardTitle>
+                  <CardDescription className="text-gray-300">
+                    Contrôlez la taille et l'apparence des éléments visuels
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  {/* Size Controls */}
+                  <div className="space-y-3">
+                    <div className="flex items-center gap-3">
+                      <Label className="w-40 text-white">📊 Visuels mathématiques:</Label>
+                      <input
+                        id="visualSize"
+                        type="range"
+                        min="50"
+                        max="200"
+                        value={visualScale}
+                        onChange={(e) => setVisualScale(parseInt(e.target.value))}
+                        className="w-32"
+                      />
+                      <span className="w-12 text-sm font-medium">{visualScale}%</span>
+                    </div>
+
+                    <div className="flex items-center gap-3">
+                      <Label className="w-40 text-white">🎨 Personnages (tous):</Label>
+                      <input
+                        id="globalCharacterSize"
+                        type="range"
+                        min="50"
+                        max="300"
+                        value={globalCharacterScale}
+                        onChange={(e) => setGlobalCharacterScale(parseInt(e.target.value))}
+                        className="w-32"
+                      />
+                      <span className="w-12 text-sm font-medium">{globalCharacterScale}%</span>
+                    </div>
                   </div>
+                </CardContent>
+              </Card>
 
-                  <div className="flex items-center gap-2">
+              {/* Illustrations Section */}
+              <Card className="bg-gray-800 text-white border-gray-700">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Palette className="h-5 w-5" />
+                    Illustrations
+                  </CardTitle>
+                  <CardDescription className="text-gray-300">
+                    Configurez les illustrations et personnages
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  {/* Show/Hide Illustrations */}
+                  <div className="flex items-center gap-3">
                     <input
                       id="showIllustrations"
                       type="checkbox"
@@ -1004,14 +1070,15 @@ export default function CardsV2Page() {
                       onChange={(e) => setShowIllustrations(e.target.checked)}
                       className="w-4 h-4"
                     />
-                    <label htmlFor="showIllustrations" className="text-sm font-medium cursor-pointer">
-                      🎨 Afficher les illustrations amusantes
+                    <label htmlFor="showIllustrations" className="font-medium cursor-pointer text-white">
+                      Afficher les illustrations amusantes
                     </label>
                   </div>
 
                   {showIllustrations && (
-                    <>
-                      <div className="flex items-center gap-2">
+                    <div className="pl-7 space-y-3 border-l-2 border-gray-600">
+                      {/* Interactive Mode */}
+                      <div className="flex items-center gap-3">
                         <input
                           id="draggableIllustrations"
                           type="checkbox"
@@ -1019,13 +1086,13 @@ export default function CardsV2Page() {
                           onChange={(e) => setIsDraggableIllustrations(e.target.checked)}
                           className="w-4 h-4"
                         />
-                        <label htmlFor="draggableIllustrations" className="text-sm font-medium cursor-pointer">
-                          ✋ Illustrations interactives (glisser, redimensionner, pivoter)
+                        <label htmlFor="draggableIllustrations" className="cursor-pointer text-white">
+                          Mode interactif (glisser, redimensionner, pivoter)
                         </label>
                         {isDraggableIllustrations && Object.keys(illustrationTransforms).length > 0 && (
                           <button
                             onClick={resetIllustrationTransforms}
-                            className="ml-2 px-2 py-1 text-xs bg-gray-200 hover:bg-gray-300 rounded"
+                            className="ml-auto px-3 py-1 text-sm bg-gray-200 hover:bg-gray-300 rounded"
                             title="Remettre à zéro les positions"
                           >
                             Réinitialiser
@@ -1033,7 +1100,8 @@ export default function CardsV2Page() {
                         )}
                       </div>
 
-                      <div className="flex items-center gap-2">
+                      {/* Transparent Background */}
+                      <div className="flex items-center gap-3">
                         <input
                           id="transparentBackground"
                           type="checkbox"
@@ -1041,15 +1109,14 @@ export default function CardsV2Page() {
                           onChange={(e) => setTransparentBackground(e.target.checked)}
                           className="w-4 h-4"
                         />
-                        <label htmlFor="transparentBackground" className="text-sm font-medium cursor-pointer">
-                          🎯 Fond transparent (sans arrière-plan coloré)
+                        <label htmlFor="transparentBackground" className="cursor-pointer text-white">
+                          Fond transparent (sans arrière-plan coloré)
                         </label>
                       </div>
 
-                      <div className="flex items-center gap-2">
-                        <label htmlFor="characterTheme" className="text-sm font-medium">
-                          🎨 Thème de personnage :
-                        </label>
+                      {/* Character Theme Selection */}
+                      <div className="flex items-center gap-3">
+                        <Label className="w-32 text-white">Thème personnage:</Label>
                         <Select value={characterTheme} onValueChange={(value) => setCharacterTheme(value as CharacterTheme)}>
                           <SelectTrigger className="w-[200px]">
                             <SelectValue />
@@ -1063,15 +1130,20 @@ export default function CardsV2Page() {
                           </SelectContent>
                         </Select>
                       </div>
-                    </>
+                    </div>
                   )}
+                </CardContent>
+              </Card>
+            </div>
 
-                  <div className="flex items-center gap-2 text-sm text-gray-600">
-                    <span>💡 Cliquez sur le texte des cartes pour l'éditer directement</span>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+            {/* Tips Section */}
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 no-print">
+              <div className="flex items-center gap-2 text-blue-700">
+                <span className="text-lg">💡</span>
+                <span className="font-medium">Astuce:</span>
+                <span>Cliquez sur le texte des cartes pour l'éditer directement</span>
+              </div>
+            </div>
 
             <div className="flex justify-between items-center no-print">
               <h2 className="text-2xl font-bold">Cartes générées</h2>

@@ -304,16 +304,32 @@ function buildStructuredPrompt(knowledge: any, request: CardRequest, knowledgeCo
 
 IMPORTANT: Les questions doivent être SIMPLES et DIRECTES, sans contexte. Aller droit au but avec des questions pédagogiques claires.
 
-RÈGLES DE GRAMMAIRE FRANÇAISE OBLIGATOIRES:
-- TOUJOURS utiliser une grammaire française complète et correcte
-- Pour les questions "Combien", utilise "Combien y a-t-il de..." au lieu de "Combien de..."
-- Pour les angles inconnus, TOUJOURS utiliser "?" et JAMAIS "x"
-- Exemples corrects:
-  ✓ "Combien y a-t-il d'angles droits dans un carré?"
-  ✓ "Quelle est la mesure de l'angle marqué par ??"
-  ✓ "Quel est le périmètre de cette figure?"
-  ✗ "Combien d'angles dans un triangle?" (incorrect)
-  ✗ "Trouve l'angle x" (incorrect - utilise ? pas x)
+RÈGLES DE FORMULATION - FRANÇAIS SIMPLE ET DIRECT:
+- Utiliser le français le plus SIMPLE et NATUREL possible
+- ÉVITER les formulations longues et compliquées
+- Pour les angles inconnus, utiliser "?" et JAMAIS "x"
+
+FORMULATIONS CORRECTES ET SIMPLES:
+• Pour les mesures d'angles:
+  ✓ "Un angle plat mesure combien de degrés?"
+  ✓ "Quelle est la mesure de cet angle?"
+  ✓ "Trouve la mesure de l'angle ?"
+
+• Pour compter des éléments:
+  ✓ "Combien de côtés a un hexagone?"
+  ✓ "Combien d'angles droits dans un carré?"
+
+• Pour les calculs:
+  ✓ "Calcule: 45 + 27"
+  ✓ "Quel est le résultat de 8 × 7?"
+
+ÉVITER CES FORMULATIONS LOURDES:
+  ✗ "Combien y a-t-il de degrés dans un angle plat?"
+  ✗ "Quel est le nombre de degrés dans un angle droit?"
+  ✗ "À combien de degrés correspond un angle plat?"
+  ✗ "Combien de côtés possède un hexagone?" (trop formel)
+
+TOUJOURS PRIVILÉGIER LA SIMPLICITÉ!
 
 INSTRUCTIONS POUR LES VISUELS:
 Pour les questions de mathématiques ou sciences nécessitant des visuels, utilise ces codes:
@@ -327,14 +343,16 @@ Pour les questions de mathématiques ou sciences nécessitant des visuels, utili
 - [visual:shape:type:taille] pour une forme (ex: [visual:shape:hexagon:100])
 - [visual:graph:valeurs] pour un graphique (ex: [visual:graph:2,4,3,5])
 
-Exemples de questions SIMPLES et DIRECTES avec GRAMMAIRE CORRECTE:
-- "Calcule: 45 + 27 = ?"
-- "Quelle est la mesure de l'angle manquant? [visual:triangle:50:60:?]"
+Exemples de questions SIMPLES et DIRECTES:
+- "Calcule: 45 + 27"
+- "Quelle est la mesure de l'angle ? [visual:triangle:50:60:?]"
 - "Quelle fraction est représentée? [visual:fraction:2:3:2]"
 - "Conjugue le verbe 'finir' au présent, 3e personne du singulier."
-- "Quel est l'état de la matière de la vapeur d'eau?"
-- "Combien y a-t-il de côtés dans un hexagone?"
-- "Trouve la mesure de l'angle marqué par ? [visual:triangle:40:70:?]"
+- "Dans quel état est la vapeur d'eau?"
+- "Combien de côtés a un hexagone?"
+- "Un angle droit mesure combien de degrés?"
+- "Un angle plat mesure combien de degrés?"
+- "Trouve la mesure de l'angle ? [visual:triangle:40:70:?]"
 
 Retourne un JSON avec exactement 8 cartes. Voici le format EXACT à suivre:
 
@@ -355,8 +373,10 @@ Note: Génère 8 cartes au total (numéros 1 à 8) avec le même format
 
 RÈGLES STRICTES:
 - 8 cartes EXACTEMENT, numérotées de 1 à 8
-- TOUTES les questions doivent être SIMPLES et DIRECTES
-- GRAMMAIRE FRANÇAISE IMPECCABLE (utilise "y a-t-il", "quel est", "quelle est")
+- FORMULATION ULTRA SIMPLE:
+  • "Combien de côtés a..." PAS "Combien de côtés possède..."
+  • "Un angle droit mesure combien de degrés?" PAS "Quelle est la mesure d'un angle droit?"
+  • Toujours la forme la plus courte et naturelle
 - TOUJOURS utiliser ? pour les angles inconnus, JAMAIS x
 - LIMITER les visuels à 25% des cartes (2-3 cartes sur 8 maximum)
 - PAS de contexte, PAS de mise en situation

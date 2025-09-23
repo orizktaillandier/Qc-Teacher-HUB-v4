@@ -163,14 +163,20 @@ npm test            # Run tests (when configured)
 
 ## 📝 Recent Updates
 
-### September 2025 - Interactive Illustrations Release
-- ✨ Added React Kawaii character illustrations to task cards
-- 🎨 13 different character themes (Cat, Ghost, Planet, Ice Cream, etc.)
-- 🔄 Consistent character theme option across all cards
-- 🖱️ Drag & drop illustrations with resize and rotate capabilities
-- 🎯 Transparent background option for cleaner designs
-- 🐛 Fixed illustration randomization on slider adjustments
-- ⚡ Improved Turbopack compatibility by removing styled-jsx
+### September 2025 - UI/UX Improvements
+- 🎯 **Interface Reorganization**: Controls now organized in 3 clear sections side-by-side
+  - Typography controls (font, size, style)
+  - Visual elements controls (math visuals, character size)
+  - Illustrations controls (interactive mode, themes)
+- 🎨 **Global Size Controls**: Added global sliders for bulk adjustments
+  - Character illustrations: 50-300% global scaling
+  - Math visuals: 50-200% global scaling
+- 📏 **Enhanced Font Controls**: Max font size increased to 25px
+- 🌑 **Dark Theme Consistency**: All control panels now use dark gray theme matching navigation
+- 🇫🇷 **French Language Improvements**: Natural, simple question formulations
+- 🖱️ **Draggable Illustrations**: Full drag, resize, and rotate capabilities
+- 🎭 **Character Themes**: 13 different kawaii characters with consistent theme option
+- 🔍 **Transparent Background**: Option to remove colored backgrounds from characters
 
 ## 🎯 Next Steps
 
