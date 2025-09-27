@@ -337,7 +337,11 @@ Pour les questions de mathématiques ou sciences nécessitant des visuels, utili
 - [visual:triangle:angleA:angleB:angleC] pour un triangle avec angles (ex: [visual:triangle:50:60:70] ou [visual:triangle:50:60:?] pour angle manquant)
 - [visual:triangle-sides:a:b:c:type] pour un triangle avec côtés (ex: [visual:triangle-sides:3:4:5:right])
 - [visual:fraction:numérateur:dénominateur:parties_colorées] (ex: [visual:fraction:3:4:3])
-- [visual:numberline:min:max:points] (ex: [visual:numberline:0:10:3,5,7])
+- [visual:numberline:min:max:points] - IMPORTANT: min et max doivent englober les nombres de la question, points = nombres à marquer
+  Exemples corrects:
+  • Pour "Quelle est la différence entre 79 et 34?" → [visual:numberline:30:80:34,79]
+  • Pour "Où est le nombre 5?" → [visual:numberline:0:10:5]
+  • Pour "Compare 23 et 41" → [visual:numberline:20:45:23,41]
 - [visual:grid:lignes:colonnes:remplies] pour une grille (ex: [visual:grid:3:4:6])
 - [visual:clock:heure:minutes] pour une horloge (ex: [visual:clock:3:15])
 - [visual:shape:type:taille] pour une forme (ex: [visual:shape:hexagon:100])

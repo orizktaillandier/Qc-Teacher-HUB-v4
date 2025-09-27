@@ -1,17 +1,19 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Loader2, Sparkles, FileText, Download, Printer, Palette, Bold, Italic, Type } from "lucide-react";
+import { Loader2, Sparkles, FileText, Download, Printer, Palette, Bold, Italic, Type, Settings2 } from "lucide-react";
 import { PFEQ_STRUCTURE, getNotionsForSubject, getSubNotionsForNotion } from '@/lib/pfeq-structure';
-import { FunIllustrations, GradientBackgrounds, PastelGradients } from '@/components/TaskCardThemes';
+import { SimpleCustomizationPanel } from '@/components/SimpleCustomizationPanel-simplified';
 import { parseQuestionWithVisuals } from '@/components/MathVisuals';
-import { CardIllustration } from '@/components/CardIllustration';
-import { IllustrationService, type CharacterTheme } from '@/lib/illustration-service';
+import { SimpleCardIllustration } from '@/components/SimpleCardIllustration';
+import { DraggableQuestionText } from '@/components/DraggableQuestionText';
+import CombinedIllustrationServiceInstance, { type IllustrationTheme } from '@/lib/combined-illustration-service';
+import { allCardThemes, getAllThemeByIndex, themeCategories, FunIllustrations } from '@/lib/all-card-themes';
 
 interface CardData {
   number: number;
@@ -34,16 +36,128 @@ interface GeneratedCardsData {
   };
 }
 
-export default function CardsV2Page() {
-  const [cardStyle, setCardStyle] = useState<'professional' | 'fun' | 'gradient'>('professional');
+// Helper function to handle background properties consistently
+function getBackgroundStyle(bgValue: string | undefined): Record<string, string> {
+  if (!bgValue) return { backgroundColor: 'transparent' };
+  if (bgValue.includes('gradient') || bgValue.includes('url(')) {
+    return { backgroundImage: bgValue };
+  }
+  return { backgroundColor: bgValue };
+}
 
-  // Font customization states
-  const [fontSettings, setFontSettings] = useState({
+export default function CardsV2Page() {
+  const [showCustomizationPanel, setShowCustomizationPanel] = useState(false);
+
+  // Page type selection for customization
+  type PageType = 'all' | 'studentCards' | 'studentAnswers' | 'teacherAnswers';
+  const [selectedPageType, setSelectedPageType] = useState<PageType>('all');
+
+  // Default settings template
+  const getDefaultSettings = () => ({
+    typography: {
+      titleSize: 24,
+      questionSize: 16,
+      answerSize: 14,
+      fontFamily: 'default',
+      fontWeight: 'normal',
+      textTransform: 'none',
+      letterSpacing: 0,
+      lineHeight: 1.5,
+      textDecoration: 'none',
+      textShadow: false,
+      fontStyle: 'normal'
+    },
+    layout: {
+      cardsPerRow: 2,
+      cardSpacing: 20,
+      pageMargins: 40,
+      cardAlignment: 'center',
+      cardOrder: 'default',
+      cardRotation: 0,
+      perspective: 0
+    },
+    visual: {
+      borderRadius: 12,
+      borderWidth: 2,
+      borderStyle: 'solid',
+      shadowIntensity: 10,
+      shadowColor: '#000000',
+      glowEffect: false,
+      glowColor: '#3b82f6',
+      backgroundOpacity: 100,
+      blur: 0,
+      contrast: 100,
+      brightness: 100,
+      saturation: 100,
+      hueRotate: 0,
+      gradientAngle: 45
+    },
+    animation: {
+      enableAnimations: true,
+      animationSpeed: 1,
+      hoverEffect: 'lift',
+      transitionDuration: 300,
+      pulseEffect: false,
+      bounceEffect: false,
+      shakeEffect: false
+    },
+    advanced: {
+      customCSS: '',
+      enableGrid: true,
+      gridColor: '#e5e5e5',
+      snapToGrid: false,
+      showRulers: false,
+      enableGuides: false
+    }
+  });
+
+  // Page-specific font settings storage - initialized with default values
+  const defaultFontSettings = {
     fontFamily: 'system-ui',
     fontSize: 21,
     isBold: false,
     isItalic: false
+  };
+
+  const [pageFontSettings, setPageFontSettings] = useState({
+    all: { ...defaultFontSettings },
+    studentCards: { ...defaultFontSettings },
+    studentAnswers: { ...defaultFontSettings },
+    teacherAnswers: { ...defaultFontSettings }
   });
+
+  // Get font settings for a specific page type
+  const getPageFontSettings = (pageType: PageType) => {
+    return pageFontSettings[pageType];
+  };
+
+  // Update font settings for selected page type
+  const updatePageFontSettings = (settings: any) => {
+    if (selectedPageType === 'all') {
+      // Update all pages when 'all' is selected
+      setPageFontSettings({
+        all: settings,
+        studentCards: settings,
+        studentAnswers: settings,
+        teacherAnswers: settings
+      });
+      setFontSettings(settings); // Update the main font settings too
+    } else {
+      // Update only the selected page type
+      setPageFontSettings(prev => ({
+        ...prev,
+        [selectedPageType]: settings
+      }));
+      // If editing a specific page, update main font settings to match
+      if (selectedPageType === 'studentCards') {
+        setFontSettings(settings);
+      }
+    }
+  };
+
+
+  // Font customization states (keeping for backward compatibility)
+  const [fontSettings, setFontSettings] = useState({ ...defaultFontSettings });
 
   // Global character illustration size state (percentage) - applies to ALL characters
   const [globalCharacterScale, setGlobalCharacterScale] = useState(100);
@@ -60,7 +174,17 @@ export default function CardsV2Page() {
   // Draggable illustrations state
   const [isDraggableIllustrations, setIsDraggableIllustrations] = useState(false);
   const [transparentBackground, setTransparentBackground] = useState(false);
-  const [characterTheme, setCharacterTheme] = useState<CharacterTheme>('random');
+  const [characterTheme, setCharacterTheme] = useState<IllustrationTheme>('random');
+
+  // Card theme state
+  const [selectedCardTheme, setSelectedCardTheme] = useState<'auto' | number>('auto');
+
+  // Question container opacity (50-100%)
+  const [questionContainerOpacity, setQuestionContainerOpacity] = useState(90);
+
+  // Draggable text state
+  const [isDraggableText, setIsDraggableText] = useState(false);
+  const [textPositions, setTextPositions] = useState<Record<number, { x: number; y: number; width: number; height: number }>>({});
 
   // Illustration transforms per card (cardIndex -> transform)
   const [illustrationTransforms, setIllustrationTransforms] = useState<Record<number, {
@@ -89,6 +213,104 @@ export default function CardsV2Page() {
   // Helper function to reset illustration transforms
   const resetIllustrationTransforms = () => {
     setIllustrationTransforms({});
+  };
+
+  // Helper function to apply card 1 illustration to all left cards (odd numbers: 1, 3, 5, 7)
+  const applyIllustrationToLeftPage = () => {
+    const sourceTransform = illustrationTransforms[0]; // Card 1 (index 0)
+
+    if (!sourceTransform) {
+      alert('Veuillez d\'abord déplacer l\'illustration de la carte 1.');
+      return;
+    }
+
+    // Create completely new transform objects to ensure React detects the change
+    const newTransforms: Record<number, any> = {};
+
+    // Copy all existing transforms
+    Object.keys(illustrationTransforms).forEach(key => {
+      const idx = Number(key);
+      newTransforms[idx] = { ...illustrationTransforms[idx] };
+    });
+
+    // Apply to all left cards: indices 0, 2, 4, 6 (cards 1, 3, 5, 7)
+    const leftIndices = [0, 2, 4, 6];
+    for (const idx of leftIndices) {
+      newTransforms[idx] = {
+        x: sourceTransform.x,
+        y: sourceTransform.y,
+        scale: sourceTransform.scale,
+        rotation: sourceTransform.rotation
+      };
+    }
+
+    // Force re-render by briefly toggling draggable state
+    setIsDraggableIllustrations(false);
+    setIllustrationTransforms(newTransforms);
+    setTimeout(() => {
+      setIsDraggableIllustrations(true);
+    }, 10);
+
+    showSuccessMessage('Position de la carte 1 appliquée à toutes les cartes de gauche!');
+  };
+
+  // Helper function to apply card 2 illustration to all right cards (even numbers: 2, 4, 6, 8)
+  const applyIllustrationToRightPage = () => {
+    const sourceTransform = illustrationTransforms[1]; // Card 2 (index 1)
+
+    if (!sourceTransform) {
+      alert('Veuillez d\'abord déplacer l\'illustration de la carte 2.');
+      return;
+    }
+
+    // Create completely new transform objects to ensure React detects the change
+    const newTransforms: Record<number, any> = {};
+
+    // Copy all existing transforms
+    Object.keys(illustrationTransforms).forEach(key => {
+      const idx = Number(key);
+      newTransforms[idx] = { ...illustrationTransforms[idx] };
+    });
+
+    // Apply to all right cards: indices 1, 3, 5, 7 (cards 2, 4, 6, 8)
+    const rightIndices = [1, 3, 5, 7];
+    for (const idx of rightIndices) {
+      newTransforms[idx] = {
+        x: sourceTransform.x,
+        y: sourceTransform.y,
+        scale: sourceTransform.scale,
+        rotation: sourceTransform.rotation
+      };
+    }
+
+    // Force re-render by briefly toggling draggable state
+    setIsDraggableIllustrations(false);
+    setIllustrationTransforms(newTransforms);
+    setTimeout(() => {
+      setIsDraggableIllustrations(true);
+    }, 10);
+
+    showSuccessMessage('Position de la carte 2 appliquée à toutes les cartes de droite!');
+  };
+
+  // Helper to show success message
+  const showSuccessMessage = (message: string) => {
+    const successMessage = document.createElement('div');
+    successMessage.textContent = message;
+    successMessage.style.cssText = `
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: #10b981;
+      color: white;
+      padding: 12px 20px;
+      border-radius: 8px;
+      font-weight: bold;
+      z-index: 9999;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    `;
+    document.body.appendChild(successMessage);
+    setTimeout(() => document.body.removeChild(successMessage), 2000);
   };
 
   // Available fonts organized by category - EXPANDED WITH MORE FUN OPTIONS!
@@ -286,276 +508,156 @@ export default function CardsV2Page() {
   };
 
   const renderCardProfessional = (card: CardData, index: number) => {
-    // More subtle, professional patterns inspired by educational task cards
-    const themes = [
-      {
-        primary: '#4A7FE6',
-        secondary: '#E8F0FF',
-        pattern: `repeating-linear-gradient(45deg, transparent, transparent 35px, rgba(74, 127, 230, 0.15) 35px, rgba(74, 127, 230, 0.15) 70px)`,
-        patternType: 'diagonal'
-      },
-      {
-        primary: '#16A085',
-        secondary: '#E8F6F3',
-        pattern: `repeating-linear-gradient(-45deg, transparent, transparent 35px, rgba(22, 160, 133, 0.15) 35px, rgba(22, 160, 133, 0.15) 70px)`,
-        patternType: 'diagonal'
-      },
-      {
-        primary: '#E74C3C',
-        secondary: '#FDEDEC',
-        pattern: `repeating-linear-gradient(90deg, transparent, transparent 35px, rgba(231, 76, 60, 0.1) 35px, rgba(231, 76, 60, 0.1) 70px)`,
-        patternType: 'vertical'
-      },
-      {
-        primary: '#8E44AD',
-        secondary: '#F4ECF7',
-        pattern: `repeating-linear-gradient(45deg, transparent, transparent 35px, rgba(142, 68, 173, 0.15) 35px, rgba(142, 68, 173, 0.15) 70px)`,
-        patternType: 'diagonal'
+    // Use student cards font settings for this card type
+    const pageFontSettings = getPageFontSettings('studentCards');
+
+    // Use the new diverse themes
+    const theme = selectedCardTheme === 'auto'
+      ? getAllThemeByIndex(index)
+      : getAllThemeByIndex(selectedCardTheme);
+
+    // All professional themes use the nested structure with pattern overlay
+    const themeIndex = selectedCardTheme === 'auto' ? index : selectedCardTheme;
+    const isProfessionalTheme = themeIndex >= themeCategories.professional.startIndex &&
+                                themeIndex <= themeCategories.professional.endIndex;
+    const useNestedStructure = isProfessionalTheme; // Use nested structure for professional themes
+
+    // Apply theme-specific styles
+    const getNumberBadgeStyles = () => {
+      // Check if numberBadgeBackground is a gradient or solid color
+      const bgValue = theme.numberBadgeBackground || '#000';
+      const isGradient = bgValue.includes('gradient') || bgValue.includes('url(');
+
+      const baseStyles = {
+        position: 'absolute' as const,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        // Use backgroundImage for gradients, backgroundColor for solid colors
+        ...(isGradient
+          ? { backgroundImage: bgValue }
+          : { backgroundColor: bgValue }
+        ),
+        color: theme.numberBadgeColor || '#fff',
+        fontWeight: 'bold',
+        fontSize: '18px',
+        zIndex: 10
+      };
+
+      switch (theme.numberBadgeStyle) {
+        case 'circle':
+          return { ...baseStyles, width: '40px', height: '40px', borderRadius: '50%', top: '8px', right: '8px', boxShadow: '0 2px 4px rgba(0,0,0,0.2)' };
+        case 'square':
+          return { ...baseStyles, width: '35px', height: '35px', borderRadius: '0px', top: '0', right: '0' };
+        case 'hexagon':
+          return { ...baseStyles, width: '40px', height: '40px', clipPath: 'polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)', top: '8px', right: '8px' };
+        case 'bubble':
+          return { ...baseStyles, width: '45px', height: '45px', borderRadius: '50%', border: '3px solid white', top: '8px', right: '8px', boxShadow: '0 2px 4px rgba(0,0,0,0.2)' };
+        case 'tag':
+          return { ...baseStyles, padding: '5px 15px', borderRadius: '20px', top: '8px', left: '8px' };
+        case 'corner':
+          return { ...baseStyles, width: '0', height: '0', borderTop: '60px solid ' + (theme.numberBadgeBackground || '#000'), borderLeft: '60px solid transparent', top: '0', right: '0', color: 'transparent' };
+        case 'ribbon':
+          return { ...baseStyles, padding: '5px 20px', top: '20px', left: '-10px', transform: 'rotate(-5deg)' };
+        default:
+          return { ...baseStyles, width: '40px', height: '40px', borderRadius: '50%', top: '8px', right: '8px', boxShadow: '0 2px 4px rgba(0,0,0,0.2)' };
       }
-    ];
+    };
 
-    const theme = themes[index % themes.length];
+    const numberBadgeStyles = getNumberBadgeStyles();
 
-    // SVG pattern overlay for more sophisticated look
-    const svgPattern = (
-      <svg className="absolute inset-0 w-full h-full" style={{ zIndex: 0 }}>
-        <defs>
-          <pattern id={`pattern-${index}`} x="0" y="0" width="40" height="40" patternUnits="userSpaceOnUse">
-            {theme.patternType === 'diagonal' && (
-              <path d="M0,40 L40,0" stroke={theme.primary} strokeWidth="0.5" opacity="0.1" fill="none"/>
-            )}
-            {theme.patternType === 'vertical' && (
-              <line x1="20" y1="0" x2="20" y2="40" stroke={theme.primary} strokeWidth="0.5" opacity="0.1"/>
-            )}
-          </pattern>
-        </defs>
-        <rect width="100%" height="100%" fill={`url(#pattern-${index})`} />
-      </svg>
-    );
-
-    return (
-      <div
-        key={index}
-        className="relative p-3"
-        style={{
-          background: theme.pattern,
-          backgroundColor: theme.secondary,
-          height: '100%',
-          boxSizing: 'border-box',
-          position: 'relative'
-        }}
-      >
-        {svgPattern}
-
-        {/* Card number in circle - at outer container level */}
+    // For scrapbook, bordered and fun themes, render nested structure
+    if (useNestedStructure) {
+      return (
         <div
-          className="absolute w-10 h-10 rounded-full text-white font-bold text-lg shadow-md"
+          key={index}
+          className="relative"
           style={{
-            top: '10px',
-            right: '10px',
-            backgroundColor: theme.primary,
-            fontSize: '18px',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            zIndex: 2
-          }}
-        >
-          {card.number}
-        </div>
-
-        {/* White content area */}
-        <div
-          className="relative bg-white shadow-md"
-          style={{
-            borderRadius: '12px',
-            width: '100%',
+            // Outer container with pattern overlay
+            backgroundColor: theme.secondary || '#ffffff',
+            backgroundImage: theme.pattern || 'none',
+            border: 'none',
+            borderRadius: '0',
+            padding: '12px',
             height: '100%',
-            border: `2px solid ${theme.primary}`,
-            padding: '15px',
-            zIndex: 1,
+            width: '100%',
             boxSizing: 'border-box',
-            overflow: isDraggableIllustrations ? 'visible' : 'hidden'
+            overflow: (isDraggableIllustrations || isDraggableText) ? 'visible' : 'hidden',
+            position: 'relative'
           }}
         >
-
-
-          {/* Main content area */}
-          <div style={{ height: '100%', position: 'relative' }}>
-            {(() => {
-              // Use edited version if available, otherwise original
-              const currentCard = editedCards[card.number] || card;
-              const { questionText, visuals } = parseQuestionWithVisuals(currentCard.question);
-
-              if (visuals.length > 0) {
-                return (
-                  <>
-                    {/* Question text area - compact when there are visuals */}
-                    <div
-                      contentEditable
-                      suppressContentEditableWarning
-                      onBlur={(e) => {
-                        const newText = e.currentTarget.textContent || '';
-                        const visualsMatch = currentCard.question.match(/\[visual:.*?\]/g);
-                        const updatedQuestion = visualsMatch ? `${newText} ${visualsMatch.join(' ')}` : newText;
-                        const updatedCard = { ...currentCard, question: updatedQuestion };
-                        setEditedCards(prev => ({ ...prev, [card.number]: updatedCard }));
-                      }}
-                      className="text-sm leading-tight text-gray-800 outline-none focus:ring-2 focus:ring-blue-300 rounded px-1"
-                      style={{
-                        fontFamily: fontSettings.fontFamily,
-                        fontSize: `${fontSettings.fontSize}px`,
-                        fontWeight: fontSettings.isBold ? 'bold' : 'normal',
-                        fontStyle: fontSettings.isItalic ? 'italic' : 'normal'
-                      }}
-                    >
-                      {questionText}
-                    </div>
-
-                    {/* Visual area - fills remaining height */}
-                    <div style={{
-                      position: 'absolute',
-                      top: '50px',  // Below question text with some spacing
-                      left: 0,
-                      right: 0,
-                      bottom: 0,
-                      padding: '10px'
-                    }}>
-                      <div style={{
-                        width: '100%',
-                        height: '100%',
-                        maxWidth: '250px',
-                        margin: '0 auto',
-                        position: 'relative',
-                        transform: `scale(${visualScale / 100})`,
-                        transformOrigin: 'center center'
-                      }}>
-                        {visuals}
-                      </div>
-                    </div>
-                  </>
-                );
-              } else {
-                // No visuals - text can use all space
-                return (
-                  <>
-                    <div
-                      contentEditable
-                      suppressContentEditableWarning
-                      onBlur={(e) => {
-                        const newText = e.currentTarget.textContent || '';
-                        const updatedCard = { ...currentCard, question: newText };
-                        setEditedCards(prev => ({ ...prev, [card.number]: updatedCard }));
-                      }}
-                      className="text-sm leading-snug text-gray-800 outline-none focus:ring-2 focus:ring-blue-300 rounded px-1"
-                      style={{
-                        fontFamily: fontSettings.fontFamily,
-                        fontSize: `${fontSettings.fontSize}px`,
-                        fontWeight: fontSettings.isBold ? 'bold' : 'normal',
-                        fontStyle: fontSettings.isItalic ? 'italic' : 'normal'
-                      }}
-                    >
-                      {questionText}
-                    </div>
-
-                    {/* Add fun illustration if enabled */}
-                    {showIllustrations && (
-                      <CardIllustration
-                        question={questionText}
-                        subject={formData.subject}
-                        difficulty={currentCard.difficulty as 'easy' | 'medium' | 'hard' | undefined}
-                        size={60}
-                        showIllustration={showIllustrations}
-                        illustrationScale={globalCharacterScale}
-                        themeColor={theme.primary}
-                        cardIndex={index}
-                        isDraggable={isDraggableIllustrations}
-                        initialTransform={illustrationTransforms[index]}
-                        onTransformChange={(transform) => handleIllustrationTransformChange(index, transform)}
-                        containerBounds={{ width: 520, height: 350 }}
-                        transparentBackground={transparentBackground}
-                        characterTheme={characterTheme}
-                      />
-                    )}
-                  </>
-                );
-              }
-            })()}
+          {/* Card number badge - positioned on outer container */}
+          <div style={numberBadgeStyles}>
+            {theme.numberBadgeStyle === 'corner' ? (
+              <span style={{ position: 'absolute', top: '10px', right: '10px', color: theme.numberBadgeColor, fontWeight: 'bold', fontSize: '18px' }}>
+                {card.number}
+              </span>
+            ) : (
+              card.number
+            )}
           </div>
 
-        </div>
-      </div>
-    );
-  };
+          {/* Inner white container */}
+          <div
+            style={{
+              backgroundColor: theme.questionStyle?.background ? (theme.questionStyle.background === '#ffffff' ? `rgba(255, 255, 255, ${questionContainerOpacity / 100})` : theme.questionStyle.background) : `rgba(255, 255, 255, ${questionContainerOpacity / 100})`,
+              borderWidth: '2px',
+              borderStyle: 'solid',
+              borderColor: theme.primary,
+              borderRadius: theme.questionStyle?.borderRadius || '12px',
+              height: '100%',
+              width: '100%',
+              position: 'relative',
+              padding: theme.questionStyle?.padding || '15px',
+              boxSizing: 'border-box',
+              boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)'
+            }}
+          >
+        {/* Decorative elements */}
+        {theme.decorations && theme.decorations.type !== 'none' && (
+            <div className="absolute inset-0 pointer-events-none" style={{ zIndex: 0 }}>
+              {theme.decorations.type === 'shapes' && theme.decorations.elements?.map((el, i) => (
+                <span key={i} className="absolute" style={{
+                  top: `${20 + i * 30}%`,
+                  right: `${10 + i * 15}%`,
+                  fontSize: '24px',
+                  opacity: 0.2
+                }}>{el}</span>
+              ))}
+              {theme.decorations.type === 'lines' && theme.decorations.elements?.includes('vertical-red-line') && (
+                <div style={{ position: 'absolute', left: '50px', top: '0', bottom: '0', width: '2px', backgroundColor: '#ff0000' }}></div>
+              )}
+              {theme.decorations.type === 'dots' && (
+                <div style={{
+                  position: 'absolute',
+                  inset: 0,
+                  backgroundImage: 'radial-gradient(circle, rgba(0,0,0,0.1) 1px, transparent 1px)',
+                  backgroundSize: '20px 20px'
+                }}></div>
+              )}
+            </div>
+          )}
 
-  const renderCardFun = (card: CardData, index: number) => {
-    const gradients = PastelGradients;
-    const illustrations = Object.values(FunIllustrations);
-    const gradient = gradients[index % gradients.length];
-    const illustration = illustrations[index % illustrations.length];
-
-    // Extract primary color from gradient for illustration matching
-    const funColors = [
-      '#ffecd2', // peach
-      '#a1c4fd', // light blue
-      '#d4fc79', // lime green
-      '#cfd9df', // gray
-      '#fccb90', // orange
-      '#f6d365', // yellow
-      '#fbc2eb', // pink
-      '#fdcbf1'  // light pink
-    ];
-    const primaryColor = funColors[index % funColors.length];
-
-    return (
-      <div
-        key={index}
-        className="relative"
-        style={{
-          background: gradient,
-          height: '100%',
-          boxSizing: 'border-box',
-          borderRadius: '8px',
-          padding: '8px',
-          overflow: isDraggableIllustrations ? 'visible' : 'hidden'
-        }}
-      >
-        {/* Fun illustration */}
-        {illustration}
-
-        {/* White content area with softer corners */}
-        <div
-          className="relative bg-white shadow-lg"
-          style={{
-            borderRadius: '20px',
-            width: 'calc(100% - 16px)',
-            height: 'calc(100% - 16px)',
-            padding: '15px',
-            border: '2px dashed rgba(0,0,0,0.1)',
-            position: 'relative',
-            margin: '8px',
-            boxSizing: 'border-box',
-            overflow: isDraggableIllustrations ? 'visible' : 'hidden'
-          }}
-        >
-          {/* Large card number */}
-          <div className="absolute -top-2 -right-2 text-5xl font-black opacity-20">
-            {card.number}
-          </div>
+        {/* Fun illustration from theme */}
+        {theme.illustration && FunIllustrations[theme.illustration] && (
+          <div
+            dangerouslySetInnerHTML={{ __html: FunIllustrations[theme.illustration] }}
+          />
+        )}
 
           {/* Add fun illustration if enabled and no visuals */}
           {showIllustrations && (() => {
             const currentCard = editedCards[card.number] || card;
             const { questionText, visuals } = parseQuestionWithVisuals(currentCard.question);
             return visuals.length === 0 && (
-              <CardIllustration
+              <SimpleCardIllustration
                 question={questionText}
                 subject={formData.subject}
                 difficulty={currentCard.difficulty as 'easy' | 'medium' | 'hard' | undefined}
                 size={60}
                 showIllustration={showIllustrations}
                 illustrationScale={globalCharacterScale}
-                themeColor={primaryColor}
+                themeColor={theme.numberBadgeBackground || '#3b82f6'}
                 cardIndex={index}
                 isDraggable={isDraggableIllustrations}
                 initialTransform={illustrationTransforms[index]}
@@ -567,35 +669,80 @@ export default function CardsV2Page() {
             );
           })()}
 
-          {/* Content with consistent layout */}
-          <div style={{ paddingTop: '10px', paddingRight: '35px', height: 'calc(100% - 10px)', position: 'relative' }}>
+          {/* Question content area */}
+          <div style={{
+            // Only apply non-background styles from theme
+            borderWidth: theme.questionStyle?.border ? '2px' : '0',
+            borderStyle: theme.questionStyle?.border ? 'solid' : 'none',
+            borderColor: theme.questionStyle?.border ? theme.primary : 'transparent',
+            borderRadius: theme.questionStyle?.borderRadius || '0',
+            padding: theme.questionStyle?.padding || '15px',
+            color: theme.questionStyle?.color || '#333333',
+            fontFamily: theme.questionStyle?.fontFamily || 'inherit',
+            fontSize: theme.questionStyle?.fontSize || 'inherit',
+            textShadow: theme.questionStyle?.textShadow || 'none',
+            boxShadow: theme.questionStyle?.boxShadow || 'none',
+            backdropFilter: theme.questionStyle?.backdropFilter || 'none',
+            transform: theme.questionStyle?.transform || 'none',
+            // Keep positioning
+            position: 'relative',
+            zIndex: 1,
+            marginTop: theme.numberBadgeStyle === 'tag' ? '30px' : '10px'
+          }}>
             {(() => {
                 // Use edited version if available, otherwise original
                 const currentCard = editedCards[card.number] || card;
                 const { questionText, visuals } = parseQuestionWithVisuals(currentCard.question);
+
+                // Apply theme-specific text color if needed
+                const textColor = theme.effects?.overlay?.includes('color:')
+                  ? theme.effects.overlay.match(/color:\s*([^;]+)/)?.[1] || '#333333'
+                  : '#333333';
+
+                const fontOverride = theme.effects?.overlay?.includes('font-family:')
+                  ? theme.effects.overlay.match(/font-family:\s*([^;]+)/)?.[1]
+                  : undefined;
+
+                const textShadow = theme.effects?.overlay?.includes('text-shadow:')
+                  ? theme.effects.overlay.match(/text-shadow:\s*([^;]+)/)?.[1]
+                  : undefined;
+
                 return (
                   <>
                     {/* Question text */}
-                    <div
-                      contentEditable
-                      suppressContentEditableWarning
-                      onBlur={(e) => {
-                        const newText = e.currentTarget.textContent || '';
-                        const visualsMatch = currentCard.question.match(/\[visual:.*?\]/g);
-                        const updatedQuestion = visualsMatch ? `${newText} ${visualsMatch.join(' ')}` : newText;
-                        const updatedCard = { ...currentCard, question: updatedQuestion };
-                        setEditedCards(prev => ({ ...prev, [card.number]: updatedCard }));
-                      }}
-                      className="text-sm leading-snug text-gray-700 outline-none focus:ring-2 focus:ring-blue-300 rounded px-1 block"
-                      style={{
-                        fontFamily: fontSettings.fontFamily,
-                        fontSize: `${fontSettings.fontSize}px`,
-                        fontWeight: fontSettings.isBold ? 'bold' : 'normal',
-                        fontStyle: fontSettings.isItalic ? 'italic' : 'normal'
+                    <DraggableQuestionText
+                      cardNumber={card.number}
+                      isDraggable={isDraggableText}
+                      initialPosition={textPositions[card.number]}
+                      onPositionChange={(cardNum, pos) => {
+                        setTextPositions(prev => ({ ...prev, [cardNum]: pos }));
                       }}
                     >
-                      {questionText}
-                    </div>
+                      <div
+                        contentEditable
+                        suppressContentEditableWarning
+                        onBlur={(e) => {
+                          const newText = e.currentTarget.textContent || '';
+                          const visualsMatch = currentCard.question.match(/\[visual:.*?\]/g);
+                          const updatedQuestion = visualsMatch ? `${newText} ${visualsMatch.join(' ')}` : newText;
+                          const updatedCard = { ...currentCard, question: updatedQuestion };
+                          setEditedCards(prev => ({ ...prev, [card.number]: updatedCard }));
+                        }}
+                        className="leading-snug outline-none focus:ring-2 focus:ring-blue-300 rounded px-1 block hover:opacity-80 hover:cursor-text transition-all"
+                        style={{
+                          fontFamily: fontOverride || pageFontSettings.fontFamily,
+                          fontSize: `${pageFontSettings.fontSize}px`,
+                          fontWeight: pageFontSettings.isBold ? 'bold' : 'normal',
+                          fontStyle: pageFontSettings.isItalic ? 'italic' : 'normal',
+                          cursor: 'text',
+                          color: textColor,
+                          textShadow: textShadow || 'none'
+                        }}
+                        title="Cliquez pour éditer le texte"
+                      >
+                        {questionText}
+                      </div>
+                    </DraggableQuestionText>
 
                     {/* Visual area - fills remaining height */}
                     {visuals.length > 0 && (
@@ -623,6 +770,701 @@ export default function CardsV2Page() {
                   </>
                 );
             })()}
+        </div>
+          </div>
+        </div>
+      );
+    }
+
+    // Original rendering for non-bordered themes
+    return (
+      <div
+        key={index}
+        className="relative"
+        style={{
+          // Use backgroundImage for gradients, backgroundColor for solid colors
+          ...(() => {
+            const bgValue = theme.gradient || theme.cardBackground || '#ffffff';
+            if (bgValue.includes('gradient') || bgValue.includes('url(')) {
+              return { backgroundImage: bgValue };
+            } else {
+              return { backgroundColor: bgValue };
+            }
+          })(),
+          borderWidth: theme.cardBorder?.match(/\d+px/)?.[0] || '0',
+          borderStyle: theme.cardBorder?.match(/(solid|dashed|dotted|double)/)?.[0] || 'none',
+          borderColor: theme.cardBorder?.match(/#[a-fA-F0-9]+|rgba?\([^)]+\)/)?.[0] || 'transparent',
+          borderRadius: '0',
+          boxShadow: theme.cardShadow || 'none',
+          padding: theme.cardPadding || '20px',
+          height: '100%',
+          width: '100%',
+          boxSizing: 'border-box',
+          overflow: (isDraggableIllustrations || isDraggableText) ? 'visible' : 'hidden',
+          ...((theme.effects?.overlay && theme.effects.overlay.includes('backdrop-filter')) ? { backdropFilter: 'blur(4px)' } : {}),
+          ...((theme.effects?.overlay && theme.effects.overlay.includes('clip-path')) ? { clipPath: theme.effects.overlay.match(/clip-path: ([^;]+)/)?.[1] } : {})
+        }}
+      >
+        {/* Card number badge */}
+        <div style={numberBadgeStyles}>
+            {theme.numberBadgeStyle === 'corner' ? (
+              <span style={{ position: 'absolute', top: '10px', right: '10px', color: theme.numberBadgeColor, fontWeight: 'bold', fontSize: '18px' }}>
+                {card.number}
+              </span>
+            ) : (
+              card.number
+            )}
+        </div>
+
+        {/* Decorative elements */}
+        {theme.decorations && theme.decorations.type !== 'none' && (
+            <div className="absolute inset-0 pointer-events-none" style={{ zIndex: 0 }}>
+              {theme.decorations.type === 'shapes' && theme.decorations.elements?.map((el, i) => (
+                <span key={i} className="absolute" style={{
+                  top: `${20 + i * 30}%`,
+                  right: `${10 + i * 15}%`,
+                  fontSize: '24px',
+                  opacity: 0.2
+                }}>{el}</span>
+              ))}
+              {theme.decorations.type === 'lines' && theme.decorations.elements?.includes('vertical-red-line') && (
+                <div style={{ position: 'absolute', left: '50px', top: '0', bottom: '0', width: '2px', backgroundColor: '#ff0000' }}></div>
+              )}
+              {theme.decorations.type === 'dots' && (
+                <div style={{
+                  position: 'absolute',
+                  inset: 0,
+                  backgroundImage: 'radial-gradient(circle, rgba(0,0,0,0.1) 1px, transparent 1px)',
+                  backgroundSize: '20px 20px'
+                }}></div>
+              )}
+            </div>
+          )}
+
+        {/* Fun illustration from theme */}
+        {theme.illustration && FunIllustrations[theme.illustration] && (
+          <div
+            dangerouslySetInnerHTML={{ __html: FunIllustrations[theme.illustration] }}
+          />
+        )}
+
+          {/* Add fun illustration if enabled and no visuals */}
+          {showIllustrations && (() => {
+            const currentCard = editedCards[card.number] || card;
+            const { questionText, visuals } = parseQuestionWithVisuals(currentCard.question);
+            return visuals.length === 0 && (
+              <SimpleCardIllustration
+                question={questionText}
+                subject={formData.subject}
+                difficulty={currentCard.difficulty as 'easy' | 'medium' | 'hard' | undefined}
+                size={60}
+                showIllustration={showIllustrations}
+                illustrationScale={globalCharacterScale}
+                themeColor={theme.numberBadgeBackground || '#3b82f6'}
+                cardIndex={index}
+                isDraggable={isDraggableIllustrations}
+                initialTransform={illustrationTransforms[index]}
+                onTransformChange={(transform) => handleIllustrationTransformChange(index, transform)}
+                containerBounds={{ width: 520, height: 350 }}
+                transparentBackground={transparentBackground}
+                characterTheme={characterTheme}
+              />
+            );
+          })()}
+
+          {/* Question content area */}
+          <div style={{
+            // Only apply non-background styles from theme
+            borderWidth: theme.questionStyle?.border ? '2px' : '0',
+            borderStyle: theme.questionStyle?.border ? 'solid' : 'none',
+            borderColor: theme.questionStyle?.border ? theme.primary : 'transparent',
+            borderRadius: theme.questionStyle?.borderRadius || '0',
+            padding: theme.questionStyle?.padding || '15px',
+            color: theme.questionStyle?.color || '#333333',
+            fontFamily: theme.questionStyle?.fontFamily || 'inherit',
+            fontSize: theme.questionStyle?.fontSize || 'inherit',
+            textShadow: theme.questionStyle?.textShadow || 'none',
+            boxShadow: theme.questionStyle?.boxShadow || 'none',
+            backdropFilter: theme.questionStyle?.backdropFilter || 'none',
+            transform: theme.questionStyle?.transform || 'none',
+            // Keep positioning
+            position: 'relative',
+            zIndex: 1,
+            marginTop: theme.numberBadgeStyle === 'tag' ? '30px' : '10px'
+          }}>
+            {(() => {
+                // Use edited version if available, otherwise original
+                const currentCard = editedCards[card.number] || card;
+                const { questionText, visuals } = parseQuestionWithVisuals(currentCard.question);
+
+                // Apply theme-specific text color if needed
+                const textColor = theme.effects?.overlay?.includes('color:')
+                  ? theme.effects.overlay.match(/color:\s*([^;]+)/)?.[1] || '#333333'
+                  : '#333333';
+
+                const fontOverride = theme.effects?.overlay?.includes('font-family:')
+                  ? theme.effects.overlay.match(/font-family:\s*([^;]+)/)?.[1]
+                  : undefined;
+
+                const textShadow = theme.effects?.overlay?.includes('text-shadow:')
+                  ? theme.effects.overlay.match(/text-shadow:\s*([^;]+)/)?.[1]
+                  : undefined;
+
+                return (
+                  <>
+                    {/* Question text */}
+                    <DraggableQuestionText
+                      cardNumber={card.number}
+                      isDraggable={isDraggableText}
+                      initialPosition={textPositions[card.number]}
+                      onPositionChange={(cardNum, pos) => {
+                        setTextPositions(prev => ({ ...prev, [cardNum]: pos }));
+                      }}
+                    >
+                      <div
+                        contentEditable
+                        suppressContentEditableWarning
+                        onBlur={(e) => {
+                          const newText = e.currentTarget.textContent || '';
+                          const visualsMatch = currentCard.question.match(/\[visual:.*?\]/g);
+                          const updatedQuestion = visualsMatch ? `${newText} ${visualsMatch.join(' ')}` : newText;
+                          const updatedCard = { ...currentCard, question: updatedQuestion };
+                          setEditedCards(prev => ({ ...prev, [card.number]: updatedCard }));
+                        }}
+                        className="leading-snug outline-none focus:ring-2 focus:ring-blue-300 rounded px-1 block hover:opacity-80 hover:cursor-text transition-all"
+                        style={{
+                          fontFamily: fontOverride || pageFontSettings.fontFamily,
+                          fontSize: `${pageFontSettings.fontSize}px`,
+                          fontWeight: pageFontSettings.isBold ? 'bold' : 'normal',
+                          fontStyle: pageFontSettings.isItalic ? 'italic' : 'normal',
+                          cursor: 'text',
+                          color: textColor,
+                          textShadow: textShadow || 'none'
+                        }}
+                        title="Cliquez pour éditer le texte"
+                      >
+                        {questionText}
+                      </div>
+                    </DraggableQuestionText>
+
+                    {/* Visual area - fills remaining height */}
+                    {visuals.length > 0 && (
+                      <div style={{
+                        position: 'absolute',
+                        top: '50px',  // Below question text with some spacing
+                        left: 0,
+                        right: 0,
+                        bottom: 0,
+                        padding: '10px'
+                      }}>
+                        <div style={{
+                          width: '100%',
+                          height: '100%',
+                          maxWidth: '220px',
+                          margin: '0 auto',
+                          position: 'relative',
+                          transform: `scale(${visualScale / 100})`,
+                          transformOrigin: 'center center'
+                        }}>
+                          {visuals}
+                        </div>
+                      </div>
+                    )}
+                  </>
+                );
+            })()}
+        </div>
+      </div>
+    );
+  };
+
+  const renderCardFun = (card: CardData, index: number) => {
+    // Use student cards font settings for this card type
+    const pageFontSettings = getPageFontSettings('studentCards');
+
+    // Use the fun/pastel themes
+    const theme = selectedCardTheme === 'auto'
+      ? getAllThemeByIndex(index)
+      : getAllThemeByIndex(selectedCardTheme);
+
+    // Get the gradient background
+    const gradient = theme.gradient || theme.cardBackground || 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
+
+    // Get the illustration if it exists
+    const illustration = theme.illustration && FunIllustrations[theme.illustration] ? (
+      <div
+        style={{
+          position: 'absolute',
+          right: '20px',
+          top: '20px',
+          width: '80px',
+          height: '80px',
+          opacity: 0.4,
+          zIndex: 1
+        }}
+        dangerouslySetInnerHTML={{ __html: FunIllustrations[theme.illustration] }}
+      />
+    ) : null;
+
+    return (
+      <div
+        key={index}
+        className="relative"
+        style={{
+          backgroundImage: gradient,
+          height: '100%',
+          boxSizing: 'border-box',
+          borderRadius: '0',
+          padding: '8px',
+          overflow: (isDraggableIllustrations || isDraggableText) ? 'visible' : 'hidden',
+          position: 'relative'
+        }}
+      >
+        {/* Card number badge - positioned on outer container */}
+        <div
+          className="absolute font-bold"
+          style={{
+            top: '10px',
+            right: '10px',
+            width: '40px',
+            height: '40px',
+            borderRadius: '50%',
+            backgroundColor: theme.primary || '#764ba2',
+            color: '#ffffff',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            fontSize: '18px',
+            zIndex: 10,
+            boxShadow: '0 2px 4px rgba(0,0,0,0.2)'
+          }}
+        >
+          {card.number}
+        </div>
+
+        {/* Fun illustration */}
+        {illustration}
+
+        {/* White content area */}
+        <div
+          className="relative shadow-lg"
+          style={{
+            backgroundColor: `rgba(255, 255, 255, ${questionContainerOpacity / 100})`,
+            borderRadius: '20px',
+            width: 'calc(100% - 16px)',
+            height: 'calc(100% - 16px)',
+            padding: '20px',
+            borderWidth: '3px',
+            borderStyle: 'solid',
+            borderColor: 'rgba(255,255,255,0.8)',
+            position: 'relative',
+            margin: '8px',
+            boxSizing: 'border-box',
+            overflow: (isDraggableIllustrations || isDraggableText) ? 'visible' : 'hidden',
+            boxShadow: '0 8px 32px rgba(0,0,0,0.1)'
+          }}
+        >
+          {/* Add fun illustration if enabled and no visuals */}
+          {showIllustrations && (() => {
+            const currentCard = editedCards[card.number] || card;
+            const { questionText, visuals } = parseQuestionWithVisuals(currentCard.question);
+            return visuals.length === 0 && (
+              <SimpleCardIllustration
+                question={questionText}
+                subject={formData.subject}
+                difficulty={currentCard.difficulty as 'easy' | 'medium' | 'hard' | undefined}
+                size={60}
+                showIllustration={showIllustrations}
+                illustrationScale={globalCharacterScale}
+                themeColor={theme.primary || '#764ba2'}
+                cardIndex={index}
+                isDraggable={isDraggableIllustrations}
+                initialTransform={illustrationTransforms[index]}
+                onTransformChange={(transform) => handleIllustrationTransformChange(index, transform)}
+                containerBounds={{ width: 520, height: 350 }}
+                transparentBackground={transparentBackground}
+                characterTheme={characterTheme}
+              />
+            );
+          })()}
+
+          {/* Content area */}
+          <div style={{
+            paddingTop: '10px',
+            paddingRight: '50px',
+            height: 'calc(100% - 10px)',
+            position: 'relative',
+            zIndex: 1
+          }}>
+            {(() => {
+              // Use edited version if available, otherwise original
+              const currentCard = editedCards[card.number] || card;
+              const { questionText, visuals } = parseQuestionWithVisuals(currentCard.question);
+
+              return (
+                <>
+                  {isDraggableText ? (
+                    <DraggableQuestionText
+                      cardNumber={card.number}
+                      isDraggable={isDraggableText}
+                      initialPosition={textPositions[card.number]}
+                      onPositionChange={(cardNum, pos) => {
+                        setTextPositions(prev => ({ ...prev, [cardNum]: pos }));
+                      }}
+                    >
+                      <div
+                        contentEditable
+                        suppressContentEditableWarning
+                        onBlur={(e) => {
+                          const newText = e.currentTarget.textContent || '';
+                          const visualsMatch = currentCard.question.match(/\[visual:.*?\]/g);
+                          const updatedQuestion = visualsMatch ? `${newText} ${visualsMatch.join(' ')}` : newText;
+                          const updatedCard = { ...currentCard, question: updatedQuestion };
+                          setEditedCards(prev => ({ ...prev, [card.number]: updatedCard }));
+                        }}
+                        className="leading-snug outline-none focus:ring-2 focus:ring-blue-300 rounded px-1 block hover:opacity-80 hover:cursor-text transition-all"
+                        style={{
+                          fontSize: `${pageFontSettings.fontSize}px`,
+                          fontFamily: pageFontSettings.fontFamily,
+                          fontWeight: pageFontSettings.isBold ? 'bold' : 'normal',
+                          fontStyle: pageFontSettings.isItalic ? 'italic' : 'normal',
+                          lineHeight: 1.6,
+                          color: '#333333',
+                          paddingTop: '20px',
+                          cursor: 'text'
+                        }}
+                        title="Cliquez pour éditer le texte"
+                      >
+                        {questionText}
+                      </div>
+                    </DraggableQuestionText>
+                  ) : (
+                    <div
+                      style={{
+                        fontSize: `${pageFontSettings.fontSize}px`,
+                        fontFamily: pageFontSettings.fontFamily,
+                        fontWeight: pageFontSettings.isBold ? 'bold' : 'normal',
+                        fontStyle: pageFontSettings.isItalic ? 'italic' : 'normal',
+                        lineHeight: 1.6,
+                        color: '#333333',
+                        paddingTop: '20px'
+                      }}
+                    >
+                      <div style={{ minHeight: '100px' }}>
+                        {questionText}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Visual elements if any */}
+                  {visuals.length > 0 && (
+                    <div style={{ marginTop: '20px' }}>
+                      <div style={{
+                        display: 'inline-block',
+                        margin: '0 auto',
+                        position: 'relative',
+                        transform: `scale(${visualScale / 100})`,
+                        transformOrigin: 'center center'
+                      }}>
+                        {visuals}
+                      </div>
+                    </div>
+                  )}
+                </>
+              );
+            })()}
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  const renderCardTeacher = (card: CardData, index: number) => {
+    // Use student cards font settings for this card type
+    const pageFontSettings = getPageFontSettings('studentCards');
+
+    // Get the teacher theme
+    const theme = selectedCardTheme === 'auto'
+      ? getAllThemeByIndex(index)
+      : getAllThemeByIndex(selectedCardTheme);
+
+    // Cast to TeacherTheme type
+    const teacherTheme = theme as any;
+
+    // Helper to render badge shape
+    const renderBadge = () => {
+      const badge = teacherTheme.numberBadge;
+      const baseStyle: React.CSSProperties = {
+        position: 'absolute',
+        top: '8px',
+        right: '8px',
+        width: '40px',
+        height: '40px',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        fontSize: '20px',
+        fontWeight: 'bold',
+        color: badge?.color || '#ffffff',
+        background: badge?.background || '#ff6b9d',
+        zIndex: 10,
+        boxShadow: '0 2px 4px rgba(0,0,0,0.2)'
+      };
+
+      if (badge?.shape === 'star') {
+        return (
+          <div
+            style={{
+              ...baseStyle,
+              clipPath: 'polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%)',
+              border: 'none'
+            }}
+          >
+            {card.number}
+          </div>
+        );
+      } else if (badge?.shape === 'cloud') {
+        return (
+          <div
+            style={{
+              ...baseStyle,
+              borderRadius: '50% 50% 50% 50% / 60% 60% 40% 40%',
+              boxShadow: '0 4px 8px rgba(0,0,0,0.1)',
+              border: badge?.border || 'none'
+            }}
+          >
+            {card.number}
+          </div>
+        );
+      } else if (badge?.shape === 'hexagon') {
+        return (
+          <div
+            style={{
+              ...baseStyle,
+              clipPath: 'polygon(30% 0%, 70% 0%, 100% 30%, 100% 70%, 70% 100%, 30% 100%, 0% 70%, 0% 30%)',
+              border: 'none'
+            }}
+          >
+            {card.number}
+          </div>
+        );
+      } else {
+        // Circle (default)
+        return (
+          <div
+            style={{
+              ...baseStyle,
+              borderRadius: '50%',
+              border: badge?.border || '3px solid #ffffff'
+            }}
+          >
+            {card.number}
+          </div>
+        );
+      }
+    };
+
+    // Render decorative elements
+    const renderDecorativeElements = () => {
+      if (!teacherTheme.decorativeElements || teacherTheme.decorativeElements.length === 0) return null;
+
+      return teacherTheme.decorativeElements.map((element: string, idx: number) => {
+        const positions = [
+          { top: '10px', left: '10px' },
+          { bottom: '10px', right: '10px' },
+          { top: '50%', left: '10px' },
+          { bottom: '10px', left: '10px' }
+        ];
+        const position = positions[idx % positions.length];
+
+        return (
+          <div
+            key={idx}
+            style={{
+              position: 'absolute',
+              ...position,
+              fontSize: '24px',
+              opacity: 0.6,
+              transform: `rotate(${idx * 15 - 15}deg)`,
+              zIndex: 0
+            }}
+          >
+            {element}
+          </div>
+        );
+      });
+    };
+
+    return (
+      <div
+        key={index}
+        className="relative"
+        style={{
+          ...(teacherTheme.pattern ? {
+            backgroundImage: `${teacherTheme.pattern}, ${teacherTheme.background || 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'}`,
+            backgroundSize: '20px 20px, cover'
+          } : {
+            backgroundImage: teacherTheme.background || 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
+          }),
+          height: '100%',
+          boxSizing: 'border-box',
+          borderRadius: '0',
+          padding: '12px',
+          overflow: (isDraggableIllustrations || isDraggableText) ? 'visible' : 'hidden',
+          position: 'relative',
+          boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
+        }}
+      >
+        {/* Number badge - positioned on outer container */}
+        {renderBadge()}
+
+        {/* Decorative elements */}
+        {renderDecorativeElements()}
+
+        {/* White content area with special border */}
+        <div
+          className="relative"
+          style={{
+            backgroundColor: teacherTheme.contentBackground ? (teacherTheme.contentBackground === '#ffffff' ? `rgba(255, 255, 255, ${questionContainerOpacity / 100})` : teacherTheme.contentBackground) : `rgba(255, 255, 255, ${questionContainerOpacity / 100})`,
+            borderRadius: teacherTheme.borderRadius || '20px',
+            width: 'calc(100% - 24px)',
+            height: 'calc(100% - 24px)',
+            padding: '24px',
+            ...(teacherTheme.contentBorder ? {
+              borderWidth: teacherTheme.contentBorder.match(/\d+/)?.[0] || '3',
+              borderStyle: teacherTheme.contentBorderStyle || teacherTheme.contentBorder.includes('dashed') ? 'dashed' : 'solid',
+              borderColor: teacherTheme.contentBorder.match(/#[a-fA-F0-9]+|rgba?\([^)]+\)/)?.[0] || '#667eea'
+            } : {
+              borderWidth: '3px',
+              borderStyle: 'solid',
+              borderColor: '#667eea'
+            }),
+            position: 'relative',
+            margin: '12px',
+            boxSizing: 'border-box',
+            overflow: (isDraggableIllustrations || isDraggableText) ? 'visible' : 'hidden',
+            boxShadow: '0 8px 24px rgba(0,0,0,0.08)',
+            zIndex: 1
+          }}
+        >
+          {/* Add fun illustration if enabled */}
+          {showIllustrations && (() => {
+            const currentCard = editedCards[card.number] || card;
+            const { questionText, visuals } = parseQuestionWithVisuals(currentCard.question);
+            return visuals.length === 0 && (
+              <SimpleCardIllustration
+                question={questionText}
+                subject={formData.subject}
+                difficulty={currentCard.difficulty as 'easy' | 'medium' | 'hard' | undefined}
+                size={60}
+                showIllustration={showIllustrations}
+                illustrationScale={globalCharacterScale}
+                themeColor={teacherTheme.numberBadge?.background || '#ff6b9d'}
+                cardIndex={index}
+                isDraggable={isDraggableIllustrations}
+                initialTransform={illustrationTransforms[index]}
+                onTransformChange={(transform) => handleIllustrationTransformChange(index, transform)}
+                containerBounds={{ width: 520, height: 350 }}
+                transparentBackground={transparentBackground}
+                characterTheme={characterTheme}
+              />
+            );
+          })()}
+
+          {/* Card content */}
+          <div className="h-full flex flex-col relative" style={{ zIndex: 3 }}>
+
+            {/* Context if exists */}
+            {card.context && (
+              <div
+                className="mb-3 text-gray-600 bg-gray-50 p-2 rounded-lg"
+                style={{
+                  fontSize: `${pageFontSettings.fontSize - 2}px`,
+                  fontFamily: pageFontSettings.fontFamily !== 'system-ui' ? pageFontSettings.fontFamily : (teacherTheme.fontFamily || 'inherit'),
+                  fontStyle: 'italic'
+                }}
+              >
+                {card.context}
+              </div>
+            )}
+
+            {/* Question with draggable support */}
+            <div className="flex-grow">
+              {isDraggableText ? (
+                <DraggableQuestionText
+                  cardNumber={card.number}
+                  isDraggable={isDraggableText}
+                  initialPosition={textPositions[card.number]}
+                  onPositionChange={(cardNum, pos) => {
+                    setTextPositions(prev => ({ ...prev, [cardNum]: pos }));
+                  }}
+                >
+                  <div
+                    contentEditable
+                    suppressContentEditableWarning
+                    onBlur={(e) => {
+                      const newText = e.currentTarget.textContent || '';
+                      const currentCard = editedCards[card.number] || card;
+                      const visualsMatch = currentCard.question.match(/\[visual:.*?\]/g);
+                      const updatedQuestion = visualsMatch ? `${newText} ${visualsMatch.join(' ')}` : newText;
+                      const updatedCard = { ...currentCard, question: updatedQuestion };
+                      setEditedCards(prev => ({ ...prev, [card.number]: updatedCard }));
+                    }}
+                    className="leading-snug outline-none focus:ring-2 focus:ring-blue-300 rounded px-1 block hover:opacity-80 hover:cursor-text transition-all"
+                    style={{
+                      fontSize: `${pageFontSettings.fontSize}px`,
+                      fontFamily: pageFontSettings.fontFamily !== 'system-ui' ? pageFontSettings.fontFamily : (teacherTheme.fontFamily || 'inherit'),
+                      fontWeight: pageFontSettings.isBold ? 'bold' : 'normal',
+                      fontStyle: pageFontSettings.isItalic ? 'italic' : 'normal',
+                      lineHeight: 1.6,
+                      color: '#2d3748',
+                      minHeight: '60px',
+                      cursor: 'text'
+                    }}
+                    title="Cliquez pour éditer le texte"
+                  >
+                    {editedCards[card.number]?.question.replace(/\[visual:.*?\]/g, '').trim() || card.question.replace(/\[visual:.*?\]/g, '').trim()}
+                  </div>
+                </DraggableQuestionText>
+              ) : (
+                (() => {
+                  const currentCard = editedCards[card.number] || card;
+                  const { questionText, visuals } = parseQuestionWithVisuals(currentCard.question);
+                  return (
+                    <>
+                      <p
+                        className="text-gray-700"
+                        style={{
+                          fontSize: `${pageFontSettings.fontSize}px`,
+                          fontFamily: pageFontSettings.fontFamily !== 'system-ui' ? pageFontSettings.fontFamily : (teacherTheme.fontFamily || 'inherit'),
+                          fontWeight: pageFontSettings.isBold ? 'bold' : 'normal',
+                          fontStyle: pageFontSettings.isItalic ? 'italic' : 'normal',
+                          lineHeight: 1.6,
+                          minHeight: '60px',
+                          color: '#2d3748'
+                        }}
+                      >
+                        {questionText}
+                      </p>
+                      {visuals.length > 0 && (
+                        <div
+                          style={{
+                            display: 'flex',
+                            flexWrap: 'wrap',
+                            gap: '10px',
+                            marginTop: '15px',
+                            justifyContent: 'center'
+                          }}
+                        >
+                          {visuals}
+                        </div>
+                      )}
+                    </>
+                  );
+                })()
+              )}
+            </div>
+
           </div>
         </div>
       </div>
@@ -630,24 +1472,38 @@ export default function CardsV2Page() {
   };
 
   const renderCard = (card: CardData, index: number) => {
-    if (cardStyle === 'fun' || cardStyle === 'gradient') {
+    // Get the current theme
+    const theme = selectedCardTheme === 'auto'
+      ? getAllThemeByIndex(index)
+      : getAllThemeByIndex(selectedCardTheme);
+
+    // Check theme type
+    const isProfessionalTheme = theme.type === 'professional';
+    const isTeacherTheme = theme.type === 'teacher';
+
+    // Use appropriate renderer
+    if (isProfessionalTheme) {
+      return renderCardProfessional(card, index);
+    } else if (isTeacherTheme) {
+      return renderCardTeacher(card, index);
+    } else {
       return renderCardFun(card, index);
     }
-    return renderCardProfessional(card, index);
   };
 
   const renderA4Page = (cards: CardData[], pageNumber: number) => {
     return (
       <div
         key={pageNumber}
-        className="bg-white mx-auto relative"
+        className="mx-auto relative"
         style={{
           width: '297mm',
           height: '210mm',
           padding: 0,
           pageBreakAfter: 'always',
           position: 'relative',
-          overflow: 'hidden'
+          overflow: 'hidden',
+          ...getBackgroundStyle(transparentBackground ? 'transparent' : 'white')
         }}
       >
         {/* Vertical cut line */}
@@ -699,68 +1555,848 @@ export default function CardsV2Page() {
   };
 
   const renderAnswerSheet = (cards: CardData[]) => {
+    // Use student answer sheet font settings for this page type
+    const pageFontSettings = getPageFontSettings('studentAnswers');
+
+    // Get the selected theme (use first card's theme for consistency)
+    const combinedTheme = selectedCardTheme === 'auto'
+      ? getAllThemeByIndex(0)
+      : getAllThemeByIndex(selectedCardTheme);
+
+    const getThemeStyles = () => {
+      // Check if it's a teacher theme
+      const isTeacherTheme = combinedTheme.type === 'teacher';
+      const teacherTheme = combinedTheme as any;
+
+      if (isTeacherTheme) {
+        return {
+          pageBackground: teacherTheme.background || 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+          pattern: teacherTheme.pattern,
+          cardBackground: teacherTheme.contentBackground || '#ffffff',
+          borderColor: teacherTheme.contentBorder?.match(/#[a-fA-F0-9]+|rgba?\([^)]+\)/)?.[0] || '#e2e8f0',
+          headerColor: teacherTheme.numberBadge?.background || '#4A7FE6',
+          accentColor: teacherTheme.numberBadge?.background || '#3b82f6',
+          numberBg: teacherTheme.contentBackground || '#E8F0FF',
+          shadowColor: 'rgba(0, 0, 0, 0.1)',
+          fontFamily: pageFontSettings.fontFamily !== 'system-ui' ? pageFontSettings.fontFamily : (teacherTheme.fontFamily || 'inherit'),
+          decorativeElements: teacherTheme.decorativeElements
+        };
+      } else {
+        return {
+          pageBackground: combinedTheme.cardBackground || 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+          cardBackground: combinedTheme.cardBackground || '#ffffff',
+          borderColor: combinedTheme.cardBorder?.split(' ')[2] || '#e2e8f0',
+          headerColor: 'primary' in combinedTheme ? combinedTheme.primary : '#4A7FE6',
+          accentColor: 'primary' in combinedTheme ? combinedTheme.primary : '#3b82f6',
+          numberBg: combinedTheme.cardBackground || '#E8F0FF',
+          shadowColor: combinedTheme.cardShadow || 'rgba(74, 127, 230, 0.2)',
+          fontFamily: pageFontSettings.fontFamily || 'inherit'
+        };
+      }
+    };
+
+    const theme = getThemeStyles();
+
     return (
-      <div
-        className="bg-white shadow-lg mx-auto p-12"
-        style={{
-          width: '210mm',
-          minHeight: '297mm',
-          pageBreakAfter: 'always'
-        }}
-      >
-        <h2 className="text-2xl font-bold text-center mb-8">
-          Feuille Réponse - {generatedCards?.metadata.subject}
-        </h2>
+      <>
+        {/* Page 1 - Student Info & Cards 1-4 */}
+        <div
+          style={{
+            width: '210mm',
+            height: '297mm',
+            pageBreakAfter: 'always',
+            backgroundImage: theme.pattern ? `${theme.pattern}, ${theme.pageBackground}` : theme.pageBackground,
+            backgroundSize: theme.pattern ? '20px 20px, cover' : 'cover',
+            padding: '10mm 8mm',
+            position: 'relative',
+            margin: '0 auto',
+            boxSizing: 'border-box',
+            display: 'flex',
+            flexDirection: 'column'
+          }}
+        >
+          {/* Decorative elements matching theme style */}
+          {combinedTheme.decorations?.pattern && (
+            <>
+              <div style={{ position: 'absolute', top: '5mm', right: '5mm', fontSize: '40px', opacity: 0.1 }}>🌟</div>
+              <div style={{ position: 'absolute', bottom: '5mm', left: '5mm', fontSize: '40px', opacity: 0.1 }}>✨</div>
+              <div style={{ position: 'absolute', top: '50%', right: '5mm', fontSize: '35px', opacity: 0.08, transform: 'rotate(20deg)' }}>🎯</div>
+            </>
+          )}
 
-        <div className="mb-6 flex gap-8">
-          <div>Nom: _________________________________</div>
-          <div>Date: ________________</div>
-        </div>
+          {/* Header with Title */}
+          <div style={{ textAlign: 'center', marginBottom: '15px' }}>
+            <h1 style={{
+              color: theme.headerColor,
+              fontSize: `${pageFontSettings.fontSize + 16}px`,
+              fontWeight: pageFontSettings.isBold ? 'bold' : '600',
+              fontStyle: pageFontSettings.isItalic ? 'italic' : 'normal',
+              fontFamily: theme.fontFamily || pageFontSettings.fontFamily || 'inherit',
+              margin: 0,
+              textShadow: '2px 2px 4px rgba(0,0,0,0.1)'
+            }}>
+              🎯 Feuille de Réponses 🎯
+            </h1>
+            <p style={{
+              color: theme.headerColor,
+              fontSize: `${pageFontSettings.fontSize - 2}px`,
+              fontFamily: theme.fontFamily || pageFontSettings.fontFamily || 'inherit',
+              fontStyle: pageFontSettings.isItalic ? 'italic' : 'normal',
+              marginTop: '5px',
+              opacity: 0.8
+            }}>
+              Écris tes réponses clairement dans les cases
+            </p>
+          </div>
 
-        <div className="space-y-6">
-          {cards.map((card) => (
-            <div key={card.number} className="border-b pb-4">
-              <div className="font-semibold mb-2">Question {card.number}:</div>
-              <div className="h-16 border-b-2 border-dashed border-gray-300"></div>
+          {/* Student Information Box */}
+          <div style={{
+            ...getBackgroundStyle(theme.cardBackground),
+            borderWidth: theme.cardBorder?.match(/\d+px/)?.[0] || '3px',
+            borderStyle: theme.cardBorder?.match(/(solid|dashed|dotted|double)/)?.[0] || 'solid',
+            borderColor: theme.cardBorder?.match(/#[a-fA-F0-9]+|rgba?\([^)]+\)/)?.[0] || theme.borderColor,
+            borderRadius: theme.cardRadius || '15px',
+            padding: '15px 20px',
+            marginBottom: '20px',
+            boxShadow: `0 4px 10px ${theme.shadowColor}`
+          }}>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px' }}>
+              <div style={{ display: 'flex', alignItems: 'center' }}>
+                <span style={{
+                  fontWeight: pageFontSettings.isBold ? 'bold' : '600',
+                  fontSize: `${pageFontSettings.fontSize}px`,
+                  fontFamily: theme.fontFamily || pageFontSettings.fontFamily || 'inherit',
+                  fontStyle: pageFontSettings.isItalic ? 'italic' : 'normal',
+                  color: theme.headerColor,
+                  marginRight: '8px'
+                }}>
+                  👤 Nom:
+                </span>
+                <div style={{
+                  flex: 1,
+                  borderBottom: `2px dotted ${theme.borderColor}`,
+                  height: '25px'
+                }}></div>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center' }}>
+                <span style={{
+                  fontWeight: pageFontSettings.isBold ? 'bold' : '600',
+                  fontSize: `${pageFontSettings.fontSize}px`,
+                  fontFamily: theme.fontFamily || pageFontSettings.fontFamily || 'inherit',
+                  fontStyle: pageFontSettings.isItalic ? 'italic' : 'normal',
+                  color: theme.headerColor,
+                  marginRight: '8px'
+                }}>
+                  📅 Date:
+                </span>
+                <div style={{
+                  flex: 1,
+                  borderBottom: `2px dotted ${theme.borderColor}`,
+                  height: '25px'
+                }}></div>
+              </div>
             </div>
-          ))}
+            <div style={{ display: 'flex', alignItems: 'center', marginTop: '15px' }}>
+              <span style={{
+                fontWeight: pageFontSettings.isBold ? 'bold' : '600',
+                fontSize: `${16}px`,
+                fontFamily: theme.fontFamily || pageFontSettings.fontFamily || 'inherit',
+                fontStyle: pageFontSettings.isItalic ? 'italic' : 'normal',
+                color: theme.headerColor,
+                marginRight: '8px'
+              }}>
+                🏫 Classe:
+              </span>
+              <div style={{
+                flex: 1,
+                borderBottom: `2px dotted ${theme.borderColor}`,
+                height: '25px'
+              }}></div>
+            </div>
+          </div>
+
+          {/* Cards 1-4 Grid */}
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: '1fr 1fr',
+            gap: '15px',
+            flex: 1
+          }}>
+            {cards.slice(0, 4).map((card) => (
+              <div
+                key={card.number}
+                className="transition-all"
+                style={{
+                  ...getBackgroundStyle(theme.cardBackground),
+                  borderWidth: theme.cardBorder?.match(/\d+px/)?.[0] || '3px',
+                  borderStyle: theme.cardBorder?.match(/(solid|dashed|dotted|double)/)?.[0] || 'solid',
+                  borderColor: theme.cardBorder?.match(/#[a-fA-F0-9]+|rgba?\([^)]+\)/)?.[0] || theme.borderColor,
+                  borderRadius: theme.cardRadius || '20px',
+                  padding: `${20}px`,
+                  position: 'relative',
+                  boxShadow: `0 6px 15px ${theme.shadowColor}`,
+                  display: 'flex',
+                  flexDirection: 'column',
+                  opacity: 1,
+                  filter: 'none',
+                  transition: `all 300ms`
+                }}
+              >
+                {/* Card Number Badge */}
+                <div style={{
+                  position: 'absolute',
+                  top: '-15px',
+                  left: '20px',
+                  ...getBackgroundStyle(theme.numberBg),
+                  color: theme.headerColor,
+                  padding: '8px 20px',
+                  borderRadius: `${25}px`,
+                  fontSize: `${20}px`,
+                  fontWeight: 'bold',
+                  fontFamily: theme.fontFamily || pageFontSettings.fontFamily || 'inherit',
+                  borderWidth: '3px',
+                  borderStyle: 'solid',
+                  borderColor: theme.cardBackground,
+                  boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
+                }}>
+                  Carte {card.number}
+                </div>
+
+                {/* Writing Lines */}
+                <div style={{ marginTop: '25px', flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+                  {[1, 2, 3, 4, 5, 6].map((line) => (
+                    <div
+                      key={line}
+                      style={{
+                        borderBottom: `2px solid ${theme.borderColor}`,
+                        height: '28px',
+                        opacity: 0.4
+                      }}
+                    ></div>
+                  ))}
+                </div>
+
+                {/* Decorative star */}
+                <div style={{
+                  position: 'absolute',
+                  bottom: '10px',
+                  right: '10px',
+                  fontSize: '20px',
+                  opacity: 0.15
+                }}>⭐</div>
+              </div>
+            ))}
+          </div>
         </div>
-      </div>
+
+        {/* Page 2 - Cards 5-8 & Score */}
+        <div
+          style={{
+            width: '210mm',
+            height: '297mm',
+            pageBreakAfter: 'always',
+            backgroundImage: theme.pattern ? `${theme.pattern}, ${theme.pageBackground}` : theme.pageBackground,
+            backgroundSize: theme.pattern ? '20px 20px, cover' : 'cover',
+            padding: '10mm 8mm',
+            position: 'relative',
+            margin: '0 auto',
+            boxSizing: 'border-box',
+            display: 'flex',
+            flexDirection: 'column'
+          }}
+        >
+          {/* Decorative elements matching theme style */}
+          {combinedTheme.decorations?.pattern && (
+            <>
+              <div style={{ position: 'absolute', top: '5mm', left: '5mm', fontSize: '40px', opacity: 0.1 }}>🎉</div>
+              <div style={{ position: 'absolute', bottom: '5mm', right: '5mm', fontSize: '40px', opacity: 0.1 }}>🏆</div>
+              <div style={{ position: 'absolute', top: '40%', left: '5mm', fontSize: '35px', opacity: 0.08, transform: 'rotate(-15deg)' }}>📝</div>
+            </>
+          )}
+
+          {/* Page 2 Header */}
+          <div style={{ textAlign: 'center', marginBottom: '20px' }}>
+            <h2 style={{
+              color: theme.headerColor,
+              fontSize: `${pageFontSettings.fontSize + 12}px`,
+              fontWeight: pageFontSettings.isBold ? 'bold' : '600',
+              fontStyle: pageFontSettings.isItalic ? 'italic' : 'normal',
+              fontFamily: theme.fontFamily || pageFontSettings.fontFamily || 'inherit',
+              margin: 0
+            }}>
+              Suite des Réponses
+            </h2>
+          </div>
+
+          {/* Cards 5-8 Grid */}
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: '1fr 1fr',
+            gap: '15px',
+            flex: 1,
+            marginBottom: '20px'
+          }}>
+            {cards.slice(4, 8).map((card) => (
+              <div
+                key={card.number}
+                className="transition-all"
+                style={{
+                  ...getBackgroundStyle(theme.cardBackground),
+                  borderWidth: theme.cardBorder?.match(/\d+px/)?.[0] || '3px',
+                  borderStyle: theme.cardBorder?.match(/(solid|dashed|dotted|double)/)?.[0] || 'solid',
+                  borderColor: theme.cardBorder?.match(/#[a-fA-F0-9]+|rgba?\([^)]+\)/)?.[0] || theme.borderColor,
+                  borderRadius: theme.cardRadius || '20px',
+                  padding: `${20}px`,
+                  position: 'relative',
+                  boxShadow: `0 6px 15px ${theme.shadowColor}`,
+                  display: 'flex',
+                  flexDirection: 'column',
+                  opacity: 1,
+                  filter: 'none',
+                  transition: `all 300ms`
+                }}
+              >
+                {/* Card Number Badge */}
+                <div style={{
+                  position: 'absolute',
+                  top: '-15px',
+                  left: '20px',
+                  ...getBackgroundStyle(theme.numberBg),
+                  color: theme.headerColor,
+                  padding: '8px 20px',
+                  borderRadius: `${25}px`,
+                  fontSize: `${20}px`,
+                  fontWeight: 'bold',
+                  fontFamily: theme.fontFamily || pageFontSettings.fontFamily || 'inherit',
+                  borderWidth: '3px',
+                  borderStyle: 'solid',
+                  borderColor: theme.cardBackground,
+                  boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
+                }}>
+                  Carte {card.number}
+                </div>
+
+                {/* Writing Lines */}
+                <div style={{ marginTop: '25px', flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+                  {[1, 2, 3, 4, 5, 6].map((line) => (
+                    <div
+                      key={line}
+                      style={{
+                        borderBottom: `2px solid ${theme.borderColor}`,
+                        height: '28px',
+                        opacity: 0.4
+                      }}
+                    ></div>
+                  ))}
+                </div>
+
+                {/* Decorative star */}
+                <div style={{
+                  position: 'absolute',
+                  bottom: '10px',
+                  right: '10px',
+                  fontSize: '20px',
+                  opacity: 0.15
+                }}>⭐</div>
+              </div>
+            ))}
+          </div>
+
+          {/* Score Section */}
+          <div style={{
+            ...getBackgroundStyle(theme.cardBackground),
+            borderWidth: theme.cardBorder?.match(/\d+px/)?.[0] || '3px',
+            borderStyle: theme.cardBorder?.match(/(solid|dashed|dotted|double)/)?.[0] || 'solid',
+            borderColor: theme.cardBorder?.match(/#[a-fA-F0-9]+|rgba?\([^)]+\)/)?.[0] || theme.borderColor,
+            borderRadius: theme.cardRadius || '20px',
+            padding: '20px',
+            boxShadow: `0 6px 15px ${theme.shadowColor}`,
+            marginTop: 'auto'
+          }}>
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(3, 1fr)',
+              gap: '20px',
+              alignItems: 'center'
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <span style={{
+                  fontWeight: pageFontSettings.isBold ? 'bold' : '600',
+                  fontSize: `${pageFontSettings.fontSize + 2}px`,
+                  fontFamily: theme.fontFamily || pageFontSettings.fontFamily || 'inherit',
+                  fontStyle: pageFontSettings.isItalic ? 'italic' : 'normal',
+                  color: theme.headerColor,
+                  marginRight: '10px'
+                }}>
+                  ✅ Score:
+                </span>
+                <div style={{
+                  width: '60px',
+                  borderBottom: `3px solid ${theme.borderColor}`,
+                  textAlign: 'center',
+                  fontSize: '20px',
+                  fontWeight: 'bold'
+                }}>___</div>
+                <span style={{ marginLeft: '5px', fontSize: '18px', color: theme.headerColor }}>/ 8</span>
+              </div>
+
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <span style={{
+                  fontWeight: pageFontSettings.isBold ? 'bold' : '600',
+                  fontSize: `${pageFontSettings.fontSize + 2}px`,
+                  fontFamily: theme.fontFamily || pageFontSettings.fontFamily || 'inherit',
+                  fontStyle: pageFontSettings.isItalic ? 'italic' : 'normal',
+                  color: theme.headerColor,
+                  marginRight: '10px'
+                }}>
+                  📊 Note:
+                </span>
+                <div style={{
+                  width: '60px',
+                  borderBottom: `3px solid ${theme.borderColor}`,
+                  textAlign: 'center',
+                  fontSize: '20px',
+                  fontWeight: 'bold'
+                }}>___</div>
+                <span style={{ marginLeft: '5px', fontSize: '18px', color: theme.headerColor }}>%</span>
+              </div>
+
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <span style={{
+                  fontWeight: pageFontSettings.isBold ? 'bold' : '600',
+                  fontSize: `${pageFontSettings.fontSize + 2}px`,
+                  fontFamily: theme.fontFamily || pageFontSettings.fontFamily || 'inherit',
+                  fontStyle: pageFontSettings.isItalic ? 'italic' : 'normal',
+                  color: theme.headerColor,
+                  marginRight: '10px'
+                }}>
+                  ✍️ Vérifié:
+                </span>
+                <div style={{
+                  flex: 1,
+                  maxWidth: '150px',
+                  borderBottom: `3px solid ${theme.borderColor}`
+                }}></div>
+              </div>
+            </div>
+
+            {/* Encouragement message */}
+            <div style={{
+              textAlign: 'center',
+              marginTop: '15px',
+              padding: '10px',
+              ...getBackgroundStyle(theme.pageBackground),
+              borderRadius: '10px'
+            }}>
+              <p style={{
+                margin: 0,
+                color: theme.headerColor,
+                fontSize: '16px',
+                fontWeight: 'bold'
+              }}>
+                🌟 Excellent travail! Continue comme ça! 🌟
+              </p>
+            </div>
+          </div>
+        </div>
+      </>
     );
   };
 
   const renderCorrection = (cards: CardData[]) => {
-    return (
-      <div
-        className="bg-gray-50 shadow-lg mx-auto p-12"
-        style={{
-          width: '210mm',
-          minHeight: '297mm'
-        }}
-      >
-        <h2 className="text-2xl font-bold text-center mb-8">
-          Corrigé - {generatedCards?.metadata.subject}
-        </h2>
+    // Use teacher answer sheet font settings for this page type
+    const pageFontSettings = getPageFontSettings('teacherAnswers');
 
-        <div className="space-y-4">
-          {cards.map((card) => (
-            <div key={card.number} className="bg-white p-4 rounded-lg">
-              <div className="font-semibold text-green-700 mb-2">
-                Question {card.number}: {card.title}
-              </div>
-              <div className="text-gray-700">
-                {card.answer || 'Réponse à venir...'}
-              </div>
+    // Get the selected theme (use first card's theme for consistency)
+    const combinedTheme = selectedCardTheme === 'auto'
+      ? getAllThemeByIndex(0)
+      : getAllThemeByIndex(selectedCardTheme);
+
+    const getThemeStyles = () => {
+      const isTeacherTheme = (combinedTheme as any).type === 'teacher';
+      const teacherTheme = combinedTheme as any;
+
+      if (isTeacherTheme) {
+        return {
+          pageBackground: teacherTheme.background,
+          pattern: teacherTheme.pattern,
+          cardBackground: teacherTheme.contentBackground,
+          cardBorder: teacherTheme.contentBorder,
+          borderStyle: teacherTheme.contentBorderStyle || 'solid',
+          borderColor: teacherTheme.contentBorder?.split(' ')[2] || '#34d399',
+          borderRadius: teacherTheme.borderRadius,
+          headerColor: teacherTheme.numberBadge?.color || '#10b981',
+          answerBg: '#d1fae5', // Keep light green for answers
+          correctColor: '#059669', // Keep green for correct answers
+          shadowColor: 'rgba(52, 211, 153, 0.2)',
+          fontFamily: pageFontSettings.fontFamily !== 'system-ui' ? pageFontSettings.fontFamily : (teacherTheme.fontFamily || 'inherit'),
+          decorativeElements: teacherTheme.decorativeElements,
+          numberBadge: teacherTheme.numberBadge
+        };
+      }
+
+      // Original theme styles for non-teacher themes
+      return {
+        pageBackground: combinedTheme.cardBackground || 'linear-gradient(135deg, #d4fc79 0%, #96e6a1 100%)',
+        cardBackground: combinedTheme.cardBackground || 'rgba(255, 255, 255, 0.95)',
+        cardBorder: combinedTheme.cardBorder,
+        borderStyle: 'solid',
+        borderColor: combinedTheme.cardBorder?.split(' ')[2] || '#34d399',
+        borderRadius: '0',
+        headerColor: 'primary' in combinedTheme ? combinedTheme.primary : '#10b981',
+        answerBg: combinedTheme.cardBackground || '#d1fae5',
+        correctColor: '#059669',
+        shadowColor: combinedTheme.cardShadow || 'rgba(52, 211, 153, 0.2)',
+        fontFamily: pageFontSettings.fontFamily || 'inherit',
+        decorativeElements: null,
+        numberBadge: null
+      };
+    };
+
+    const theme = getThemeStyles();
+
+    // Split cards into two groups for two pages
+    const firstPageCards = cards.slice(0, 4);
+    const secondPageCards = cards.slice(4, 8);
+
+    return (
+      <>
+        {/* Page 1 - Cards 1-4 */}
+        <div
+          style={{
+            width: '210mm',
+            height: '297mm',
+            backgroundImage: theme.pattern ? `${theme.pattern}, ${theme.pageBackground}` : theme.pageBackground,
+            backgroundSize: theme.pattern ? '20px 20px, cover' : 'cover',
+            padding: '15mm',
+            pageBreakBefore: 'always',
+            position: 'relative',
+            margin: '0 auto',
+            overflow: 'hidden',
+            boxSizing: 'border-box'
+          }}
+        >
+          {/* Decorative elements for teacher themes */}
+          {theme.decorativeElements && theme.decorativeElements.map((element, idx) => (
+            <div
+              key={idx}
+              style={{
+                position: 'absolute',
+                fontSize: '60px',
+                opacity: 0.1,
+                ...(idx === 0 && { top: '10px', right: '20px', transform: 'rotate(15deg)' }),
+                ...(idx === 1 && { bottom: '10px', left: '20px', transform: 'rotate(-15deg)' }),
+                ...(idx === 2 && { top: '50%', left: '10px', transform: 'translateY(-50%) rotate(25deg)' }),
+                ...(idx === 3 && { top: '50%', right: '10px', transform: 'translateY(-50%) rotate(-25deg)' })
+              }}
+            >
+              {element}
             </div>
           ))}
+          {!theme.decorativeElements && (
+            <>
+              <div style={{
+                position: 'absolute',
+                top: '10px',
+                right: '20px',
+                fontSize: '60px',
+                opacity: 0.1,
+                transform: 'rotate(15deg)'
+              }}>✓</div>
+              <div style={{
+                position: 'absolute',
+                bottom: '10px',
+                left: '20px',
+                fontSize: '60px',
+                opacity: 0.1,
+                transform: 'rotate(-15deg)'
+              }}>★</div>
+            </>
+          )}
+
+          <h2 className="text-3xl font-bold text-center mb-8" style={{
+            color: theme.headerColor,
+            textShadow: '2px 2px 4px rgba(0,0,0,0.1)'
+          }}>
+            📝 Corrigé - {generatedCards?.metadata.subject} (Page 1/2) 📝
+          </h2>
+
+          <div className="grid grid-cols-2 gap-6">
+            {firstPageCards.map((card) => {
+              const currentCard = editedCards[card.number] || card;
+              const questionText = currentCard.question.replace(/\[visual:.*?\]/g, '').trim();
+
+              return (
+                <div
+                  key={card.number}
+                  className="relative transition-all"
+                  style={{
+                    backgroundColor: theme.cardBackground,
+                    borderWidth: theme.cardBorder?.match(/\d+px/)?.[0] || '2px',
+                    borderStyle: theme.borderStyle || theme.cardBorder?.match(/(solid|dashed|dotted|double)/)?.[0] || 'solid',
+                    borderColor: theme.cardBorder?.match(/#[a-fA-F0-9]+|rgba?\([^)]+\)/)?.[0] || theme.borderColor,
+                    borderRadius: theme.borderRadius,
+                    boxShadow: `0 2px 8px ${theme.shadowColor}`,
+                    height: '250px',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    padding: `${20}px`,
+                    opacity: 1,
+                    filter: 'none',
+                    transition: `all 300ms`
+                  }}
+                >
+                  <div className="flex items-start justify-between mb-3">
+                    <div
+                      style={{
+                        color: theme.headerColor,
+                        fontSize: `${pageFontSettings.fontSize + 2}px`,
+                        fontWeight: pageFontSettings.isBold ? 'bold' : '600',
+                        fontFamily: theme.fontFamily,
+                        textAlign: 'left'
+                      }}
+                    >
+                      Carte {card.number}
+                    </div>
+                    <div style={{
+                      ...getBackgroundStyle(theme.correctColor),
+                    color: 'white',
+                    borderRadius: '50%',
+                    width: '24px',
+                    height: '24px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontSize: '14px',
+                    fontWeight: 'bold'
+                    }}>✓</div>
+                  </div>
+                  <div
+                    className="mb-2 flex-grow"
+                    style={{
+                      color: '#6b7280',
+                      fontSize: `${pageFontSettings.fontSize - 2}px`,
+                      fontWeight: pageFontSettings.isBold ? 'bold' : 'normal',
+                      fontStyle: pageFontSettings.isItalic ? 'italic' : 'normal',
+                      fontFamily: theme.fontFamily,
+                      textAlign: 'left',
+                      lineHeight: 1.5,
+                      letterSpacing: `${0}px`
+                    }}
+                  >
+                    Q: {questionText}
+                  </div>
+                  <div
+                    className="pt-3 rounded px-3 py-2 mt-auto"
+                    style={{
+                      borderTop: `${2}px ${'solid'} ${theme.borderColor}`,
+                      backgroundColor: theme.answerBg,
+                      color: theme.correctColor,
+                      fontSize: `${pageFontSettings.fontSize - 2}px`,
+                      fontWeight: pageFontSettings.isBold ? 'bold' : 'semibold',
+                      fontStyle: pageFontSettings.isItalic ? 'italic' : 'normal',
+                      fontFamily: theme.fontFamily,
+                      textAlign: 'left'
+                    }}
+                  >
+                    R: {currentCard.answer || 'Réponse à venir...'}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
         </div>
-      </div>
+
+        {/* Page 2 - Cards 5-8 */}
+        <div
+          style={{
+            width: '210mm',
+            height: '297mm',
+            backgroundImage: theme.pattern ? `${theme.pattern}, ${theme.pageBackground}` : theme.pageBackground,
+            backgroundSize: theme.pattern ? '20px 20px, cover' : 'cover',
+            padding: '15mm',
+            pageBreakBefore: 'always',
+            position: 'relative',
+            margin: '0 auto',
+            overflow: 'hidden',
+            boxSizing: 'border-box'
+          }}
+        >
+          {/* Decorative elements for teacher themes */}
+          {theme.decorativeElements && theme.decorativeElements.map((element, idx) => (
+            <div
+              key={idx}
+              style={{
+                position: 'absolute',
+                fontSize: '60px',
+                opacity: 0.1,
+                ...(idx === 0 && { top: '10px', right: '20px', transform: 'rotate(15deg)' }),
+                ...(idx === 1 && { bottom: '10px', left: '20px', transform: 'rotate(-15deg)' }),
+                ...(idx === 2 && { top: '50%', left: '10px', transform: 'translateY(-50%) rotate(25deg)' }),
+                ...(idx === 3 && { top: '50%', right: '10px', transform: 'translateY(-50%) rotate(-25deg)' })
+              }}
+            >
+              {element}
+            </div>
+          ))}
+          {!theme.decorativeElements && (
+            <>
+              <div style={{
+                position: 'absolute',
+                top: '10px',
+                right: '20px',
+                fontSize: '60px',
+                opacity: 0.1,
+                transform: 'rotate(15deg)'
+              }}>✓</div>
+              <div style={{
+                position: 'absolute',
+                bottom: '10px',
+                left: '20px',
+                fontSize: '60px',
+                opacity: 0.1,
+                transform: 'rotate(-15deg)'
+              }}>★</div>
+            </>
+          )}
+
+          <h2 className="text-3xl font-bold text-center mb-8" style={{
+            color: theme.headerColor,
+            textShadow: '2px 2px 4px rgba(0,0,0,0.1)'
+          }}>
+            📝 Corrigé - {generatedCards?.metadata.subject} (Page 2/2) 📝
+          </h2>
+
+          <div className="grid grid-cols-2 gap-6">
+            {secondPageCards.map((card) => {
+              const currentCard = editedCards[card.number] || card;
+              const questionText = currentCard.question.replace(/\[visual:.*?\]/g, '').trim();
+
+              return (
+                <div
+                  key={card.number}
+                  className="relative transition-all"
+                  style={{
+                    backgroundColor: theme.cardBackground,
+                    borderWidth: theme.cardBorder?.match(/\d+px/)?.[0] || '2px',
+                    borderStyle: theme.borderStyle || theme.cardBorder?.match(/(solid|dashed|dotted|double)/)?.[0] || 'solid',
+                    borderColor: theme.cardBorder?.match(/#[a-fA-F0-9]+|rgba?\([^)]+\)/)?.[0] || theme.borderColor,
+                    borderRadius: theme.borderRadius,
+                    boxShadow: `0 2px 8px ${theme.shadowColor}`,
+                    height: '250px',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    padding: `${20}px`,
+                    opacity: 1,
+                    filter: 'none',
+                    transition: `all 300ms`
+                  }}
+                >
+                  <div className="flex items-start justify-between mb-3">
+                    <div
+                      style={{
+                        color: theme.headerColor,
+                        fontSize: `${pageFontSettings.fontSize + 2}px`,
+                        fontWeight: pageFontSettings.isBold ? 'bold' : '600',
+                        fontFamily: theme.fontFamily,
+                        textAlign: 'left'
+                      }}
+                    >
+                      Carte {card.number}
+                    </div>
+                    <div style={{
+                      ...getBackgroundStyle(theme.correctColor),
+                      color: 'white',
+                      borderRadius: '50%',
+                      width: '24px',
+                      height: '24px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      fontSize: '14px',
+                      fontWeight: 'bold'
+                    }}>✓</div>
+                  </div>
+                  <div
+                    className="mb-2 flex-grow"
+                    style={{
+                      color: '#6b7280',
+                      fontSize: `${pageFontSettings.fontSize - 2}px`,
+                      fontWeight: pageFontSettings.isBold ? 'bold' : 'normal',
+                      fontStyle: pageFontSettings.isItalic ? 'italic' : 'normal',
+                      fontFamily: theme.fontFamily,
+                      textAlign: 'left',
+                      lineHeight: 1.5,
+                      letterSpacing: `${0}px`
+                    }}
+                  >
+                    Q: {questionText}
+                  </div>
+                  <div
+                    className="pt-3 rounded px-3 py-2 mt-auto"
+                    style={{
+                      borderTop: `${2}px ${'solid'} ${theme.borderColor}`,
+                      backgroundColor: theme.answerBg,
+                      color: theme.correctColor,
+                      fontSize: `${pageFontSettings.fontSize - 2}px`,
+                      fontWeight: pageFontSettings.isBold ? 'bold' : 'semibold',
+                      fontStyle: pageFontSettings.isItalic ? 'italic' : 'normal',
+                      fontFamily: theme.fontFamily,
+                      textAlign: 'left'
+                    }}
+                  >
+                    R: {currentCard.answer || 'Réponse à venir...'}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+
+          <div className="mt-auto text-center text-gray-600" style={{ position: 'absolute', bottom: '15mm', left: 0, right: 0 }}>
+            <p className="text-sm">© {new Date().getFullYear()} - Généré avec Quebec Teacher Hub</p>
+          </div>
+        </div>
+      </>
     );
   };
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      <div className="max-w-7xl mx-auto p-6">
+      {/* Customization Panel */}
+      <SimpleCustomizationPanel
+        isOpen={showCustomizationPanel}
+        onToggle={() => setShowCustomizationPanel(!showCustomizationPanel)}
+        selectedPageType={selectedPageType}
+        onPageTypeChange={setSelectedPageType}
+        fontSettings={pageFontSettings[selectedPageType]}
+        onFontSettingsChange={updatePageFontSettings}
+        isDraggableText={isDraggableText}
+        onDraggableTextChange={setIsDraggableText}
+        isDraggableIllustrations={isDraggableIllustrations}
+        onDraggableIllustrationsChange={setIsDraggableIllustrations}
+        showIllustrations={showIllustrations}
+        onShowIllustrationsChange={setShowIllustrations}
+        characterTheme={characterTheme}
+        onCharacterThemeChange={setCharacterTheme}
+        globalCharacterScale={globalCharacterScale}
+        onGlobalCharacterScaleChange={setGlobalCharacterScale}
+        visualScale={visualScale}
+        onVisualScaleChange={setVisualScale}
+        onResetIllustrationTransforms={resetIllustrationTransforms}
+        onResetTextPositions={() => setTextPositions({})}
+        onApplyIllustrationToLeftPage={applyIllustrationToLeftPage}
+        onApplyIllustrationToRightPage={applyIllustrationToRightPage}
+        selectedCardTheme={selectedCardTheme}
+        onCardThemeChange={setSelectedCardTheme}
+        transparentBackground={transparentBackground}
+        onTransparentBackgroundChange={setTransparentBackground}
+        questionContainerOpacity={questionContainerOpacity}
+        onQuestionContainerOpacityChange={setQuestionContainerOpacity}
+      />
+
+      {/* Main Content - Adjusted for panel */}
+      <div className={`transition-all duration-300 ${showCustomizationPanel ? 'mr-96' : ''}`}>
+        <div className="p-6">
         <div className="mb-8">
           <h1 className="text-3xl font-bold mb-2">Générateur de Cartes à Tâches V2</h1>
           <p className="text-gray-600 dark:text-gray-400">
@@ -921,221 +2557,6 @@ export default function CardsV2Page() {
         {/* Generated Cards Display */}
         {generatedCards && (
           <div className="space-y-8">
-            {/* Customization Controls - Organized into sections */}
-            <div className="grid grid-cols-3 gap-4 no-print">
-              {/* Typography Section */}
-              <Card className="bg-gray-800 text-white border-gray-700">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Type className="h-5 w-5" />
-                    Typographie
-                  </CardTitle>
-                  <CardDescription className="text-gray-300">
-                    Personnalisez la police et le style du texte
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  {/* Font Selection */}
-                  <div className="flex items-center gap-3">
-                    <Label className="w-20 text-white">Police:</Label>
-                    <Select
-                      value={fontSettings.fontFamily}
-                      onValueChange={(value) => setFontSettings(prev => ({ ...prev, fontFamily: value }))}
-                    >
-                      <SelectTrigger className="w-64">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent className="max-h-96 overflow-y-auto">
-                        {fontCategories.map(category => (
-                          <div key={category.name}>
-                            <div className="px-2 py-1.5 text-xs font-semibold text-gray-600 bg-gray-100 sticky top-0">
-                              {category.name}
-                            </div>
-                            {category.fonts.map(font => (
-                              <SelectItem key={font.value} value={font.value}>
-                                <span style={{ fontFamily: font.value, fontSize: '16px' }}>
-                                  {font.label}
-                                </span>
-                              </SelectItem>
-                            ))}
-                          </div>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  {/* Font Size */}
-                  <div className="flex items-center gap-3">
-                    <Label className="w-20 text-white">Taille:</Label>
-                    <input
-                      id="fontSize"
-                      type="range"
-                      min="10"
-                      max="25"
-                      value={fontSettings.fontSize}
-                      onChange={(e) => setFontSettings(prev => ({ ...prev, fontSize: parseInt(e.target.value) }))}
-                      className="w-32"
-                    />
-                    <span className="w-12 text-sm font-medium">{fontSettings.fontSize}px</span>
-                  </div>
-
-                  {/* Font Style */}
-                  <div className="flex items-center gap-3">
-                    <Label className="w-20 text-white">Style:</Label>
-                    <div className="flex gap-2">
-                      <Button
-                        variant={fontSettings.isBold ? "default" : "outline"}
-                        size="sm"
-                        onClick={() => setFontSettings(prev => ({ ...prev, isBold: !prev.isBold }))}
-                        title="Gras"
-                      >
-                        <Bold className="h-4 w-4" />
-                      </Button>
-                      <Button
-                        variant={fontSettings.isItalic ? "default" : "outline"}
-                        size="sm"
-                        onClick={() => setFontSettings(prev => ({ ...prev, isItalic: !prev.isItalic }))}
-                        title="Italique"
-                      >
-                        <Italic className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* Visual Elements Section */}
-              <Card className="bg-gray-800 text-white border-gray-700">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Sparkles className="h-5 w-5" />
-                    Éléments visuels
-                  </CardTitle>
-                  <CardDescription className="text-gray-300">
-                    Contrôlez la taille et l'apparence des éléments visuels
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  {/* Size Controls */}
-                  <div className="space-y-3">
-                    <div className="flex items-center gap-3">
-                      <Label className="w-40 text-white">📊 Visuels mathématiques:</Label>
-                      <input
-                        id="visualSize"
-                        type="range"
-                        min="50"
-                        max="200"
-                        value={visualScale}
-                        onChange={(e) => setVisualScale(parseInt(e.target.value))}
-                        className="w-32"
-                      />
-                      <span className="w-12 text-sm font-medium">{visualScale}%</span>
-                    </div>
-
-                    <div className="flex items-center gap-3">
-                      <Label className="w-40 text-white">🎨 Personnages (tous):</Label>
-                      <input
-                        id="globalCharacterSize"
-                        type="range"
-                        min="50"
-                        max="300"
-                        value={globalCharacterScale}
-                        onChange={(e) => setGlobalCharacterScale(parseInt(e.target.value))}
-                        className="w-32"
-                      />
-                      <span className="w-12 text-sm font-medium">{globalCharacterScale}%</span>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* Illustrations Section */}
-              <Card className="bg-gray-800 text-white border-gray-700">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Palette className="h-5 w-5" />
-                    Illustrations
-                  </CardTitle>
-                  <CardDescription className="text-gray-300">
-                    Configurez les illustrations et personnages
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  {/* Show/Hide Illustrations */}
-                  <div className="flex items-center gap-3">
-                    <input
-                      id="showIllustrations"
-                      type="checkbox"
-                      checked={showIllustrations}
-                      onChange={(e) => setShowIllustrations(e.target.checked)}
-                      className="w-4 h-4"
-                    />
-                    <label htmlFor="showIllustrations" className="font-medium cursor-pointer text-white">
-                      Afficher les illustrations amusantes
-                    </label>
-                  </div>
-
-                  {showIllustrations && (
-                    <div className="pl-7 space-y-3 border-l-2 border-gray-600">
-                      {/* Interactive Mode */}
-                      <div className="flex items-center gap-3">
-                        <input
-                          id="draggableIllustrations"
-                          type="checkbox"
-                          checked={isDraggableIllustrations}
-                          onChange={(e) => setIsDraggableIllustrations(e.target.checked)}
-                          className="w-4 h-4"
-                        />
-                        <label htmlFor="draggableIllustrations" className="cursor-pointer text-white">
-                          Mode interactif (glisser, redimensionner, pivoter)
-                        </label>
-                        {isDraggableIllustrations && Object.keys(illustrationTransforms).length > 0 && (
-                          <button
-                            onClick={resetIllustrationTransforms}
-                            className="ml-auto px-3 py-1 text-sm bg-gray-200 hover:bg-gray-300 rounded"
-                            title="Remettre à zéro les positions"
-                          >
-                            Réinitialiser
-                          </button>
-                        )}
-                      </div>
-
-                      {/* Transparent Background */}
-                      <div className="flex items-center gap-3">
-                        <input
-                          id="transparentBackground"
-                          type="checkbox"
-                          checked={transparentBackground}
-                          onChange={(e) => setTransparentBackground(e.target.checked)}
-                          className="w-4 h-4"
-                        />
-                        <label htmlFor="transparentBackground" className="cursor-pointer text-white">
-                          Fond transparent (sans arrière-plan coloré)
-                        </label>
-                      </div>
-
-                      {/* Character Theme Selection */}
-                      <div className="flex items-center gap-3">
-                        <Label className="w-32 text-white">Thème personnage:</Label>
-                        <Select value={characterTheme} onValueChange={(value) => setCharacterTheme(value as CharacterTheme)}>
-                          <SelectTrigger className="w-[200px]">
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {IllustrationService.getAvailableCharacters().map(character => (
-                              <SelectItem key={character.value} value={character.value}>
-                                <span>{character.icon} {character.label}</span>
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      </div>
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
-            </div>
-
             {/* Tips Section */}
             <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 no-print">
               <div className="flex items-center gap-2 text-blue-700">
@@ -1152,14 +2573,17 @@ export default function CardsV2Page() {
                   <Printer className="mr-2 h-4 w-4" />
                   Imprimer
                 </Button>
-                <Button variant="outline" onClick={() => {
-                  const styles = ['professional', 'fun', 'gradient'] as const;
-                  const currentIndex = styles.indexOf(cardStyle);
-                  const nextIndex = (currentIndex + 1) % styles.length;
-                  setCardStyle(styles[nextIndex]);
-                }}>
-                  <Palette className="mr-2 h-4 w-4" />
-                  Style: {cardStyle === 'professional' ? 'Professionnel' : cardStyle === 'fun' ? 'Amusant' : 'Gradient'}
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    const element = document.querySelector('.answer-sheet-section');
+                    if (element) {
+                      element.scrollIntoView({ behavior: 'smooth' });
+                    }
+                  }}
+                >
+                  <FileText className="mr-2 h-4 w-4" />
+                  Feuille-réponse
                 </Button>
                 <Button variant="outline">
                   <Download className="mr-2 h-4 w-4" />
@@ -1167,6 +2591,8 @@ export default function CardsV2Page() {
                 </Button>
               </div>
             </div>
+
+            {/* Theme Selector */}
 
             <div className="print-area">
               {/* Page 1: Cards 1-4 */}
@@ -1186,19 +2612,20 @@ export default function CardsV2Page() {
               )}
 
               {/* Answer Sheet */}
-              <div className="no-print">
-                <h3 className="text-lg font-semibold mb-4">Feuille Réponse</h3>
+              <div className="answer-sheet-section mt-8">
+                <h3 className="text-lg font-semibold mb-4 no-print">Feuille-Réponse</h3>
                 {renderAnswerSheet(generatedCards.cards)}
               </div>
 
               {/* Correction */}
-              <div className="no-print">
-                <h3 className="text-lg font-semibold mb-4">Corrigé</h3>
+              <div className="correction-section mt-8">
+                <h3 className="text-lg font-semibold mb-4 no-print">Corrigé</h3>
                 {renderCorrection(generatedCards.cards)}
               </div>
             </div>
           </div>
         )}
+        </div>
       </div>
     </div>
   );
