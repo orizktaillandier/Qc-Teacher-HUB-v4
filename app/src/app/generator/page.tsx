@@ -701,7 +701,7 @@ export default function GeneratorPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
       <GoogleFontsLoader fontValue={selectedFont} weight={isBold ? 700 : 400} />
       <Navigation />
 

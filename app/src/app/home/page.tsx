@@ -27,7 +27,7 @@ export default function Home() {
   const firstName = session?.user?.name?.split(' ')[0] || 'Enseignant'
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-gradient-to-br from-orange-50 via-blue-50 to-green-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
       <Navigation />
 
       <div className="pt-24 pb-12 px-4">

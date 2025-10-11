@@ -56,10 +56,10 @@
   --soft-lavender: 276 58% 90%;      /* #E8D5F2 - Gentle accent */
   --cream-paper: 48 100% 93%;        /* #FFF8DC - Warm background */
 
-  /* Base Colors - Warm tones */
-  --background: 45 20% 96%;          /* Warm off-white */
+  /* Base Colors - Warm & Colorful */
+  --background: 45 60% 98%;          /* Warm cream background */
   --foreground: 222 47% 11%;         /* Deep charcoal */
-  --card: 0 0% 100%;                 /* Pure white cards */
+  --card: 48 100% 99%;               /* Warm white cards with hint of yellow */
   --card-foreground: 222 47% 11%;
 
   /* Primary - Maple Orange (Quebec identity) */
@@ -74,9 +74,9 @@
   --accent: var(--forest-green);
   --accent-foreground: 0 0% 100%;
 
-  /* Muted - Warm grays */
-  --muted: 45 15% 94%;
-  --muted-foreground: 222 13% 45%;
+  /* Muted - Warm and soft */
+  --muted: 45 40% 94%;               /* Warmer muted */
+  --muted-foreground: 222 20% 40%;   /* Slightly lighter for warmth */
 
   /* Popover */
   --popover: 0 0% 100%;
@@ -88,9 +88,9 @@
   --warning: var(--golden-yellow);
   --info: var(--quebec-blue);
 
-  /* Borders & Inputs - Soft */
-  --border: 45 15% 88%;
-  --input: 45 15% 88%;
+  /* Borders & Inputs - Colorful */
+  --border: 45 30% 88%;              /* Warmer borders */
+  --input: 45 30% 92%;               /* Lighter, warmer inputs */
   --ring: var(--maple-orange);
 
   /* Chart Colors - Quebec palette */

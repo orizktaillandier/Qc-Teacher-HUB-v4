@@ -47,7 +47,7 @@ export default function LandingPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-gradient-to-br from-orange-50 via-amber-50 to-yellow-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
       {/* Navigation Bar */}
       <nav className="fixed top-0 w-full bg-card/80 backdrop-blur-md z-50 border-b border-border">
         <div className="container mx-auto px-4">
@@ -125,9 +125,9 @@ export default function LandingPage() {
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {/* Feature Cards */}
-            <Card className="group hover:shadow-xl transition-all duration-300 hover:scale-105 border-2">
+            <Card className="group hover:shadow-xl transition-all duration-300 hover:scale-105 border-2 bg-gradient-to-br from-white to-orange-50">
               <CardContent className="p-6 space-y-4">
-                <div className="p-3 rounded-2xl bg-primary/10 w-fit transition-transform group-hover:scale-110">
+                <div className="p-3 rounded-2xl bg-gradient-to-br from-primary/20 to-primary/10 w-fit transition-transform group-hover:scale-110">
                   <Brain className="h-8 w-8 text-primary" />
                 </div>
                 <div>
@@ -139,9 +139,9 @@ export default function LandingPage() {
               </CardContent>
             </Card>
 
-            <Card className="group hover:shadow-xl transition-all duration-300 hover:scale-105 border-2">
+            <Card className="group hover:shadow-xl transition-all duration-300 hover:scale-105 border-2 bg-gradient-to-br from-white to-blue-50">
               <CardContent className="p-6 space-y-4">
-                <div className="p-3 rounded-2xl bg-secondary/10 w-fit transition-transform group-hover:scale-110">
+                <div className="p-3 rounded-2xl bg-gradient-to-br from-secondary/20 to-secondary/10 w-fit transition-transform group-hover:scale-110">
                   <Palette className="h-8 w-8 text-secondary" />
                 </div>
                 <div>
@@ -153,9 +153,9 @@ export default function LandingPage() {
               </CardContent>
             </Card>
 
-            <Card className="group hover:shadow-xl transition-all duration-300 hover:scale-105 border-2">
+            <Card className="group hover:shadow-xl transition-all duration-300 hover:scale-105 border-2 bg-gradient-to-br from-white to-green-50">
               <CardContent className="p-6 space-y-4">
-                <div className="p-3 rounded-2xl bg-accent/10 w-fit transition-transform group-hover:scale-110">
+                <div className="p-3 rounded-2xl bg-gradient-to-br from-accent/20 to-accent/10 w-fit transition-transform group-hover:scale-110">
                   <Wand2 className="h-8 w-8 text-accent" />
                 </div>
                 <div>
@@ -167,10 +167,10 @@ export default function LandingPage() {
               </CardContent>
             </Card>
 
-            <Card className="group hover:shadow-xl transition-all duration-300 hover:scale-105 border-2">
+            <Card className="group hover:shadow-xl transition-all duration-300 hover:scale-105 border-2 bg-gradient-to-br from-white to-yellow-50">
               <CardContent className="p-6 space-y-4">
-                <div className="p-3 rounded-2xl bg-primary/10 w-fit transition-transform group-hover:scale-110">
-                  <Clock className="h-8 w-8 text-primary" />
+                <div className="p-3 rounded-2xl bg-gradient-to-br from-yellow-500/20 to-yellow-500/10 w-fit transition-transform group-hover:scale-110">
+                  <Clock className="h-8 w-8 text-yellow-600" />
                 </div>
                 <div>
                   <h3 className="font-display font-semibold text-lg mb-2">Économisez des Heures</h3>
@@ -181,10 +181,10 @@ export default function LandingPage() {
               </CardContent>
             </Card>
 
-            <Card className="group hover:shadow-xl transition-all duration-300 hover:scale-105 border-2">
+            <Card className="group hover:shadow-xl transition-all duration-300 hover:scale-105 border-2 bg-gradient-to-br from-white to-purple-50">
               <CardContent className="p-6 space-y-4">
-                <div className="p-3 rounded-2xl bg-secondary/10 w-fit transition-transform group-hover:scale-110">
-                  <Download className="h-8 w-8 text-secondary" />
+                <div className="p-3 rounded-2xl bg-gradient-to-br from-purple-500/20 to-purple-500/10 w-fit transition-transform group-hover:scale-110">
+                  <Download className="h-8 w-8 text-purple-600" />
                 </div>
                 <div>
                   <h3 className="font-display font-semibold text-lg mb-2">Export PDF Parfait</h3>
@@ -195,10 +195,10 @@ export default function LandingPage() {
               </CardContent>
             </Card>
 
-            <Card className="group hover:shadow-xl transition-all duration-300 hover:scale-105 border-2">
+            <Card className="group hover:shadow-xl transition-all duration-300 hover:scale-105 border-2 bg-gradient-to-br from-white to-pink-50">
               <CardContent className="p-6 space-y-4">
-                <div className="p-3 rounded-2xl bg-accent/10 w-fit transition-transform group-hover:scale-110">
-                  <Users className="h-8 w-8 text-accent" />
+                <div className="p-3 rounded-2xl bg-gradient-to-br from-pink-500/20 to-pink-500/10 w-fit transition-transform group-hover:scale-110">
+                  <Users className="h-8 w-8 text-pink-600" />
                 </div>
                 <div>
                   <h3 className="font-display font-semibold text-lg mb-2">Bibliothèque Communautaire</h3>

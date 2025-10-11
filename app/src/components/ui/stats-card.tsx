@@ -19,14 +19,14 @@ interface StatsCardProps {
 export function StatsCard({ title, value, icon: Icon, trend, className }: StatsCardProps) {
   return (
     <Card className={cn(
-      "relative overflow-hidden transition-all duration-300 hover:shadow-lg hover:scale-105",
-      "bg-gradient-to-br from-card to-card/80 border-2",
+      "relative overflow-hidden transition-all duration-300 hover:shadow-xl hover:scale-105",
+      "bg-gradient-to-br from-white to-orange-50/50 dark:from-slate-800 dark:to-slate-900 border-2",
       className
     )}>
       <div className="p-6">
         {/* Icon with Quebec colors */}
         <div className="flex items-center justify-between mb-4">
-          <div className="p-3 rounded-2xl bg-primary/10">
+          <div className="p-3 rounded-2xl bg-gradient-to-br from-primary/20 to-primary/10">
             <Icon className="h-6 w-6 text-primary" />
           </div>
           {trend && (
@@ -51,7 +51,7 @@ export function StatsCard({ title, value, icon: Icon, trend, className }: StatsC
         </div>
 
         {/* Decorative element */}
-        <div className="absolute -right-4 -bottom-4 w-24 h-24 rounded-full bg-primary/5" />
+        <div className="absolute -right-4 -bottom-4 w-24 h-24 rounded-full bg-gradient-to-br from-primary/10 to-transparent" />
       </div>
     </Card>
   );
