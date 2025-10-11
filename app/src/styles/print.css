@@ -1,0 +1,85 @@
+@media print {
+  @page {
+    size: A4 landscape;
+    margin: 0;
+  }
+
+  .no-print {
+    display: none !important;
+  }
+
+  .no-print-digital {
+    display: block !important;
+  }
+
+  .page-break {
+    page-break-before: always;
+  }
+
+  .print-page {
+    margin: 0;
+    page-break-after: always;
+    box-sizing: border-box;
+    transform: scale(1) !important;
+  }
+
+  /* Reset any preview scaling for print */
+  [style*="transform"] {
+    transform: none !important;
+  }
+
+  /* Ensure proper page breaks */
+  .print-page:last-child {
+    page-break-after: auto;
+  }
+
+  /* Hide navigation and controls in print */
+  nav,
+  .navigation,
+  .tabs-list,
+  button,
+  .controls {
+    display: none !important;
+  }
+
+  /* Optimize colors for print */
+  * {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  /* Ensure backgrounds print */
+  .bg-gradient-to-br {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  /* Reset body margins for print */
+  body {
+    margin: 0;
+    padding: 0;
+  }
+
+  /* Ensure cards fit properly */
+  .grid {
+    display: grid !important;
+  }
+
+  /* Fix font sizes for print */
+  html {
+    font-size: 12pt;
+  }
+}
+
+/* Print-specific utility classes */
+.print-avoid-break {
+  page-break-inside: avoid;
+}
+
+.print-break-before {
+  page-break-before: always;
+}
+
+.print-break-after {
+  page-break-after: always;
+}

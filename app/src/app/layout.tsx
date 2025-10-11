@@ -1,0 +1,43 @@
+import type { Metadata } from "next";
+import { Inter } from "next/font/google";
+import "./globals.css";
+import "@/styles/print.css";
+import { ThemeProvider } from "@/components/providers/theme-provider";
+import { SessionProvider } from "@/components/SessionProvider";
+import { Toaster } from "@/components/ui/sonner";
+
+const inter = Inter({
+  variable: "--font-inter",
+  subsets: ["latin"],
+});
+
+export const metadata: Metadata = {
+  title: "Quebec Teacher Hub v5 - Générateur de Cartes à Tâches PFEQ",
+  description: "Créez des cartes éducatives alignées au Programme de Formation de l'École Québécoise avec notre IA spécialisée",
+  keywords: "PFEQ, cartes à tâches, éducation québécoise, enseignement primaire, générateur pédagogique",
+};
+
+export default function RootLayout({
+  children,
+}: Readonly<{
+  children: React.ReactNode;
+}>) {
+  return (
+    <html lang="fr" suppressHydrationWarning>
+      <body
+        className={`${inter.variable} font-sans antialiased`}
+      >
+        <SessionProvider>
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="system"
+            enableSystem
+          >
+            {children}
+            <Toaster position="top-right" richColors />
+          </ThemeProvider>
+        </SessionProvider>
+      </body>
+    </html>
+  );
+}
