@@ -6,7 +6,8 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
+  --font-sans: var(--font-inter);
+  --font-display: var(--font-quicksand);
   --font-mono: var(--font-geist-mono);
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
@@ -44,72 +45,126 @@
 }
 
 :root {
-  --radius: 0.625rem;
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
-  --chart-1: oklch(0.646 0.222 41.116);
-  --chart-2: oklch(0.6 0.118 184.704);
-  --chart-3: oklch(0.398 0.07 227.392);
-  --chart-4: oklch(0.828 0.189 84.429);
-  --chart-5: oklch(0.769 0.188 70.08);
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
+  --radius: 1rem;
+
+  /* Quebec Warm Color Palette */
+  --maple-orange: 24 88% 52%;        /* #E67E22 - Warm, inviting maple */
+  --quebec-blue: 207 73% 46%;        /* #1976D2 - Official Quebec blue */
+  --forest-green: 145 63% 42%;       /* #27AE60 - Nature, growth */
+  --golden-yellow: 38 100% 65%;      /* #FFB84D - Celebration */
+  --coral-pink: 0 100% 80%;          /* #FF9999 - Playful */
+  --soft-lavender: 276 58% 90%;      /* #E8D5F2 - Gentle accent */
+  --cream-paper: 48 100% 93%;        /* #FFF8DC - Warm background */
+
+  /* Base Colors - Warm tones */
+  --background: 45 20% 96%;          /* Warm off-white */
+  --foreground: 222 47% 11%;         /* Deep charcoal */
+  --card: 0 0% 100%;                 /* Pure white cards */
+  --card-foreground: 222 47% 11%;
+
+  /* Primary - Maple Orange (Quebec identity) */
+  --primary: var(--maple-orange);
+  --primary-foreground: 0 0% 100%;
+
+  /* Secondary - Quebec Blue */
+  --secondary: var(--quebec-blue);
+  --secondary-foreground: 0 0% 100%;
+
+  /* Accent - Forest Green */
+  --accent: var(--forest-green);
+  --accent-foreground: 0 0% 100%;
+
+  /* Muted - Warm grays */
+  --muted: 45 15% 94%;
+  --muted-foreground: 222 13% 45%;
+
+  /* Popover */
+  --popover: 0 0% 100%;
+  --popover-foreground: 222 47% 11%;
+
+  /* Semantic Colors */
+  --destructive: 0 100% 80%;         /* Coral pink */
+  --success: var(--forest-green);
+  --warning: var(--golden-yellow);
+  --info: var(--quebec-blue);
+
+  /* Borders & Inputs - Soft */
+  --border: 45 15% 88%;
+  --input: 45 15% 88%;
+  --ring: var(--maple-orange);
+
+  /* Chart Colors - Quebec palette */
+  --chart-1: var(--maple-orange);
+  --chart-2: var(--quebec-blue);
+  --chart-3: var(--forest-green);
+  --chart-4: var(--golden-yellow);
+  --chart-5: var(--coral-pink);
+
+  /* Sidebar */
+  --sidebar: 0 0% 100%;
+  --sidebar-foreground: 222 47% 11%;
+  --sidebar-primary: var(--maple-orange);
+  --sidebar-primary-foreground: 0 0% 100%;
+  --sidebar-accent: 45 20% 96%;
+  --sidebar-accent-foreground: 222 47% 11%;
+  --sidebar-border: 45 15% 88%;
+  --sidebar-ring: var(--maple-orange);
 }
 
 .dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
-  --chart-1: oklch(0.488 0.243 264.376);
-  --chart-2: oklch(0.696 0.17 162.48);
-  --chart-3: oklch(0.769 0.188 70.08);
-  --chart-4: oklch(0.627 0.265 303.9);
-  --chart-5: oklch(0.645 0.246 16.439);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.556 0 0);
+  /* Dark mode - Warm, cozy evening palette */
+  --background: 222 30% 12%;         /* Deep warm charcoal */
+  --foreground: 45 20% 96%;          /* Warm off-white text */
+  --card: 222 25% 16%;               /* Slightly lighter cards */
+  --card-foreground: 45 20% 96%;
+
+  /* Primary - Brighter Maple Orange for dark */
+  --primary: 24 95% 60%;             /* Brighter orange for contrast */
+  --primary-foreground: 222 30% 12%;
+
+  /* Secondary - Brighter Quebec Blue */
+  --secondary: 207 80% 55%;          /* Lighter blue */
+  --secondary-foreground: 222 30% 12%;
+
+  /* Accent - Brighter Forest Green */
+  --accent: 145 70% 50%;             /* Vibrant green */
+  --accent-foreground: 222 30% 12%;
+
+  /* Muted */
+  --muted: 222 20% 20%;
+  --muted-foreground: 45 10% 65%;
+
+  /* Popover */
+  --popover: 222 25% 16%;
+  --popover-foreground: 45 20% 96%;
+
+  /* Semantic */
+  --destructive: 0 95% 70%;          /* Brighter coral */
+  --success: 145 70% 50%;
+  --warning: 38 100% 70%;
+  --info: 207 80% 55%;
+
+  /* Borders & Inputs */
+  --border: 222 20% 25%;
+  --input: 222 20% 25%;
+  --ring: 24 95% 60%;
+
+  /* Charts - Brighter for dark mode */
+  --chart-1: 24 95% 60%;
+  --chart-2: 207 80% 55%;
+  --chart-3: 145 70% 50%;
+  --chart-4: 38 100% 70%;
+  --chart-5: 0 95% 70%;
+
+  /* Sidebar */
+  --sidebar: 222 25% 16%;
+  --sidebar-foreground: 45 20% 96%;
+  --sidebar-primary: 24 95% 60%;
+  --sidebar-primary-foreground: 222 30% 12%;
+  --sidebar-accent: 222 20% 20%;
+  --sidebar-accent-foreground: 45 20% 96%;
+  --sidebar-border: 222 20% 25%;
+  --sidebar-ring: 24 95% 60%;
 }
 
 @layer base {
@@ -118,6 +173,130 @@
   }
   body {
     @apply bg-background text-foreground;
+  }
+
+  /* Typography - Quebec warm & friendly */
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-display font-semibold tracking-tight;
+  }
+
+  h1 {
+    @apply text-4xl lg:text-5xl leading-tight;
+  }
+
+  h2 {
+    @apply text-3xl lg:text-4xl leading-tight;
+  }
+
+  h3 {
+    @apply text-2xl lg:text-3xl leading-snug;
+  }
+
+  h4 {
+    @apply text-xl lg:text-2xl leading-snug;
+  }
+
+  /* Smooth transitions for Quebec warmth */
+  * {
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  button, a, [role="button"] {
+    @apply transition-all duration-200;
+  }
+
+  /* Custom animations for Quebec warmth */
+  @keyframes fade-in {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  @keyframes fade-in-up {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes fade-in-down {
+    from {
+      opacity: 0;
+      transform: translateY(-20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes slide-in-right {
+    from {
+      opacity: 0;
+      transform: translateX(-20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+
+  @keyframes scale-in {
+    from {
+      opacity: 0;
+      transform: scale(0.95);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+
+  .animate-fade-in {
+    animation: fade-in 0.6s ease-out forwards;
+  }
+
+  .animate-fade-in-up {
+    animation: fade-in-up 0.6s ease-out forwards;
+  }
+
+  .animate-fade-in-down {
+    animation: fade-in-down 0.6s ease-out forwards;
+  }
+
+  .animate-slide-in-right {
+    animation: slide-in-right 0.6s ease-out forwards;
+  }
+
+  .animate-scale-in {
+    animation: scale-in 0.6s ease-out forwards;
+  }
+
+  .delay-100 {
+    animation-delay: 100ms;
+  }
+
+  .delay-200 {
+    animation-delay: 200ms;
+  }
+
+  .delay-400 {
+    animation-delay: 400ms;
+  }
+
+  .delay-1000 {
+    animation-delay: 1000ms;
+  }
+
+  .delay-2000 {
+    animation-delay: 2000ms;
   }
 }
 
