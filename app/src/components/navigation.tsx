@@ -34,27 +34,26 @@ export function Navigation() {
   const { data: session, status } = useSession()
 
   const navItems = [
-    { href: '/home', label: 'Accueil', icon: Home, color: 'text-purple-600 dark:text-purple-400' },
-    { href: '/generator', label: 'Générateur', icon: Zap, color: 'text-blue-600 dark:text-blue-400' },
-    { href: '/library', label: 'Bibliothèque', icon: Library, color: 'text-pink-600 dark:text-pink-400' },
-    { href: '/shared-library', label: 'Partagé', icon: Globe, color: 'text-green-600 dark:text-green-400' },
+    { href: '/home', label: 'Accueil', icon: Home, color: 'text-primary' },
+    { href: '/generator', label: 'Générateur', icon: Zap, color: 'text-secondary' },
+    { href: '/library', label: 'Bibliothèque', icon: Library, color: 'text-accent' },
+    { href: '/shared-library', label: 'Partagé', icon: Globe, color: 'text-primary' },
   ]
 
   return (
-    <nav className="fixed top-0 w-full bg-white/80 dark:bg-slate-950/80 backdrop-blur-md z-50 border-b border-purple-100/50 dark:border-purple-900/30">
+    <nav className="fixed top-0 w-full bg-card/80 backdrop-blur-md z-50 border-b border-border">
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           {/* Logo and Brand */}
-          <div className="flex items-center space-x-2">
+          <div className="flex items-center space-x-3">
             <Link href="/home" className="flex items-center space-x-2 group">
-              <div className="relative">
-                <div className="absolute inset-0 bg-gradient-to-r from-purple-600 via-blue-600 to-pink-600 rounded-lg blur opacity-30 group-hover:opacity-50 transition-opacity"></div>
-                <GraduationCap className="h-8 w-8 text-purple-600 dark:text-purple-400 relative" />
+              <div className="p-2 rounded-xl bg-primary/10 transition-all group-hover:scale-110">
+                <GraduationCap className="h-6 w-6 text-primary" />
               </div>
-              <span className="font-bold text-xl hidden sm:inline bg-gradient-to-r from-purple-600 via-blue-600 to-pink-600 dark:from-purple-400 dark:via-blue-400 dark:to-pink-400 bg-clip-text text-transparent">Quebec Teacher Hub</span>
-              <span className="font-bold text-xl sm:hidden bg-gradient-to-r from-purple-600 via-blue-600 to-pink-600 dark:from-purple-400 dark:via-blue-400 dark:to-pink-400 bg-clip-text text-transparent">QTH</span>
+              <span className="font-display font-bold text-xl hidden sm:inline">Quebec Teacher Hub</span>
+              <span className="font-display font-bold text-xl sm:hidden">QTH</span>
             </Link>
-            <Badge className="ml-2 bg-gradient-to-r from-purple-600 via-blue-600 to-pink-600 text-white border-0">v5.0</Badge>
+            <Badge variant="outline" className="ml-2 border-primary/30">v5.0</Badge>
           </div>
 
           {/* Desktop Navigation */}
@@ -67,7 +66,7 @@ export function Navigation() {
                 <Link key={item.href} href={item.href}>
                   <Button
                     variant={isActive ? "default" : "ghost"}
-                    className={`transition-all active:scale-95 ${isActive ? 'bg-gradient-to-r from-purple-600 via-blue-600 to-pink-600 hover:from-purple-700 hover:via-blue-700 hover:to-pink-700 text-white border-0' : ''}`}
+                    className={`transition-all hover:scale-105 active:scale-95`}
                   >
                     <Icon className={`mr-2 h-4 w-4 ${isActive ? '' : item.color}`} />
                     {item.label}
@@ -179,7 +178,7 @@ export function Navigation() {
 
                   return (
                     <Link key={item.href} href={item.href}>
-                      <DropdownMenuItem className={`cursor-pointer ${isActive ? 'bg-gradient-to-r from-purple-100 via-blue-100 to-pink-100 dark:from-purple-900/40 dark:via-blue-900/40 dark:to-pink-900/40' : ''}`}>
+                      <DropdownMenuItem className={`cursor-pointer ${isActive ? 'bg-primary/10' : ''}`}>
                         <Icon className={`mr-2 h-4 w-4 ${item.color}`} />
                         {item.label}
                       </DropdownMenuItem>

@@ -701,7 +701,7 @@ export default function GeneratorPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-950 dark:to-slate-900">
+    <div className="min-h-screen bg-background">
       <GoogleFontsLoader fontValue={selectedFont} weight={isBold ? 700 : 400} />
       <Navigation />
 
@@ -709,15 +709,15 @@ export default function GeneratorPage() {
       <div className="pt-20 pb-12 px-4">
         <div className="w-full max-w-full">
           {/* Header */}
-          <div className="container mx-auto max-w-7xl mb-8">
+          <div className="container mx-auto max-w-7xl mb-8 animate-fade-in-down">
             <div className="flex items-center gap-3 mb-2">
-              <div className="p-2 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg">
-                <Wand2 className="h-6 w-6 text-white" />
+              <div className="p-3 rounded-2xl bg-primary/10 transition-transform hover:scale-110">
+                <Wand2 className="h-6 w-6 text-primary" />
               </div>
-              <h1 className="text-3xl font-bold">Générateur de Cartes à Tâches</h1>
-              <Badge variant="outline" className="ml-2">PFEQ Aligné</Badge>
+              <h1 className="text-3xl font-display font-bold">Générateur de Cartes à Tâches</h1>
+              <Badge variant="outline" className="ml-2 border-primary/30">PFEQ Aligné</Badge>
             </div>
-            <p className="text-slate-600 dark:text-slate-400">
+            <p className="text-muted-foreground">
               Créez des cartes éducatives personnalisées alignées au Programme de formation de l'école québécoise
             </p>
           </div>
@@ -746,21 +746,22 @@ export default function GeneratorPage() {
                 animate={{ scale: 1, y: 0 }}
                 transition={{ type: "spring", damping: 25 }}
               >
-                <Card className="p-8 max-w-md w-full mx-4 shadow-2xl">
+                <Card className="p-8 max-w-md w-full mx-4 shadow-2xl border-2 border-primary/20">
                   <div className="space-y-6">
                     <div className="flex flex-col items-center space-y-4">
                       <motion.div
                         animate={{ rotate: 360 }}
                         transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+                        className="p-4 rounded-2xl bg-primary/10"
                       >
-                        <Sparkles className="h-16 w-16 text-blue-500" />
+                        <Sparkles className="h-16 w-16 text-primary" />
                       </motion.div>
-                      <h3 className="text-xl font-semibold">Génération en cours...</h3>
+                      <h3 className="text-xl font-display font-semibold">Génération en cours...</h3>
                       <motion.p
                         key={generationMessage}
                         initial={{ opacity: 0, y: -10 }}
                         animate={{ opacity: 1, y: 0 }}
-                        className="text-sm text-gray-600 dark:text-gray-400 text-center h-5"
+                        className="text-sm text-muted-foreground text-center h-5"
                       >
                         {generationMessage}
                       </motion.p>
@@ -778,10 +779,11 @@ export default function GeneratorPage() {
                           style={{ width: "30%" }}
                         />
                       </div>
-                      <div className="flex justify-between text-xs text-gray-600 dark:text-gray-400">
+                      <div className="flex justify-between text-xs text-muted-foreground">
                         <motion.span
                           animate={{ opacity: [0.5, 1, 0.5] }}
                           transition={{ duration: 2, repeat: Infinity }}
+                          className="font-display font-semibold"
                         >
                           {Math.floor(generationProgress)}%
                         </motion.span>
@@ -800,14 +802,14 @@ export default function GeneratorPage() {
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
                       transition={{ delay: 2 }}
-                      className="pt-4 border-t"
+                      className="pt-4 border-t border-border"
                     >
                       <motion.p
                         key={tipIndex}
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: -10 }}
-                        className="text-sm text-gray-600 dark:text-gray-400 text-center italic font-medium"
+                        className="text-sm text-muted-foreground text-center italic font-medium"
                       >
                         {tips[tipIndex]}
                       </motion.p>
