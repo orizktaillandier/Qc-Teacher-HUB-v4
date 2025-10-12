@@ -16,19 +16,19 @@ interface QuickActionCardProps {
 
 const colorSchemes = {
   primary: {
-    bg: "hover:bg-primary/5",
-    border: "border-primary/20 hover:border-primary",
-    icon: "bg-primary/10 text-primary",
+    bg: "bg-gradient-to-br from-orange-50 to-orange-100 dark:from-orange-900/20 dark:to-orange-800/20",
+    border: "border-orange-200 dark:border-orange-700",
+    icon: "bg-gradient-to-br from-orange-500/20 to-orange-500/10 text-orange-600 dark:text-orange-400",
   },
   secondary: {
-    bg: "hover:bg-secondary/5",
-    border: "border-secondary/20 hover:border-secondary",
-    icon: "bg-secondary/10 text-secondary",
+    bg: "bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-800/20",
+    border: "border-blue-200 dark:border-blue-700",
+    icon: "bg-gradient-to-br from-blue-500/20 to-blue-500/10 text-blue-600 dark:text-blue-400",
   },
   accent: {
-    bg: "hover:bg-accent/5",
-    border: "border-accent/20 hover:border-accent",
-    icon: "bg-accent/10 text-accent",
+    bg: "bg-gradient-to-br from-green-50 to-green-100 dark:from-green-900/20 dark:to-green-800/20",
+    border: "border-green-200 dark:border-green-700",
+    icon: "bg-gradient-to-br from-green-500/20 to-green-500/10 text-green-600 dark:text-green-400",
   },
 };
 
