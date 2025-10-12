@@ -69,28 +69,28 @@ export function CommandPalette({ open, setOpen }: CommandPaletteProps) {
           >
             <Home className="mr-2 h-4 w-4" />
             <span>Accueil</span>
-            <CommandShortcut>⌘H</CommandShortcut>
+            <CommandShortcut>Ctrl+H</CommandShortcut>
           </CommandItem>
           <CommandItem
             onSelect={() => runCommand(() => router.push("/generator"))}
           >
             <Zap className="mr-2 h-4 w-4" />
             <span>Générateur de cartes</span>
-            <CommandShortcut>⌘G</CommandShortcut>
+            <CommandShortcut>Ctrl+G</CommandShortcut>
           </CommandItem>
           <CommandItem
             onSelect={() => runCommand(() => router.push("/library"))}
           >
             <Library className="mr-2 h-4 w-4" />
             <span>Ma bibliothèque</span>
-            <CommandShortcut>⌘L</CommandShortcut>
+            <CommandShortcut>Ctrl+L</CommandShortcut>
           </CommandItem>
           <CommandItem
             onSelect={() => runCommand(() => router.push("/shared-library"))}
           >
             <Globe className="mr-2 h-4 w-4" />
             <span>Bibliothèque partagée</span>
-            <CommandShortcut>⌘S</CommandShortcut>
+            <CommandShortcut>Ctrl+S</CommandShortcut>
           </CommandItem>
         </CommandGroup>
 
@@ -140,7 +140,7 @@ export function CommandPalette({ open, setOpen }: CommandPaletteProps) {
           <CommandItem>
             <HelpCircle className="mr-2 h-4 w-4" />
             <span>Centre d'aide</span>
-            <CommandShortcut>?</CommandShortcut>
+            <CommandShortcut>F1</CommandShortcut>
           </CommandItem>
           <CommandItem>
             <BookOpen className="mr-2 h-4 w-4" />
@@ -149,7 +149,7 @@ export function CommandPalette({ open, setOpen }: CommandPaletteProps) {
           <CommandItem>
             <FileText className="mr-2 h-4 w-4" />
             <span>Raccourcis clavier</span>
-            <CommandShortcut>⌘/</CommandShortcut>
+            <CommandShortcut>Ctrl+/</CommandShortcut>
           </CommandItem>
         </CommandGroup>
       </CommandList>
