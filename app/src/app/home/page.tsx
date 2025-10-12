@@ -137,12 +137,13 @@ export default function Home() {
                     <div className="p-3 rounded-2xl bg-white/30">
                       <Sparkles className="h-6 w-6 text-orange-900 dark:text-orange-100" />
                     </div>
-                    <div className="flex items-center gap-2">
+                    {/* Hidden during testing phase */}
+                    {/* <div className="flex items-center gap-2">
                       <div className="text-sm font-medium px-3 py-1 rounded-full bg-green-500 text-white">
                         ↑ 12%
                       </div>
                       <Info className="h-4 w-4 text-orange-700 dark:text-orange-200 opacity-0 group-hover:opacity-100 transition-opacity" />
-                    </div>
+                    </div> */}
                   </div>
                   <p className="text-sm text-orange-900 dark:text-orange-100 font-medium">Cartes créées</p>
                   <p className="text-3xl font-display font-bold text-orange-950 dark:text-white">42</p>
@@ -179,9 +180,10 @@ export default function Home() {
                 <div className="p-3 rounded-2xl bg-white/30">
                   <Clock className="h-6 w-6 text-green-900 dark:text-green-100" />
                 </div>
-                <div className="text-sm font-medium px-3 py-1 rounded-full bg-green-600 text-white">
+                {/* Hidden during testing phase */}
+                {/* <div className="text-sm font-medium px-3 py-1 rounded-full bg-green-600 text-white">
                   ↑ 5%
-                </div>
+                </div> */}
               </div>
               <p className="text-sm text-green-900 dark:text-green-100 font-medium">Temps économisé</p>
               <p className="text-3xl font-display font-bold text-green-950 dark:text-white">12h</p>
