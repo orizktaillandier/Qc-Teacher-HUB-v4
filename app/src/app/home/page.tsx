@@ -177,7 +177,7 @@ export default function Home() {
           {/* Recent Activity & Tips */}
           <div className="grid lg:grid-cols-2 gap-6 mt-8">
             {/* Recent Activity */}
-            <div className="bg-gradient-to-br from-purple-200 to-purple-300 dark:from-purple-700 dark:to-purple-800 rounded-2xl border-2 border-purple-400 dark:border-purple-600 p-6 shadow-xl hover:shadow-2xl transition-shadow duration-300 backdrop-blur-sm">
+            <div className="bg-gradient-to-br from-purple-200/80 to-purple-300/80 dark:from-purple-700/80 dark:to-purple-800/80 rounded-2xl border-2 border-purple-400 dark:border-purple-600 p-6 shadow-xl hover:shadow-2xl transition-shadow duration-300 backdrop-blur-md">
               <div className="flex items-center justify-between mb-6">
                 <h2 className="text-xl font-display font-semibold">Activité récente</h2>
                 <Button variant="ghost" size="sm">
@@ -210,7 +210,7 @@ export default function Home() {
             </div>
 
             {/* Tips & Inspiration */}
-            <div className="bg-gradient-to-br from-pink-200 to-pink-300 dark:from-pink-700 dark:to-pink-800 rounded-2xl border-2 border-pink-400 dark:border-pink-600 p-6 shadow-xl hover:shadow-2xl transition-shadow duration-300 backdrop-blur-sm">
+            <div className="bg-gradient-to-br from-pink-200/80 to-pink-300/80 dark:from-pink-700/80 dark:to-pink-800/80 rounded-2xl border-2 border-pink-400 dark:border-pink-600 p-6 shadow-xl hover:shadow-2xl transition-shadow duration-300 backdrop-blur-md">
               <div className="flex items-center gap-2 mb-4">
                 <div className="p-2 rounded-lg bg-white/40">
                   <Sparkles className="h-5 w-5 text-pink-800 dark:text-pink-100" />
@@ -244,7 +244,7 @@ export default function Home() {
 
           {/* Inspiring CTA */}
           <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-primary via-secondary to-accent p-[2px] shadow-2xl hover:shadow-[0_20px_60px_-15px_rgba(0,0,0,0.3)] transition-all duration-300 mt-8">
-            <div className="bg-background/95 backdrop-blur-sm rounded-3xl p-8 md:p-12 text-center">
+            <div className="bg-background/85 backdrop-blur-md rounded-3xl p-8 md:p-12 text-center">
               <h2 className="text-2xl md:text-3xl font-display font-bold mb-4">
                 Prêt à inspirer vos élèves?
               </h2>

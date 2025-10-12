@@ -61,7 +61,9 @@
       "WebFetch(domain:www.canva.com)",
       "Bash(git commit:*)",
       "Bash(if exist .next rmdir /s /q .next)",
-      "WebFetch(domain:undraw.co)"
+      "WebFetch(domain:undraw.co)",
+      "Bash(npx tsc:*)",
+      "Bash(npx next dev:*)"
     ],
     "deny": [],
     "ask": []
