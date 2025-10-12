@@ -118,75 +118,7 @@ export default function Home() {
             </p>
           </motion.div>
 
-          {/* Stats Overview */}
-          <motion.div
-            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4"
-            variants={containerVariants}
-            initial="hidden"
-            animate="visible"
-          >
-            <motion.div
-              className="bg-gradient-to-br from-orange-300 to-orange-400 dark:from-orange-600 dark:to-orange-700 rounded-2xl p-6 border-2 border-orange-500 dark:border-orange-600 hover:scale-105 transition-all shadow-lg cursor-pointer"
-              variants={statsCardVariants}
-              whileHover={{ scale: 1.05, transition: { duration: 0.2 } }}
-              whileTap={{ scale: 0.98 }}
-            >
-              <div className="flex items-center justify-between mb-4">
-                <div className="p-3 rounded-2xl bg-white/30">
-                  <Sparkles className="h-6 w-6 text-orange-900 dark:text-orange-100" />
-                </div>
-              </div>
-              <p className="text-sm text-orange-900 dark:text-orange-100 font-medium">Cartes créées</p>
-              <p className="text-3xl font-display font-bold text-orange-950 dark:text-white">42</p>
-              <p className="text-xs text-orange-800 dark:text-orange-200">Cette semaine</p>
-            </motion.div>
-
-            <motion.div
-              className="bg-gradient-to-br from-blue-300 to-blue-400 dark:from-blue-600 dark:to-blue-700 rounded-2xl p-6 border-2 border-blue-500 dark:border-blue-600 hover:scale-105 transition-all shadow-lg cursor-pointer"
-              variants={statsCardVariants}
-              whileHover={{ scale: 1.05, transition: { duration: 0.2 } }}
-              whileTap={{ scale: 0.98 }}
-            >
-              <div className="flex items-center justify-between mb-4">
-                <div className="p-3 rounded-2xl bg-white/30">
-                  <Library className="h-6 w-6 text-blue-900 dark:text-blue-100" />
-                </div>
-              </div>
-              <p className="text-sm text-blue-900 dark:text-blue-100 font-medium">Collections</p>
-              <p className="text-3xl font-display font-bold text-blue-950 dark:text-white">8</p>
-            </motion.div>
-
-            <motion.div
-              className="bg-gradient-to-br from-green-300 to-green-400 dark:from-green-600 dark:to-green-700 rounded-2xl p-6 border-2 border-green-500 dark:border-green-600 hover:scale-105 transition-all shadow-lg cursor-pointer"
-              variants={statsCardVariants}
-              whileHover={{ scale: 1.05, transition: { duration: 0.2 } }}
-              whileTap={{ scale: 0.98 }}
-            >
-              <div className="flex items-center justify-between mb-4">
-                <div className="p-3 rounded-2xl bg-white/30">
-                  <Clock className="h-6 w-6 text-green-900 dark:text-green-100" />
-                </div>
-              </div>
-              <p className="text-sm text-green-900 dark:text-green-100 font-medium">Temps économisé</p>
-              <p className="text-3xl font-display font-bold text-green-950 dark:text-white">12h</p>
-              <p className="text-xs text-green-800 dark:text-green-200">Ce mois-ci</p>
-            </motion.div>
-
-            <motion.div
-              className="bg-gradient-to-br from-yellow-300 to-yellow-400 dark:from-yellow-600 dark:to-yellow-700 rounded-2xl p-6 border-2 border-yellow-500 dark:border-yellow-600 hover:scale-105 transition-all shadow-lg cursor-pointer"
-              variants={statsCardVariants}
-              whileHover={{ scale: 1.05, transition: { duration: 0.2 } }}
-              whileTap={{ scale: 0.98 }}
-            >
-              <div className="flex items-center justify-between mb-4">
-                <div className="p-3 rounded-2xl bg-white/30">
-                  <Star className="h-6 w-6 text-yellow-900 dark:text-yellow-100" />
-                </div>
-              </div>
-              <p className="text-sm text-yellow-900 dark:text-yellow-100 font-medium">Notes moyennes</p>
-              <p className="text-3xl font-display font-bold text-yellow-950 dark:text-white">4.8</p>
-            </motion.div>
-          </motion.div>
+          {/* Stats Overview - Hidden during testing phase */}
 
           {/* Quick Actions */}
           <motion.div
