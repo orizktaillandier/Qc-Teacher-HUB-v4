@@ -5,6 +5,13 @@ import { Button } from "@/components/ui/button"
 import { StatsCard } from "@/components/ui/stats-card"
 import { QuickActionCard } from "@/components/ui/quick-action-card"
 import { ActivityFeedItem } from "@/components/ui/activity-feed-item"
+import { FloatingActionButton } from "@/components/ui/floating-action-button"
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip"
 import {
   Sparkles,
   Zap,
@@ -17,7 +24,10 @@ import {
   TrendingUp,
   Clock,
   Star,
-  Download
+  Download,
+  FileText,
+  Image,
+  Info
 } from "lucide-react"
 import Link from "next/link"
 import { useSession } from "next-auth/react"
@@ -26,6 +36,28 @@ import { motion } from "framer-motion"
 export default function Home() {
   const { data: session } = useSession()
   const firstName = session?.user?.name?.split(' ')[0] || 'Enseignant'
+
+  // FAB quick actions (inspired by Canva)
+  const fabActions = [
+    {
+      icon: Wand2,
+      label: "Générer des cartes",
+      href: "/generator",
+      color: "bg-primary hover:bg-primary/90"
+    },
+    {
+      icon: Library,
+      label: "Ma bibliothèque",
+      href: "/library",
+      color: "bg-secondary hover:bg-secondary/90"
+    },
+    {
+      icon: FileText,
+      label: "Modèles",
+      href: "/templates",
+      color: "bg-accent hover:bg-accent/90"
+    }
+  ];
 
   // Smooth animation variants
   const containerVariants = {
@@ -66,8 +98,9 @@ export default function Home() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-orange-50 via-blue-50 to-green-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
-      <Navigation />
+    <TooltipProvider>
+      <div className="min-h-screen bg-gradient-to-br from-orange-50 via-blue-50 to-green-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
+        <Navigation />
 
       <div className="pt-24 pb-12 px-4">
         <div className="container mx-auto max-w-7xl space-y-8">
@@ -92,24 +125,34 @@ export default function Home() {
             initial="hidden"
             animate="visible"
           >
-            <motion.div
-              className="bg-gradient-to-br from-orange-300 to-orange-400 dark:from-orange-600 dark:to-orange-700 rounded-2xl p-6 border-2 border-orange-500 dark:border-orange-600 hover:scale-105 transition-all shadow-lg cursor-pointer"
-              variants={statsCardVariants}
-              whileHover={{ scale: 1.05, transition: { duration: 0.2 } }}
-              whileTap={{ scale: 0.98 }}
-            >
-              <div className="flex items-center justify-between mb-4">
-                <div className="p-3 rounded-2xl bg-white/30">
-                  <Sparkles className="h-6 w-6 text-orange-900 dark:text-orange-100" />
-                </div>
-                <div className="text-sm font-medium px-3 py-1 rounded-full bg-green-500 text-white">
-                  ↑ 12%
-                </div>
-              </div>
-              <p className="text-sm text-orange-900 dark:text-orange-100 font-medium">Cartes créées</p>
-              <p className="text-3xl font-display font-bold text-orange-950 dark:text-white">42</p>
-              <p className="text-xs text-orange-800 dark:text-orange-200">Cette semaine</p>
-            </motion.div>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <motion.div
+                  className="bg-gradient-to-br from-orange-300 to-orange-400 dark:from-orange-600 dark:to-orange-700 rounded-2xl p-6 border-2 border-orange-500 dark:border-orange-600 hover:scale-105 transition-all shadow-lg cursor-pointer relative group"
+                  variants={statsCardVariants}
+                  whileHover={{ scale: 1.05, transition: { duration: 0.2 } }}
+                  whileTap={{ scale: 0.98 }}
+                >
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="p-3 rounded-2xl bg-white/30">
+                      <Sparkles className="h-6 w-6 text-orange-900 dark:text-orange-100" />
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <div className="text-sm font-medium px-3 py-1 rounded-full bg-green-500 text-white">
+                        ↑ 12%
+                      </div>
+                      <Info className="h-4 w-4 text-orange-700 dark:text-orange-200 opacity-0 group-hover:opacity-100 transition-opacity" />
+                    </div>
+                  </div>
+                  <p className="text-sm text-orange-900 dark:text-orange-100 font-medium">Cartes créées</p>
+                  <p className="text-3xl font-display font-bold text-orange-950 dark:text-white">42</p>
+                  <p className="text-xs text-orange-800 dark:text-orange-200">Cette semaine</p>
+                </motion.div>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p className="text-sm">12% d'augmentation par rapport à la semaine dernière</p>
+              </TooltipContent>
+            </Tooltip>
 
             <motion.div
               className="bg-gradient-to-br from-blue-300 to-blue-400 dark:from-blue-600 dark:to-blue-700 rounded-2xl p-6 border-2 border-blue-500 dark:border-blue-600 hover:scale-105 transition-all shadow-lg cursor-pointer"
@@ -286,6 +329,13 @@ export default function Home() {
           </div>
         </div>
       </div>
-    </div>
+
+        {/* Floating Action Button (Canva-inspired) */}
+        <FloatingActionButton
+          actions={fabActions}
+          mainLabel="Actions rapides"
+        />
+      </div>
+    </TooltipProvider>
   )
 }
