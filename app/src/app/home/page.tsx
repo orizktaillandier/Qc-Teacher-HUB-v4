@@ -101,8 +101,8 @@ export default function Home() {
   return (
     <TooltipProvider>
       <div className="min-h-screen relative overflow-hidden bg-gradient-to-br from-orange-50/80 via-amber-50/60 to-yellow-50/80 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
-        {/* Educational Icon Pattern Background */}
-        <BackgroundPattern variant="educational" />
+        {/* Professional Educational Illustrations Background */}
+        <BackgroundPattern variant="illustrations" />
 
         {/* Floating Decorative Shapes */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">

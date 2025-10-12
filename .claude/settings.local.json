@@ -60,7 +60,8 @@
       "Bash(git commit -m \"$(cat <<''EOF''\nAdd smooth Framer Motion animations throughout\n\n🎯 Framer Motion Integration (No NextUI needed):\n- Leveraged existing framer-motion dependency\n- Added spring animations with natural physics\n- Staggered entrance animations for visual hierarchy\n\n✨ Home Page Animations:\n- Welcome header: Smooth fade-in from top\n- Stats cards: Staggered scale-in with spring physics\n  - whileHover: scale 1.05 + smooth transition\n  - whileTap: scale 0.98 for tactile feedback\n- Quick actions: Delayed entrance with stagger effect\n- All animations use spring physics (stiffness: 100-300, damping: 12-20)\n\n🎨 QuickActionCard Component:\n- Card hover: scale 1.05 + lift effect (y: -5)\n- Icon hover: Playful wiggle animation (rotate: [0, -10, 10, 0])\n- Enhanced shadow on hover (shadow-2xl)\n- Smooth spring transitions throughout\n\n🌊 Smooth UX Improvements:\n- Natural spring physics instead of linear transitions\n- Staggered children for visual hierarchy\n- Reduced motion respected (Framer Motion default)\n- 60fps animations via GPU acceleration\n\n💡 Why NOT NextUI 2.0:\n- Already have Framer Motion installed\n- Shadcn/ui provides excellent component foundation\n- Tailwind CSS v4 for styling flexibility\n- Avoids bundle size increase from additional library\n- Full control over animation behavior\n\n🚀 Result: Smooth, natural animations that feel polished without adding dependencies!\n\n🚀 Generated with Claude Code\nEOF\n)\")",
       "WebFetch(domain:www.canva.com)",
       "Bash(git commit:*)",
-      "Bash(if exist .next rmdir /s /q .next)"
+      "Bash(if exist .next rmdir /s /q .next)",
+      "WebFetch(domain:undraw.co)"
     ],
     "deny": [],
     "ask": []
