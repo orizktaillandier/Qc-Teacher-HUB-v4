@@ -1,10 +1,12 @@
 'use client'
 
+import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { ThemeToggle } from "@/components/theme-toggle"
 import { Separator } from "@/components/ui/separator"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { CommandPalette } from "@/components/command-palette"
 import {
   GraduationCap,
   Home,
@@ -15,7 +17,12 @@ import {
   LogOut,
   User,
   Library,
-  Globe
+  Globe,
+  Command,
+  Clock,
+  Star,
+  Keyboard,
+  Sparkles
 } from "lucide-react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
@@ -27,11 +34,13 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
   DropdownMenuLabel,
+  DropdownMenuGroup,
 } from "@/components/ui/dropdown-menu"
 
 export function Navigation() {
   const pathname = usePathname()
   const { data: session, status } = useSession()
+  const [commandOpen, setCommandOpen] = useState(false)
 
   const navItems = [
     { href: '/home', label: 'Accueil', icon: Home, color: 'text-primary' },
@@ -77,6 +86,20 @@ export function Navigation() {
 
             <Separator orientation="vertical" className="h-8 mx-2" />
 
+            {/* Command Palette Trigger */}
+            <Button
+              variant="outline"
+              className="relative h-9 w-full justify-start text-sm text-muted-foreground sm:pr-12 md:w-40 lg:w-64"
+              onClick={() => setCommandOpen(true)}
+            >
+              <Command className="mr-2 h-4 w-4" />
+              <span className="hidden lg:inline-flex">Rechercher...</span>
+              <span className="inline-flex lg:hidden">Rechercher...</span>
+              <kbd className="pointer-events-none absolute right-1.5 top-1.5 hidden h-6 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium opacity-100 sm:flex">
+                <span className="text-xs">⌘</span>K
+              </kbd>
+            </Button>
+
             {/* Auth Section */}
             {status === 'loading' ? (
               <div className="h-8 w-8 rounded-full bg-gray-200 dark:bg-gray-700 animate-pulse" />
@@ -92,7 +115,7 @@ export function Navigation() {
                     </Avatar>
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-56">
+                <DropdownMenuContent align="end" className="w-64">
                   <DropdownMenuLabel>
                     <div className="flex flex-col space-y-1">
                       <p className="text-sm font-medium">{session.user?.name}</p>
@@ -100,6 +123,27 @@ export function Navigation() {
                     </div>
                   </DropdownMenuLabel>
                   <DropdownMenuSeparator />
+
+                  <DropdownMenuGroup>
+                    <DropdownMenuLabel className="text-xs font-normal text-muted-foreground">
+                      Actions rapides
+                    </DropdownMenuLabel>
+                    <DropdownMenuItem className="cursor-pointer">
+                      <Sparkles className="mr-2 h-4 w-4 text-primary" />
+                      <span>Créer des cartes</span>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem className="cursor-pointer">
+                      <Clock className="mr-2 h-4 w-4 text-secondary" />
+                      <span>Cartes récentes</span>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem className="cursor-pointer">
+                      <Star className="mr-2 h-4 w-4 text-accent" />
+                      <span>Favoris</span>
+                    </DropdownMenuItem>
+                  </DropdownMenuGroup>
+
+                  <DropdownMenuSeparator />
+
                   <DropdownMenuItem className="cursor-pointer">
                     <User className="mr-2 h-4 w-4" />
                     Mon profil
@@ -108,6 +152,17 @@ export function Navigation() {
                     <Settings className="mr-2 h-4 w-4" />
                     Paramètres
                   </DropdownMenuItem>
+                  <DropdownMenuItem
+                    className="cursor-pointer"
+                    onClick={() => setCommandOpen(true)}
+                  >
+                    <Keyboard className="mr-2 h-4 w-4" />
+                    Raccourcis clavier
+                    <kbd className="ml-auto pointer-events-none inline-flex h-5 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium opacity-100">
+                      ⌘K
+                    </kbd>
+                  </DropdownMenuItem>
+
                   <DropdownMenuSeparator />
                   <DropdownMenuItem
                     className="cursor-pointer text-red-600 dark:text-red-400"
@@ -232,6 +287,9 @@ export function Navigation() {
           </div>
         </div>
       </div>
+
+      {/* Command Palette */}
+      <CommandPalette open={commandOpen} setOpen={setCommandOpen} />
     </nav>
   )
 }
