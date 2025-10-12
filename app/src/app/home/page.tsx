@@ -6,6 +6,7 @@ import { StatsCard } from "@/components/ui/stats-card"
 import { QuickActionCard } from "@/components/ui/quick-action-card"
 import { ActivityFeedItem } from "@/components/ui/activity-feed-item"
 import { FloatingActionButton } from "@/components/ui/floating-action-button"
+import { BackgroundPattern } from "@/components/ui/background-pattern"
 import {
   Tooltip,
   TooltipContent,
@@ -100,6 +101,9 @@ export default function Home() {
   return (
     <TooltipProvider>
       <div className="min-h-screen relative overflow-hidden bg-gradient-to-br from-orange-50/80 via-amber-50/60 to-yellow-50/80 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
+        {/* Educational Icon Pattern Background */}
+        <BackgroundPattern variant="educational" />
+
         {/* Floating Decorative Shapes */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
           {/* Large orange circle - top right */}
