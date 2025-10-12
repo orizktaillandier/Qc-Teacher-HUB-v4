@@ -99,21 +99,34 @@ export default function Home() {
 
   return (
     <TooltipProvider>
-      <div className="min-h-screen bg-gradient-to-br from-orange-50 via-blue-50 to-green-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
+      <div className="min-h-screen relative overflow-hidden bg-gradient-to-br from-orange-50/80 via-amber-50/60 to-yellow-50/80 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
+        {/* Floating Decorative Shapes */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          {/* Large orange circle - top right */}
+          <div className="absolute -top-24 -right-24 w-96 h-96 bg-primary/10 rounded-full blur-3xl" />
+          {/* Medium blue circle - middle left */}
+          <div className="absolute top-1/3 -left-32 w-80 h-80 bg-secondary/10 rounded-full blur-3xl" />
+          {/* Small green circle - bottom right */}
+          <div className="absolute bottom-32 right-1/4 w-64 h-64 bg-accent/10 rounded-full blur-3xl" />
+          {/* Extra small yellow circle - top left */}
+          <div className="absolute top-48 left-1/4 w-48 h-48 bg-yellow-300/10 rounded-full blur-2xl" />
+        </div>
+
         <Navigation />
 
-      <div className="pt-24 pb-12 px-4">
-        <div className="container mx-auto max-w-7xl space-y-8">
+      <div className="relative pt-24 pb-12 px-4">
+        <div className="container mx-auto max-w-7xl space-y-10">
           {/* Welcome Header */}
           <motion.div
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, ease: "easeOut" }}
+            className="text-center md:text-left"
           >
-            <h1 className="text-3xl md:text-4xl font-display font-bold mb-2">
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-display font-bold mb-3 bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent">
               Bonjour, {firstName}! 👋
             </h1>
-            <p className="text-muted-foreground">
+            <p className="text-lg md:text-xl text-muted-foreground">
               Bienvenue dans votre studio créatif. Qu'allez-vous créer aujourd'hui?
             </p>
           </motion.div>
@@ -126,9 +139,9 @@ export default function Home() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.4 }}
           >
-            <h2 className="text-2xl font-display font-semibold mb-4">Actions rapides</h2>
+            <h2 className="text-2xl md:text-3xl font-display font-semibold mb-6">Actions rapides</h2>
             <motion.div
-              className="grid md:grid-cols-2 lg:grid-cols-3 gap-4"
+              className="grid md:grid-cols-2 lg:grid-cols-3 gap-6"
               variants={containerVariants}
               initial="hidden"
               animate="visible"
@@ -158,9 +171,9 @@ export default function Home() {
           </motion.div>
 
           {/* Recent Activity & Tips */}
-          <div className="grid lg:grid-cols-2 gap-6">
+          <div className="grid lg:grid-cols-2 gap-6 mt-8">
             {/* Recent Activity */}
-            <div className="bg-gradient-to-br from-purple-200 to-purple-300 dark:from-purple-700 dark:to-purple-800 rounded-2xl border-2 border-purple-400 dark:border-purple-600 p-6 shadow-lg">
+            <div className="bg-gradient-to-br from-purple-200 to-purple-300 dark:from-purple-700 dark:to-purple-800 rounded-2xl border-2 border-purple-400 dark:border-purple-600 p-6 shadow-xl hover:shadow-2xl transition-shadow duration-300 backdrop-blur-sm">
               <div className="flex items-center justify-between mb-6">
                 <h2 className="text-xl font-display font-semibold">Activité récente</h2>
                 <Button variant="ghost" size="sm">
@@ -193,7 +206,7 @@ export default function Home() {
             </div>
 
             {/* Tips & Inspiration */}
-            <div className="bg-gradient-to-br from-pink-200 to-pink-300 dark:from-pink-700 dark:to-pink-800 rounded-2xl border-2 border-pink-400 dark:border-pink-600 p-6 shadow-lg">
+            <div className="bg-gradient-to-br from-pink-200 to-pink-300 dark:from-pink-700 dark:to-pink-800 rounded-2xl border-2 border-pink-400 dark:border-pink-600 p-6 shadow-xl hover:shadow-2xl transition-shadow duration-300 backdrop-blur-sm">
               <div className="flex items-center gap-2 mb-4">
                 <div className="p-2 rounded-lg bg-white/40">
                   <Sparkles className="h-5 w-5 text-pink-800 dark:text-pink-100" />
@@ -210,13 +223,13 @@ export default function Home() {
                     Thèmes populaires cette semaine
                   </p>
                   <div className="flex flex-wrap gap-2">
-                    <span className="px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-medium">
+                    <span className="px-3 py-1.5 rounded-full bg-gradient-to-r from-primary/20 to-primary/10 border border-primary/30 text-primary text-xs font-medium hover:scale-105 hover:shadow-md transition-all duration-200 cursor-pointer">
                       Minecraft Pixel
                     </span>
-                    <span className="px-3 py-1 rounded-full bg-secondary/10 text-secondary text-xs font-medium">
+                    <span className="px-3 py-1.5 rounded-full bg-gradient-to-r from-secondary/20 to-secondary/10 border border-secondary/30 text-secondary text-xs font-medium hover:scale-105 hover:shadow-md transition-all duration-200 cursor-pointer">
                       Kawaii Pastel
                     </span>
-                    <span className="px-3 py-1 rounded-full bg-accent/10 text-accent text-xs font-medium">
+                    <span className="px-3 py-1.5 rounded-full bg-gradient-to-r from-accent/20 to-accent/10 border border-accent/30 text-accent text-xs font-medium hover:scale-105 hover:shadow-md transition-all duration-200 cursor-pointer">
                       Scrapbook Vintage
                     </span>
                   </div>
@@ -226,8 +239,8 @@ export default function Home() {
           </div>
 
           {/* Inspiring CTA */}
-          <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-primary via-secondary to-accent p-[2px]">
-            <div className="bg-background rounded-3xl p-8 md:p-12 text-center">
+          <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-primary via-secondary to-accent p-[2px] shadow-2xl hover:shadow-[0_20px_60px_-15px_rgba(0,0,0,0.3)] transition-all duration-300 mt-8">
+            <div className="bg-background/95 backdrop-blur-sm rounded-3xl p-8 md:p-12 text-center">
               <h2 className="text-2xl md:text-3xl font-display font-bold mb-4">
                 Prêt à inspirer vos élèves?
               </h2>

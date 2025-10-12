@@ -51,8 +51,8 @@ export function QuickActionCard({
         transition={{ type: "spring", stiffness: 300, damping: 20 }}
       >
         <Card className={cn(
-          "relative overflow-hidden transition-all duration-300",
-          "hover:shadow-2xl cursor-pointer",
+          "relative overflow-hidden transition-all duration-300 rounded-3xl",
+          "shadow-lg hover:shadow-2xl cursor-pointer backdrop-blur-sm",
           "border-2",
           colors.bg,
           colors.border,
