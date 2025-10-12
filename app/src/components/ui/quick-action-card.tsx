@@ -4,6 +4,7 @@ import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { LucideIcon } from "lucide-react";
 import Link from "next/link";
+import { motion } from "framer-motion";
 
 interface QuickActionCardProps {
   title: string;
@@ -43,23 +44,32 @@ export function QuickActionCard({
   const colors = colorSchemes[colorScheme];
 
   return (
-    <Link href={href} className="block group">
-      <Card className={cn(
-        "relative overflow-hidden transition-all duration-300",
-        "hover:shadow-xl hover:scale-105 cursor-pointer",
-        "border-2",
-        colors.bg,
-        colors.border,
-        className
-      )}>
-        <div className="p-6">
-          {/* Icon */}
-          <div className={cn(
-            "inline-flex p-4 rounded-2xl mb-4 transition-transform group-hover:scale-110",
-            colors.icon
-          )}>
-            <Icon className="h-8 w-8" />
-          </div>
+    <Link href={href} className="block">
+      <motion.div
+        whileHover={{ scale: 1.05, y: -5 }}
+        whileTap={{ scale: 0.98 }}
+        transition={{ type: "spring", stiffness: 300, damping: 20 }}
+      >
+        <Card className={cn(
+          "relative overflow-hidden transition-all duration-300",
+          "hover:shadow-2xl cursor-pointer",
+          "border-2",
+          colors.bg,
+          colors.border,
+          className
+        )}>
+          <div className="p-6 group">
+            {/* Icon */}
+            <motion.div
+              className={cn(
+                "inline-flex p-4 rounded-2xl mb-4",
+                colors.icon
+              )}
+              whileHover={{ rotate: [0, -10, 10, 0], scale: 1.1 }}
+              transition={{ duration: 0.3 }}
+            >
+              <Icon className="h-8 w-8" />
+            </motion.div>
 
           {/* Content */}
           <div className="space-y-2">
@@ -79,14 +89,15 @@ export function QuickActionCard({
             </svg>
           </div>
 
-          {/* Decorative maple leaf pattern */}
-          <div className="absolute -right-6 -bottom-6 w-32 h-32 opacity-5">
-            <svg viewBox="0 0 24 24" fill="currentColor" className="w-full h-full text-primary">
-              <path d="M12 2L9 9H2l6 4.5L5 22l7-5 7 5-3-8.5L22 9h-7z" />
-            </svg>
+            {/* Decorative maple leaf pattern */}
+            <div className="absolute -right-6 -bottom-6 w-32 h-32 opacity-5">
+              <svg viewBox="0 0 24 24" fill="currentColor" className="w-full h-full text-primary">
+                <path d="M12 2L9 9H2l6 4.5L5 22l7-5 7 5-3-8.5L22 9h-7z" />
+              </svg>
+            </div>
           </div>
-        </div>
-      </Card>
+        </Card>
+      </motion.div>
     </Link>
   );
 }

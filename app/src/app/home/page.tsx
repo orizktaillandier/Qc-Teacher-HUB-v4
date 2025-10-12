@@ -21,10 +21,49 @@ import {
 } from "lucide-react"
 import Link from "next/link"
 import { useSession } from "next-auth/react"
+import { motion } from "framer-motion"
 
 export default function Home() {
   const { data: session } = useSession()
   const firstName = session?.user?.name?.split(' ')[0] || 'Enseignant'
+
+  // Smooth animation variants
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1,
+        delayChildren: 0.2
+      }
+    }
+  }
+
+  const itemVariants = {
+    hidden: { y: 20, opacity: 0 },
+    visible: {
+      y: 0,
+      opacity: 1,
+      transition: {
+        type: "spring",
+        stiffness: 100,
+        damping: 12
+      }
+    }
+  }
+
+  const statsCardVariants = {
+    hidden: { scale: 0.8, opacity: 0 },
+    visible: {
+      scale: 1,
+      opacity: 1,
+      transition: {
+        type: "spring",
+        stiffness: 120,
+        damping: 15
+      }
+    }
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-orange-50 via-blue-50 to-green-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
@@ -33,18 +72,32 @@ export default function Home() {
       <div className="pt-24 pb-12 px-4">
         <div className="container mx-auto max-w-7xl space-y-8">
           {/* Welcome Header */}
-          <div className="animate-fade-in-down">
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, ease: "easeOut" }}
+          >
             <h1 className="text-3xl md:text-4xl font-display font-bold mb-2">
               Bonjour, {firstName}! 👋
             </h1>
             <p className="text-muted-foreground">
               Bienvenue dans votre studio créatif. Qu'allez-vous créer aujourd'hui?
             </p>
-          </div>
+          </motion.div>
 
           {/* Stats Overview */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 animate-fade-in">
-            <div className="bg-gradient-to-br from-orange-300 to-orange-400 dark:from-orange-600 dark:to-orange-700 rounded-2xl p-6 border-2 border-orange-500 dark:border-orange-600 hover:scale-105 transition-all shadow-lg">
+          <motion.div
+            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4"
+            variants={containerVariants}
+            initial="hidden"
+            animate="visible"
+          >
+            <motion.div
+              className="bg-gradient-to-br from-orange-300 to-orange-400 dark:from-orange-600 dark:to-orange-700 rounded-2xl p-6 border-2 border-orange-500 dark:border-orange-600 hover:scale-105 transition-all shadow-lg cursor-pointer"
+              variants={statsCardVariants}
+              whileHover={{ scale: 1.05, transition: { duration: 0.2 } }}
+              whileTap={{ scale: 0.98 }}
+            >
               <div className="flex items-center justify-between mb-4">
                 <div className="p-3 rounded-2xl bg-white/30">
                   <Sparkles className="h-6 w-6 text-orange-900 dark:text-orange-100" />
@@ -56,9 +109,14 @@ export default function Home() {
               <p className="text-sm text-orange-900 dark:text-orange-100 font-medium">Cartes créées</p>
               <p className="text-3xl font-display font-bold text-orange-950 dark:text-white">42</p>
               <p className="text-xs text-orange-800 dark:text-orange-200">Cette semaine</p>
-            </div>
+            </motion.div>
 
-            <div className="bg-gradient-to-br from-blue-300 to-blue-400 dark:from-blue-600 dark:to-blue-700 rounded-2xl p-6 border-2 border-blue-500 dark:border-blue-600 hover:scale-105 transition-all shadow-lg">
+            <motion.div
+              className="bg-gradient-to-br from-blue-300 to-blue-400 dark:from-blue-600 dark:to-blue-700 rounded-2xl p-6 border-2 border-blue-500 dark:border-blue-600 hover:scale-105 transition-all shadow-lg cursor-pointer"
+              variants={statsCardVariants}
+              whileHover={{ scale: 1.05, transition: { duration: 0.2 } }}
+              whileTap={{ scale: 0.98 }}
+            >
               <div className="flex items-center justify-between mb-4">
                 <div className="p-3 rounded-2xl bg-white/30">
                   <Library className="h-6 w-6 text-blue-900 dark:text-blue-100" />
@@ -66,9 +124,14 @@ export default function Home() {
               </div>
               <p className="text-sm text-blue-900 dark:text-blue-100 font-medium">Collections</p>
               <p className="text-3xl font-display font-bold text-blue-950 dark:text-white">8</p>
-            </div>
+            </motion.div>
 
-            <div className="bg-gradient-to-br from-green-300 to-green-400 dark:from-green-600 dark:to-green-700 rounded-2xl p-6 border-2 border-green-500 dark:border-green-600 hover:scale-105 transition-all shadow-lg">
+            <motion.div
+              className="bg-gradient-to-br from-green-300 to-green-400 dark:from-green-600 dark:to-green-700 rounded-2xl p-6 border-2 border-green-500 dark:border-green-600 hover:scale-105 transition-all shadow-lg cursor-pointer"
+              variants={statsCardVariants}
+              whileHover={{ scale: 1.05, transition: { duration: 0.2 } }}
+              whileTap={{ scale: 0.98 }}
+            >
               <div className="flex items-center justify-between mb-4">
                 <div className="p-3 rounded-2xl bg-white/30">
                   <Clock className="h-6 w-6 text-green-900 dark:text-green-100" />
@@ -80,9 +143,14 @@ export default function Home() {
               <p className="text-sm text-green-900 dark:text-green-100 font-medium">Temps économisé</p>
               <p className="text-3xl font-display font-bold text-green-950 dark:text-white">12h</p>
               <p className="text-xs text-green-800 dark:text-green-200">Ce mois-ci</p>
-            </div>
+            </motion.div>
 
-            <div className="bg-gradient-to-br from-yellow-300 to-yellow-400 dark:from-yellow-600 dark:to-yellow-700 rounded-2xl p-6 border-2 border-yellow-500 dark:border-yellow-600 hover:scale-105 transition-all shadow-lg">
+            <motion.div
+              className="bg-gradient-to-br from-yellow-300 to-yellow-400 dark:from-yellow-600 dark:to-yellow-700 rounded-2xl p-6 border-2 border-yellow-500 dark:border-yellow-600 hover:scale-105 transition-all shadow-lg cursor-pointer"
+              variants={statsCardVariants}
+              whileHover={{ scale: 1.05, transition: { duration: 0.2 } }}
+              whileTap={{ scale: 0.98 }}
+            >
               <div className="flex items-center justify-between mb-4">
                 <div className="p-3 rounded-2xl bg-white/30">
                   <Star className="h-6 w-6 text-yellow-900 dark:text-yellow-100" />
@@ -90,13 +158,22 @@ export default function Home() {
               </div>
               <p className="text-sm text-yellow-900 dark:text-yellow-100 font-medium">Notes moyennes</p>
               <p className="text-3xl font-display font-bold text-yellow-950 dark:text-white">4.8</p>
-            </div>
-          </div>
+            </motion.div>
+          </motion.div>
 
           {/* Quick Actions */}
-          <div>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.4 }}
+          >
             <h2 className="text-2xl font-display font-semibold mb-4">Actions rapides</h2>
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <motion.div
+              className="grid md:grid-cols-2 lg:grid-cols-3 gap-4"
+              variants={containerVariants}
+              initial="hidden"
+              animate="visible"
+            >
               <QuickActionCard
                 title="Générer des cartes"
                 description="Créez un nouveau jeu de cartes éducatives avec notre IA spécialisée PFEQ"
@@ -118,8 +195,8 @@ export default function Home() {
                 href="/shared-library"
                 colorScheme="accent"
               />
-            </div>
-          </div>
+            </motion.div>
+          </motion.div>
 
           {/* Recent Activity & Tips */}
           <div className="grid lg:grid-cols-2 gap-6">
