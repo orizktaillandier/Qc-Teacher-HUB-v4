@@ -16,19 +16,19 @@ interface QuickActionCardProps {
 
 const colorSchemes = {
   primary: {
-    bg: "bg-gradient-to-br from-orange-50 to-orange-100 dark:from-orange-900/20 dark:to-orange-800/20",
-    border: "border-orange-200 dark:border-orange-700",
-    icon: "bg-gradient-to-br from-orange-500/20 to-orange-500/10 text-orange-600 dark:text-orange-400",
+    bg: "bg-gradient-to-br from-orange-200 to-orange-300 dark:from-orange-700 dark:to-orange-800",
+    border: "border-orange-400 dark:border-orange-600",
+    icon: "bg-white/40 text-orange-700 dark:text-orange-200",
   },
   secondary: {
-    bg: "bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-800/20",
-    border: "border-blue-200 dark:border-blue-700",
-    icon: "bg-gradient-to-br from-blue-500/20 to-blue-500/10 text-blue-600 dark:text-blue-400",
+    bg: "bg-gradient-to-br from-blue-200 to-blue-300 dark:from-blue-700 dark:to-blue-800",
+    border: "border-blue-400 dark:border-blue-600",
+    icon: "bg-white/40 text-blue-700 dark:text-blue-200",
   },
   accent: {
-    bg: "bg-gradient-to-br from-green-50 to-green-100 dark:from-green-900/20 dark:to-green-800/20",
-    border: "border-green-200 dark:border-green-700",
-    icon: "bg-gradient-to-br from-green-500/20 to-green-500/10 text-green-600 dark:text-green-400",
+    bg: "bg-gradient-to-br from-green-200 to-green-300 dark:from-green-700 dark:to-green-800",
+    border: "border-green-400 dark:border-green-600",
+    icon: "bg-white/40 text-green-700 dark:text-green-200",
   },
 };
 

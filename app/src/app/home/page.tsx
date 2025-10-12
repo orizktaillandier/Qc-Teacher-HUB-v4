@@ -44,52 +44,52 @@ export default function Home() {
 
           {/* Stats Overview */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 animate-fade-in">
-            <div className="bg-gradient-to-br from-orange-100 to-orange-200 dark:from-orange-900/40 dark:to-orange-800/40 rounded-2xl p-6 border-2 border-orange-300 dark:border-orange-700 hover:scale-105 transition-all">
+            <div className="bg-gradient-to-br from-orange-300 to-orange-400 dark:from-orange-600 dark:to-orange-700 rounded-2xl p-6 border-2 border-orange-500 dark:border-orange-600 hover:scale-105 transition-all shadow-lg">
               <div className="flex items-center justify-between mb-4">
-                <div className="p-3 rounded-2xl bg-orange-500/20">
-                  <Sparkles className="h-6 w-6 text-orange-600 dark:text-orange-400" />
+                <div className="p-3 rounded-2xl bg-white/30">
+                  <Sparkles className="h-6 w-6 text-orange-900 dark:text-orange-100" />
                 </div>
-                <div className="text-sm font-medium px-3 py-1 rounded-full bg-green-500/20 text-green-700 dark:text-green-400">
+                <div className="text-sm font-medium px-3 py-1 rounded-full bg-green-500 text-white">
                   ↑ 12%
                 </div>
               </div>
-              <p className="text-sm text-orange-700 dark:text-orange-300 font-medium">Cartes créées</p>
-              <p className="text-3xl font-display font-bold text-orange-900 dark:text-orange-100">42</p>
-              <p className="text-xs text-orange-600 dark:text-orange-400">Cette semaine</p>
+              <p className="text-sm text-orange-900 dark:text-orange-100 font-medium">Cartes créées</p>
+              <p className="text-3xl font-display font-bold text-orange-950 dark:text-white">42</p>
+              <p className="text-xs text-orange-800 dark:text-orange-200">Cette semaine</p>
             </div>
 
-            <div className="bg-gradient-to-br from-blue-100 to-blue-200 dark:from-blue-900/40 dark:to-blue-800/40 rounded-2xl p-6 border-2 border-blue-300 dark:border-blue-700 hover:scale-105 transition-all">
+            <div className="bg-gradient-to-br from-blue-300 to-blue-400 dark:from-blue-600 dark:to-blue-700 rounded-2xl p-6 border-2 border-blue-500 dark:border-blue-600 hover:scale-105 transition-all shadow-lg">
               <div className="flex items-center justify-between mb-4">
-                <div className="p-3 rounded-2xl bg-blue-500/20">
-                  <Library className="h-6 w-6 text-blue-600 dark:text-blue-400" />
+                <div className="p-3 rounded-2xl bg-white/30">
+                  <Library className="h-6 w-6 text-blue-900 dark:text-blue-100" />
                 </div>
               </div>
-              <p className="text-sm text-blue-700 dark:text-blue-300 font-medium">Collections</p>
-              <p className="text-3xl font-display font-bold text-blue-900 dark:text-blue-100">8</p>
+              <p className="text-sm text-blue-900 dark:text-blue-100 font-medium">Collections</p>
+              <p className="text-3xl font-display font-bold text-blue-950 dark:text-white">8</p>
             </div>
 
-            <div className="bg-gradient-to-br from-green-100 to-green-200 dark:from-green-900/40 dark:to-green-800/40 rounded-2xl p-6 border-2 border-green-300 dark:border-green-700 hover:scale-105 transition-all">
+            <div className="bg-gradient-to-br from-green-300 to-green-400 dark:from-green-600 dark:to-green-700 rounded-2xl p-6 border-2 border-green-500 dark:border-green-600 hover:scale-105 transition-all shadow-lg">
               <div className="flex items-center justify-between mb-4">
-                <div className="p-3 rounded-2xl bg-green-500/20">
-                  <Clock className="h-6 w-6 text-green-600 dark:text-green-400" />
+                <div className="p-3 rounded-2xl bg-white/30">
+                  <Clock className="h-6 w-6 text-green-900 dark:text-green-100" />
                 </div>
-                <div className="text-sm font-medium px-3 py-1 rounded-full bg-green-500/20 text-green-700 dark:text-green-400">
+                <div className="text-sm font-medium px-3 py-1 rounded-full bg-green-600 text-white">
                   ↑ 5%
                 </div>
               </div>
-              <p className="text-sm text-green-700 dark:text-green-300 font-medium">Temps économisé</p>
-              <p className="text-3xl font-display font-bold text-green-900 dark:text-green-100">12h</p>
-              <p className="text-xs text-green-600 dark:text-green-400">Ce mois-ci</p>
+              <p className="text-sm text-green-900 dark:text-green-100 font-medium">Temps économisé</p>
+              <p className="text-3xl font-display font-bold text-green-950 dark:text-white">12h</p>
+              <p className="text-xs text-green-800 dark:text-green-200">Ce mois-ci</p>
             </div>
 
-            <div className="bg-gradient-to-br from-yellow-100 to-yellow-200 dark:from-yellow-900/40 dark:to-yellow-800/40 rounded-2xl p-6 border-2 border-yellow-300 dark:border-yellow-700 hover:scale-105 transition-all">
+            <div className="bg-gradient-to-br from-yellow-300 to-yellow-400 dark:from-yellow-600 dark:to-yellow-700 rounded-2xl p-6 border-2 border-yellow-500 dark:border-yellow-600 hover:scale-105 transition-all shadow-lg">
               <div className="flex items-center justify-between mb-4">
-                <div className="p-3 rounded-2xl bg-yellow-500/20">
-                  <Star className="h-6 w-6 text-yellow-600 dark:text-yellow-400" />
+                <div className="p-3 rounded-2xl bg-white/30">
+                  <Star className="h-6 w-6 text-yellow-900 dark:text-yellow-100" />
                 </div>
               </div>
-              <p className="text-sm text-yellow-700 dark:text-yellow-300 font-medium">Notes moyennes</p>
-              <p className="text-3xl font-display font-bold text-yellow-900 dark:text-yellow-100">4.8</p>
+              <p className="text-sm text-yellow-900 dark:text-yellow-100 font-medium">Notes moyennes</p>
+              <p className="text-3xl font-display font-bold text-yellow-950 dark:text-white">4.8</p>
             </div>
           </div>
 
@@ -124,7 +124,7 @@ export default function Home() {
           {/* Recent Activity & Tips */}
           <div className="grid lg:grid-cols-2 gap-6">
             {/* Recent Activity */}
-            <div className="bg-gradient-to-br from-purple-50 to-purple-100 dark:from-purple-900/20 dark:to-purple-800/20 rounded-2xl border-2 border-purple-200 dark:border-purple-700 p-6">
+            <div className="bg-gradient-to-br from-purple-200 to-purple-300 dark:from-purple-700 dark:to-purple-800 rounded-2xl border-2 border-purple-400 dark:border-purple-600 p-6 shadow-lg">
               <div className="flex items-center justify-between mb-6">
                 <h2 className="text-xl font-display font-semibold">Activité récente</h2>
                 <Button variant="ghost" size="sm">
@@ -157,10 +157,10 @@ export default function Home() {
             </div>
 
             {/* Tips & Inspiration */}
-            <div className="bg-gradient-to-br from-pink-50 to-pink-100 dark:from-pink-900/20 dark:to-pink-800/20 rounded-2xl border-2 border-pink-200 dark:border-pink-700 p-6">
+            <div className="bg-gradient-to-br from-pink-200 to-pink-300 dark:from-pink-700 dark:to-pink-800 rounded-2xl border-2 border-pink-400 dark:border-pink-600 p-6 shadow-lg">
               <div className="flex items-center gap-2 mb-4">
-                <div className="p-2 rounded-lg bg-pink-500/20">
-                  <Sparkles className="h-5 w-5 text-pink-600 dark:text-pink-400" />
+                <div className="p-2 rounded-lg bg-white/40">
+                  <Sparkles className="h-5 w-5 text-pink-800 dark:text-pink-100" />
                 </div>
                 <h2 className="text-xl font-display font-semibold text-pink-900 dark:text-pink-100">Astuce du jour</h2>
               </div>
