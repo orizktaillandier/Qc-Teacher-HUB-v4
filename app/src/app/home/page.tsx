@@ -125,35 +125,21 @@ export default function Home() {
             initial="hidden"
             animate="visible"
           >
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <motion.div
-                  className="bg-gradient-to-br from-orange-300 to-orange-400 dark:from-orange-600 dark:to-orange-700 rounded-2xl p-6 border-2 border-orange-500 dark:border-orange-600 hover:scale-105 transition-all shadow-lg cursor-pointer relative group"
-                  variants={statsCardVariants}
-                  whileHover={{ scale: 1.05, transition: { duration: 0.2 } }}
-                  whileTap={{ scale: 0.98 }}
-                >
-                  <div className="flex items-center justify-between mb-4">
-                    <div className="p-3 rounded-2xl bg-white/30">
-                      <Sparkles className="h-6 w-6 text-orange-900 dark:text-orange-100" />
-                    </div>
-                    {/* Hidden during testing phase */}
-                    {/* <div className="flex items-center gap-2">
-                      <div className="text-sm font-medium px-3 py-1 rounded-full bg-green-500 text-white">
-                        ↑ 12%
-                      </div>
-                      <Info className="h-4 w-4 text-orange-700 dark:text-orange-200 opacity-0 group-hover:opacity-100 transition-opacity" />
-                    </div> */}
-                  </div>
-                  <p className="text-sm text-orange-900 dark:text-orange-100 font-medium">Cartes créées</p>
-                  <p className="text-3xl font-display font-bold text-orange-950 dark:text-white">42</p>
-                  <p className="text-xs text-orange-800 dark:text-orange-200">Cette semaine</p>
-                </motion.div>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p className="text-sm">12% d'augmentation par rapport à la semaine dernière</p>
-              </TooltipContent>
-            </Tooltip>
+            <motion.div
+              className="bg-gradient-to-br from-orange-300 to-orange-400 dark:from-orange-600 dark:to-orange-700 rounded-2xl p-6 border-2 border-orange-500 dark:border-orange-600 hover:scale-105 transition-all shadow-lg cursor-pointer"
+              variants={statsCardVariants}
+              whileHover={{ scale: 1.05, transition: { duration: 0.2 } }}
+              whileTap={{ scale: 0.98 }}
+            >
+              <div className="flex items-center justify-between mb-4">
+                <div className="p-3 rounded-2xl bg-white/30">
+                  <Sparkles className="h-6 w-6 text-orange-900 dark:text-orange-100" />
+                </div>
+              </div>
+              <p className="text-sm text-orange-900 dark:text-orange-100 font-medium">Cartes créées</p>
+              <p className="text-3xl font-display font-bold text-orange-950 dark:text-white">42</p>
+              <p className="text-xs text-orange-800 dark:text-orange-200">Cette semaine</p>
+            </motion.div>
 
             <motion.div
               className="bg-gradient-to-br from-blue-300 to-blue-400 dark:from-blue-600 dark:to-blue-700 rounded-2xl p-6 border-2 border-blue-500 dark:border-blue-600 hover:scale-105 transition-all shadow-lg cursor-pointer"
@@ -180,10 +166,6 @@ export default function Home() {
                 <div className="p-3 rounded-2xl bg-white/30">
                   <Clock className="h-6 w-6 text-green-900 dark:text-green-100" />
                 </div>
-                {/* Hidden during testing phase */}
-                {/* <div className="text-sm font-medium px-3 py-1 rounded-full bg-green-600 text-white">
-                  ↑ 5%
-                </div> */}
               </div>
               <p className="text-sm text-green-900 dark:text-green-100 font-medium">Temps économisé</p>
               <p className="text-3xl font-display font-bold text-green-950 dark:text-white">12h</p>
