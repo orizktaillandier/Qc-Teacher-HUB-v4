@@ -5,6 +5,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Project: Quebec Teacher Hub v5
 Educational card generator for Quebec teachers, fully aligned with PFEQ (Programme de formation de l'école québécoise) curriculum standards.
 
+**Design Philosophy**: Quebec Creative Studio - A warm, colorful, and professional design language inspired by educational tools like Canva, featuring custom illustrations, smooth animations, and a Quebec-themed color palette.
+
 ## Commands
 
 ```bash
@@ -43,8 +45,21 @@ data/               # Data layer
 - React 19.1.0, TypeScript (strict mode)
 - Shadcn/ui components (New York style)
 - Tailwind CSS v4, next-themes for dark mode
+- Framer Motion for spring animations
 - OpenAI GPT-5 API for card generation
 - SQLite knowledge base with PFEQ content
+
+### Design System
+- **Quebec Color Palette**:
+  - Primary: Maple Orange (#E67E22) - Warmth and energy
+  - Secondary: Quebec Blue (#1976D2) - Trust and professionalism
+  - Accent: Forest Green (#27AE60) - Growth and nature
+- **Typography**:
+  - Display font: Quicksand (warm, friendly headings)
+  - Body font: Inter (readable, modern)
+- **Border Radius**: 1rem (rounded-2xl) - Warm, approachable feel
+- **Animations**: Spring physics (stiffness: 100-300, damping: 12-20)
+- **Glass-morphism**: 80-85% opacity + backdrop-blur-md for depth
 
 ## PFEQ Compliance (Critical)
 
@@ -66,6 +81,46 @@ The API uses specific key mappings between frontend and database:
 - Frontend notion keys map to specific database notion keys (see `app/src/app/api/generate-cards/route.ts`)
 
 ## Key Implementation Files
+
+### Background Pattern Component (`app/src/components/ui/background-pattern.tsx`)
+Professional educational illustrations displayed as background:
+- **12 custom SVG illustrations**: Teacher at board, books, light bulb, globe, pencils, apple, graduation cap, calculator, trophy, microscope, art palette, atom
+- **Inline SVG approach**: No external dependencies, full customization control
+- **Strategic positioning**: x/y percentages spread across page
+- **Size range**: 270-420px for visual hierarchy
+- **Opacity range**: 42-50% for subtle but visible presence
+- **Performance**: Inline reduces HTTP requests, GPU-accelerated rendering
+
+Implementation pattern:
+```typescript
+const illustrations = [
+  {
+    svg: <svg>...</svg>,
+    x: "2%",
+    y: "8%",
+    size: 400,
+    opacity: 0.45
+  },
+  // ... 11 more
+]
+```
+
+**Why inline SVG over external files?**
+- Eliminates HTTP requests (faster)
+- Full control over colors and styling
+- No dependency on third-party APIs (Undraw returned 404)
+- Easy to customize per theme
+- Better tree-shaking in production builds
+
+### Glass-morphism Card Technique
+Transparent cards with backdrop blur create depth:
+```typescript
+className="bg-gradient-to-br from-purple-200/80 to-purple-300/80
+  backdrop-blur-md rounded-2xl"
+```
+- `/80` suffix = 80% opacity (Tailwind arbitrary values)
+- `backdrop-blur-md` = blur background for glass effect
+- Allows background illustrations to show through
 
 ### Generator Page (`app/src/app/generator/page.tsx`)
 - PFEQ cascading filters implementation
@@ -127,9 +182,17 @@ const getCharacterTheme = (character: string) => {
 
 ## Current Implementation Status
 
-### ✅ Completed
+### ✅ Completed (v5.0 UI/UX Redesign - Oct 12, 2025)
+- **Quebec Creative Studio Design**:
+  - 12 professional background illustrations (custom SVG)
+  - Warm Quebec color palette throughout
+  - Smooth Framer Motion spring animations
+  - Command palette with Ctrl+K (Canva-inspired)
+  - Glass-morphism card effects (transparent + backdrop blur)
+  - Staggered entrance animations for visual hierarchy
+  - Hover effects with scale and lift animations
+  - Dark mode with seamless transitions
 - PFEQ-compliant cascading filters
-- Dark mode with system preference
 - Responsive navigation
 - **Google OAuth authentication** (NextAuth)
 - **Auth middleware** protecting routes
@@ -231,9 +294,29 @@ Always verify icon names exist before using:
 ### Adding New Features
 1. Maintain PFEQ hierarchy compliance
 2. Test cascading filter dependencies
-3. Ensure dark mode compatibility
-4. Verify TypeScript strict mode compliance
-5. Test with different card counts (8, 16, 24)
+3. **Follow Quebec Creative Studio design language**:
+   - Use Quebec color palette (primary/secondary/accent)
+   - Add Framer Motion spring animations for interactions
+   - Apply glass-morphism effects for cards (80-85% opacity + backdrop-blur-md)
+   - Use rounded-2xl for warmth
+   - Add hover states with scale-105 transitions
+4. Ensure dark mode compatibility
+5. Verify TypeScript strict mode compliance
+6. Test with different card counts (8, 16, 24)
+
+### Animation Guidelines
+- **Use Framer Motion spring physics**: `type: "spring", stiffness: 100-300, damping: 12-20`
+- **Stagger children for hierarchy**: `staggerChildren: 0.1, delayChildren: 0.2`
+- **Hover effects**: `whileHover: { scale: 1.05, y: -5 }` for lift effect
+- **Tap feedback**: `whileTap: { scale: 0.98 }` for tactile response
+- **Respect reduced motion**: Framer Motion handles this by default
+
+### Design System Adherence
+- **Cards**: Always use gradient backgrounds with 80-85% opacity
+- **Borders**: Use color-400 or color-500 for definition
+- **Shadows**: Use shadow-xl base, shadow-2xl on hover
+- **Icon backgrounds**: white/40 for contrast
+- **Text hierarchy**: font-display for headings, regular for body
 
 ### Code Quality
 - TypeScript strict mode enabled

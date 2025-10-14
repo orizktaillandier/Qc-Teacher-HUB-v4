@@ -63,7 +63,11 @@
       "Bash(if exist .next rmdir /s /q .next)",
       "WebFetch(domain:undraw.co)",
       "Bash(npx tsc:*)",
-      "Bash(npx next dev:*)"
+      "Bash(npx next dev:*)",
+      "Bash(del check-db.js)",
+      "Bash(vercel:*)",
+      "Bash(git pull:*)",
+      "Bash(git stash:*)"
     ],
     "deny": [],
     "ask": []

@@ -4,12 +4,14 @@ import { useEffect, useState } from 'react'
 import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import { Navigation } from '@/components/navigation'
+import { BackgroundPattern } from '@/components/ui/background-pattern'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { toast } from 'sonner'
 import { Globe, Download, Eye, Users, TrendingUp, Calendar, Filter } from 'lucide-react'
+import { motion } from 'framer-motion'
 
 interface SharedGeneration {
   id: string
@@ -170,12 +172,13 @@ export default function SharedLibraryPage() {
 
   if (status === 'loading' || isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-950 dark:to-slate-900">
+      <div className="min-h-screen relative overflow-hidden bg-gradient-to-br from-orange-50/80 via-amber-50/60 to-yellow-50/80 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
+        <BackgroundPattern variant="illustrations" />
         <Navigation />
-        <div className="pt-20 pb-12 px-4">
+        <div className="relative pt-20 pb-12 px-4">
           <div className="container mx-auto max-w-7xl">
             <div className="flex items-center justify-center py-20">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
             </div>
           </div>
         </div>
@@ -188,95 +191,138 @@ export default function SharedLibraryPage() {
   const availableGrades = Array.from(new Set(generations.map(g => g.grade)))
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-950 dark:to-slate-900">
+    <div className="min-h-screen relative overflow-hidden bg-gradient-to-br from-orange-50/80 via-amber-50/60 to-yellow-50/80 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
+      {/* Professional Educational Illustrations Background */}
+      <BackgroundPattern variant="illustrations" />
+
+      {/* Floating Decorative Shapes */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute -top-24 -right-24 w-96 h-96 bg-primary/10 rounded-full blur-3xl" />
+        <div className="absolute top-1/3 -left-32 w-80 h-80 bg-secondary/10 rounded-full blur-3xl" />
+        <div className="absolute bottom-32 right-1/4 w-64 h-64 bg-accent/10 rounded-full blur-3xl" />
+      </div>
+
       <Navigation />
 
-      <div className="pt-20 pb-12 px-4">
+      <div className="relative pt-20 pb-12 px-4">
         <div className="container mx-auto max-w-7xl">
           {/* Header */}
-          <div className="mb-8">
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, ease: "easeOut" }}
+            className="mb-8"
+          >
             <div className="flex items-center gap-3 mb-2">
-              <div className="p-2 bg-gradient-to-br from-green-500 to-teal-600 rounded-lg">
+              <div className="p-3 rounded-2xl bg-gradient-to-br from-green-500 to-teal-600 shadow-lg transition-transform hover:scale-110">
                 <Globe className="h-6 w-6 text-white" />
               </div>
-              <h1 className="text-3xl font-bold">Bibliothèque Partagée</h1>
-              <Badge variant="outline" className="ml-2">
+              <h1 className="text-3xl md:text-4xl font-display font-bold bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent">
+                Bibliothèque Partagée
+              </h1>
+              <Badge variant="outline" className="ml-2 border-primary/30">
                 <Users className="h-3 w-3 mr-1" />
                 {generations.length} générations
               </Badge>
             </div>
-            <p className="text-slate-600 dark:text-slate-400">
+            <p className="text-muted-foreground text-lg">
               Découvrez et copiez des cartes créées par d'autres enseignants
             </p>
-          </div>
+          </motion.div>
 
           {/* Filters */}
-          <Card className="mb-6">
-            <CardHeader>
-              <CardTitle className="text-lg flex items-center gap-2">
-                <Filter className="h-5 w-5" />
-                Filtres
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="flex gap-4">
-                <div className="flex-1">
-                  <label className="text-sm font-medium mb-2 block">Matière</label>
-                  <Select value={filterSubject} onValueChange={setFilterSubject}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Toutes les matières" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">Toutes les matières</SelectItem>
-                      {availableSubjects.map(subject => (
-                        <SelectItem key={subject} value={subject}>
-                          {subjectLabels[subject] || subject}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4, delay: 0.1 }}
+          >
+            <Card className="mb-6 bg-background/85 backdrop-blur-md border-2 shadow-xl">
+              <CardHeader>
+                <CardTitle className="text-lg flex items-center gap-2">
+                  <Filter className="h-5 w-5" />
+                  Filtres
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="flex gap-4">
+                  <div className="flex-1">
+                    <label className="text-sm font-medium mb-2 block">Matière</label>
+                    <Select value={filterSubject} onValueChange={setFilterSubject}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Toutes les matières" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">Toutes les matières</SelectItem>
+                        {availableSubjects.map(subject => (
+                          <SelectItem key={subject} value={subject}>
+                            {subjectLabels[subject] || subject}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
 
-                <div className="flex-1">
-                  <label className="text-sm font-medium mb-2 block">Année</label>
-                  <Select value={filterGrade} onValueChange={setFilterGrade}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Toutes les années" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">Toutes les années</SelectItem>
-                      {availableGrades.sort().map(grade => (
-                        <SelectItem key={grade} value={grade}>
-                          {gradeLabels[grade] || grade}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Generations Grid */}
-          {filteredGenerations.length === 0 ? (
-            <Card>
-              <CardContent className="py-20">
-                <div className="text-center">
-                  <Globe className="h-12 w-12 mx-auto text-slate-400 mb-4" />
-                  <h3 className="text-lg font-semibold mb-2">Aucune génération partagée</h3>
-                  <p className="text-slate-600 dark:text-slate-400">
-                    {filterSubject !== 'all' || filterGrade !== 'all'
-                      ? 'Aucune génération ne correspond à vos filtres'
-                      : 'Soyez le premier à partager des cartes!'}
-                  </p>
+                  <div className="flex-1">
+                    <label className="text-sm font-medium mb-2 block">Année</label>
+                    <Select value={filterGrade} onValueChange={setFilterGrade}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Toutes les années" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">Toutes les années</SelectItem>
+                        {availableGrades.sort().map(grade => (
+                          <SelectItem key={grade} value={grade}>
+                            {gradeLabels[grade] || grade}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
                 </div>
               </CardContent>
             </Card>
+          </motion.div>
+
+          {/* Generations Grid */}
+          {filteredGenerations.length === 0 ? (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.3 }}
+            >
+              <Card className="bg-background/85 backdrop-blur-md border-2 shadow-xl">
+                <CardContent className="py-20">
+                  <div className="text-center">
+                    <Globe className="h-12 w-12 mx-auto text-slate-400 mb-4" />
+                    <h3 className="text-lg font-display font-semibold mb-2">Aucune génération partagée</h3>
+                    <p className="text-muted-foreground">
+                      {filterSubject !== 'all' || filterGrade !== 'all'
+                        ? 'Aucune génération ne correspond à vos filtres'
+                        : 'Soyez le premier à partager des cartes!'}
+                    </p>
+                  </div>
+                </CardContent>
+              </Card>
+            </motion.div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {filteredGenerations.map((generation) => (
-                <Card key={generation.id} className="hover:shadow-lg transition-shadow">
-                  <CardHeader>
+              {filteredGenerations.map((generation, index) => (
+                <motion.div
+                  key={generation.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{
+                    duration: 0.4,
+                    delay: index * 0.08,
+                    type: "spring",
+                    stiffness: 100,
+                    damping: 15
+                  }}
+                  whileHover={{ scale: 1.02, y: -4 }}
+                  whileTap={{ scale: 0.98 }}
+                >
+                  <Card className="h-full bg-background/85 backdrop-blur-md border-2 shadow-xl hover:shadow-2xl transition-all duration-300">
+                    <CardHeader>
                     <div className="flex items-start justify-between mb-2">
                       <Badge variant="secondary">
                         {subjectLabels[generation.subject] || generation.subject}
@@ -286,52 +332,53 @@ export default function SharedLibraryPage() {
                       </Badge>
                     </div>
                     <CardTitle className="text-lg">{generation.notion}</CardTitle>
-                    <CardDescription>
-                      Par {generation.authorName || 'Utilisateur anonyme'}
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div className="flex items-center justify-between text-sm text-slate-600 dark:text-slate-400">
-                      <span>{generation.cardCount} carte{generation.cardCount > 1 ? 's' : ''}</span>
-                      <span className="flex items-center gap-1">
-                        <Calendar className="h-3 w-3" />
-                        {new Date(generation.sharedAt).toLocaleDateString('fr-CA')}
-                      </span>
-                    </div>
+                      <CardDescription>
+                        Par {generation.authorName || 'Utilisateur anonyme'}
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      <div className="flex items-center justify-between text-sm text-slate-600 dark:text-slate-400">
+                        <span>{generation.cardCount} carte{generation.cardCount > 1 ? 's' : ''}</span>
+                        <span className="flex items-center gap-1">
+                          <Calendar className="h-3 w-3" />
+                          {new Date(generation.sharedAt).toLocaleDateString('fr-CA')}
+                        </span>
+                      </div>
 
-                    <div className="flex items-center gap-4 text-sm text-slate-600 dark:text-slate-400">
-                      <span className="flex items-center gap-1">
-                        <Eye className="h-3 w-3" />
-                        {generation.views}
-                      </span>
-                      <span className="flex items-center gap-1">
-                        <Download className="h-3 w-3" />
-                        {generation.copies} copie{generation.copies !== 1 ? 's' : ''}
-                      </span>
-                    </div>
+                      <div className="flex items-center gap-4 text-sm text-slate-600 dark:text-slate-400">
+                        <span className="flex items-center gap-1">
+                          <Eye className="h-3 w-3" />
+                          {generation.views}
+                        </span>
+                        <span className="flex items-center gap-1">
+                          <Download className="h-3 w-3" />
+                          {generation.copies} copie{generation.copies !== 1 ? 's' : ''}
+                        </span>
+                      </div>
 
-                    <div className="flex gap-2 pt-2">
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        className="flex-1"
-                        onClick={() => handleView(generation)}
-                      >
-                        <Eye className="h-4 w-4 mr-1" />
-                        Voir
-                      </Button>
-                      <Button
-                        size="sm"
-                        className="flex-1"
-                        onClick={() => handleCopyToLibrary(generation.id)}
-                        disabled={!session}
-                      >
-                        <Download className="h-4 w-4 mr-1" />
-                        Copier
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
+                      <div className="flex gap-2 pt-2">
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          className="flex-1"
+                          onClick={() => handleView(generation)}
+                        >
+                          <Eye className="h-4 w-4 mr-1" />
+                          Voir
+                        </Button>
+                        <Button
+                          size="sm"
+                          className="flex-1"
+                          onClick={() => handleCopyToLibrary(generation.id)}
+                          disabled={!session}
+                        >
+                          <Download className="h-4 w-4 mr-1" />
+                          Copier
+                        </Button>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </motion.div>
               ))}
             </div>
           )}

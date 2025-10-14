@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { toast } from 'sonner'
 import { Navigation } from '@/components/navigation'
+import { BackgroundPattern } from '@/components/ui/background-pattern'
 import { generateStudentCardsPDF, generateAnswerSheetPDF } from '@/lib/pdf-generation'
 import { ProgressiveFilters } from '@/components/ProgressiveFilters'
 import { CollapsibleSection } from '@/components/CollapsibleSection'
@@ -701,26 +702,43 @@ export default function GeneratorPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
+    <div className="min-h-screen relative overflow-hidden bg-gradient-to-br from-orange-50/80 via-amber-50/60 to-yellow-50/80 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
+      {/* Professional Educational Illustrations Background */}
+      <BackgroundPattern variant="illustrations" />
+
+      {/* Floating Decorative Shapes */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute -top-24 -right-24 w-96 h-96 bg-primary/10 rounded-full blur-3xl" />
+        <div className="absolute top-1/3 -left-32 w-80 h-80 bg-secondary/10 rounded-full blur-3xl" />
+        <div className="absolute bottom-32 right-1/4 w-64 h-64 bg-accent/10 rounded-full blur-3xl" />
+      </div>
+
       <GoogleFontsLoader fontValue={selectedFont} weight={isBold ? 700 : 400} />
       <Navigation />
 
       {/* Main Content */}
-      <div className="pt-20 pb-12 px-4">
+      <div className="relative pt-20 pb-12 px-4">
         <div className="w-full max-w-full">
           {/* Header */}
-          <div className="container mx-auto max-w-7xl mb-8 animate-fade-in-down">
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, ease: "easeOut" }}
+            className="container mx-auto max-w-7xl mb-8"
+          >
             <div className="flex items-center gap-3 mb-2">
-              <div className="p-3 rounded-2xl bg-primary/10 transition-transform hover:scale-110">
+              <div className="p-3 rounded-2xl bg-primary/10 shadow-lg transition-transform hover:scale-110">
                 <Wand2 className="h-6 w-6 text-primary" />
               </div>
-              <h1 className="text-3xl font-display font-bold">Générateur de Cartes à Tâches</h1>
+              <h1 className="text-3xl md:text-4xl font-display font-bold bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent">
+                Générateur de Cartes à Tâches
+              </h1>
               <Badge variant="outline" className="ml-2 border-primary/30">PFEQ Aligné</Badge>
             </div>
-            <p className="text-muted-foreground">
+            <p className="text-muted-foreground text-lg">
               Créez des cartes éducatives personnalisées alignées au Programme de formation de l'école québécoise
             </p>
-          </div>
+          </motion.div>
 
           {/* Progressive Filters - Full width when active */}
           {!filtersCompleted && (
@@ -830,7 +848,7 @@ export default function GeneratorPage() {
             >
               {/* Left Panel - Customization */}
               <div className="no-print lg:w-96 flex-shrink-0">
-                <Card className="h-fit">
+                <Card className="h-fit bg-background/85 backdrop-blur-md border-2 shadow-xl">
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2">
                       <Settings2 className="h-5 w-5" />
@@ -992,7 +1010,7 @@ export default function GeneratorPage() {
 
             {/* Right Panel - Preview and Results */}
             <div className="flex-1 min-w-0">
-              <Card className="h-full overflow-hidden">
+              <Card className="h-full overflow-hidden bg-background/85 backdrop-blur-md border-2 shadow-xl">
                 <CardHeader className="no-print">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">

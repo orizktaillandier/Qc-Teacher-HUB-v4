@@ -26,17 +26,26 @@ Open http://localhost:3000
 
 ## 🎯 Key Features
 
+### Quebec Creative Studio Design
+- **Professional educational illustrations**: 12 custom SVG background illustrations (teacher, books, globe, etc.)
+- **Warm & playful aesthetic**: Quebec color palette (Maple Orange, Quebec Blue, Forest Green)
+- **Smooth animations**: Framer Motion spring physics for natural, polished interactions
+- **Command palette**: Quick navigation with Ctrl+K (Canva-inspired)
+- **Glass-morphism effects**: Transparent cards with backdrop blur for modern depth
+- **Dark mode support**: Seamless theme switching with system preference detection
+
 ### PFEQ-Compliant Generator
 - Cascading filters in correct order: Cycle → Grade → Subject → Notion → Sub-notions
 - Full Quebec curriculum coverage
 - Automatic filter updates based on selections
 
 ### Modern Tech Stack
-- Next.js 15.5.4 with App Router
+- Next.js 15.5.4 with App Router & Turbopack
 - Shadcn/ui components
 - Tailwind CSS v4
 - React 19.1.0
 - TypeScript with strict mode
+- Framer Motion for animations
 
 ### Quebec-Specific Content
 - 59+ authentic Quebec themes
@@ -54,11 +63,17 @@ v5/
 └── docs/         # Documentation
 ```
 
-## 📝 Current Status (Oct 11, 2025)
+## 📝 Current Status (Oct 12, 2025)
 
 ✅ **Completed**:
+- **Quebec Creative Studio UI/UX** (v5.0 redesign)
+  - 12 professional background illustrations
+  - Warm color palette with gradients
+  - Smooth Framer Motion animations
+  - Command palette (Ctrl+K)
+  - Glass-morphism card effects
 - PFEQ-compliant cascading filters
-- Dark mode support
+- Dark mode support with smooth transitions
 - Responsive navigation
 - Google OAuth authentication
 - Card generation with GPT-5/GPT-5-mini
