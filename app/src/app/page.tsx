@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { ThemeToggle } from "@/components/theme-toggle"
 import { HeroSection } from "@/components/ui/hero-section"
+import { BackgroundPattern } from "@/components/ui/background-pattern"
 import {
   Sparkles,
   BookOpen,
@@ -47,9 +48,19 @@ export default function LandingPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-orange-50 via-amber-50 to-yellow-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
+    <div className="min-h-screen relative overflow-hidden bg-gradient-to-br from-orange-50/80 via-amber-50/60 to-yellow-50/80 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
+      {/* Professional Educational Illustrations Background */}
+      <BackgroundPattern variant="illustrations" />
+
+      {/* Floating Decorative Shapes */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute -top-24 -right-24 w-96 h-96 bg-primary/10 rounded-full blur-3xl" />
+        <div className="absolute top-1/3 -left-32 w-80 h-80 bg-secondary/10 rounded-full blur-3xl" />
+        <div className="absolute bottom-32 right-1/4 w-64 h-64 bg-accent/10 rounded-full blur-3xl" />
+      </div>
+
       {/* Navigation Bar */}
-      <nav className="fixed top-0 w-full bg-card/80 backdrop-blur-md z-50 border-b border-border">
+      <nav className="relative w-full bg-card/80 backdrop-blur-md z-50 border-b border-border">
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center space-x-3">
