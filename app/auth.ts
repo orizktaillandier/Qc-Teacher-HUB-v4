@@ -4,6 +4,7 @@ import { authConfig } from './auth.config';
 // Main NextAuth configuration
 export const { handlers, auth, signIn, signOut } = NextAuth({
   ...authConfig,
+  secret: process.env.NEXTAUTH_SECRET,
   session: {
     strategy: 'jwt', // Using JWT strategy (no database required)
     maxAge: 30 * 24 * 60 * 60, // 30 days
