@@ -14,7 +14,9 @@ export const authConfig = {
           access_type: "offline",
           response_type: "code"
         }
-      }
+      },
+      // Disable PKCE for Vercel compatibility
+      checks: ['state']
     }),
   ],
   pages: {
