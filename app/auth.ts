@@ -5,11 +5,23 @@ import { authConfig } from './auth.config';
 export const { handlers, auth, signIn, signOut } = NextAuth({
   ...authConfig,
   trustHost: true, // Required for Vercel deployment
+  useSecureCookies: process.env.NODE_ENV === 'production',
   session: {
     strategy: 'jwt', // Using JWT strategy (no database required)
     maxAge: 30 * 24 * 60 * 60, // 30 days
   },
   secret: process.env.NEXTAUTH_SECRET,
+  cookies: {
+    pkceCodeVerifier: {
+      name: 'next-auth.pkce.code_verifier',
+      options: {
+        httpOnly: true,
+        sameSite: 'lax',
+        path: '/',
+        secure: process.env.NODE_ENV === 'production'
+      }
+    }
+  },
   callbacks: {
     async jwt({ token, user, account }) {
       // Initial sign in
