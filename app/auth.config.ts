@@ -15,13 +15,15 @@ export const authConfig = {
           response_type: "code"
         }
       },
-      // Disable PKCE for Vercel compatibility
-      checks: ['state']
+      // Disable PKCE completely for Vercel
+      checks: ['none']
     }),
   ],
   pages: {
     signIn: '/',  // Redirect to homepage for sign-in
   },
+  // Experimental: Skip PKCE verification
+  skipCSRFCheck: false,
   callbacks: {
     authorized({ auth, request: { nextUrl } }) {
       const isLoggedIn = !!auth?.user;
