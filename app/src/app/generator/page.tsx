@@ -721,13 +721,13 @@ export default function GeneratorPage() {
         <div className="w-full max-w-full">
           {/* Header */}
           <motion.div
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, ease: "easeOut" }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.2 }}
             className="container mx-auto max-w-7xl mb-8"
           >
             <div className="flex items-center gap-3 mb-2">
-              <div className="p-3 rounded-2xl bg-primary/10 shadow-lg transition-transform hover:scale-110">
+              <div className="p-3 rounded-2xl bg-primary/10 shadow-lg">
                 <Wand2 className="h-6 w-6 text-primary" />
               </div>
               <h1 className="text-3xl md:text-4xl font-display font-bold bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent">
@@ -841,9 +841,9 @@ export default function GeneratorPage() {
           {/* Main Content Grid - Only show after filters completed */}
           {filtersCompleted && (
             <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.2 }}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.3 }}
               className="flex flex-col lg:flex-row gap-6"
             >
               {/* Left Panel - Customization */}
