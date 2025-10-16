@@ -47,50 +47,50 @@
 :root {
   --radius: 1rem;
 
-  /* Quebec Warm Color Palette */
-  --maple-orange: 24 88% 52%;        /* #E67E22 - Warm, inviting maple */
-  --quebec-blue: 207 73% 46%;        /* #1976D2 - Official Quebec blue */
-  --forest-green: 145 63% 42%;       /* #27AE60 - Nature, growth */
-  --golden-yellow: 38 100% 65%;      /* #FFB84D - Celebration */
-  --coral-pink: 0 100% 80%;          /* #FF9999 - Playful */
-  --soft-lavender: 276 58% 90%;      /* #E8D5F2 - Gentle accent */
-  --cream-paper: 48 100% 93%;        /* #FFF8DC - Warm background */
+  /* Quebec Warm Color Palette - Softer, teacher-friendly */
+  --maple-orange: 25 85% 60%;        /* Warm coral-orange - softer than before */
+  --quebec-blue: 210 40% 65%;        /* Soft sky blue - less corporate */
+  --forest-green: 140 45% 60%;       /* Sage green - calmer */
+  --golden-yellow: 38 90% 65%;       /* Muted gold - less intense */
+  --coral-pink: 0 70% 75%;           /* Softer coral */
+  --soft-lavender: 276 50% 88%;      /* Gentler lavender */
+  --cream-paper: 30 25% 96%;         /* Warmer cream (less yellow) */
 
-  /* Base Colors - Warm & Colorful */
-  --background: 45 60% 98%;          /* Warm cream background */
-  --foreground: 222 47% 11%;         /* Deep charcoal */
-  --card: 48 100% 99%;               /* Warm white cards with hint of yellow */
-  --card-foreground: 222 47% 11%;
+  /* Base Colors - Warm off-white, not stark */
+  --background: 30 15% 97%;          /* Warm off-white background */
+  --foreground: 25 15% 25%;          /* Warm dark brown (not black) */
+  --card: 0 0% 100%;                 /* Pure white cards for contrast */
+  --card-foreground: 25 15% 25%;
 
-  /* Primary - Maple Orange (Quebec identity) */
+  /* Primary - Warm coral-orange */
   --primary: var(--maple-orange);
   --primary-foreground: 0 0% 100%;
 
-  /* Secondary - Quebec Blue */
+  /* Secondary - Soft sky blue */
   --secondary: var(--quebec-blue);
   --secondary-foreground: 0 0% 100%;
 
-  /* Accent - Forest Green */
+  /* Accent - Sage green */
   --accent: var(--forest-green);
   --accent-foreground: 0 0% 100%;
 
   /* Muted - Warm and soft */
-  --muted: 45 40% 94%;               /* Warmer muted */
-  --muted-foreground: 222 20% 40%;   /* Slightly lighter for warmth */
+  --muted: 30 10% 92%;               /* Warm gray backgrounds */
+  --muted-foreground: 25 10% 45%;    /* Muted text */
 
   /* Popover */
   --popover: 0 0% 100%;
-  --popover-foreground: 222 47% 11%;
+  --popover-foreground: 25 15% 25%;
 
   /* Semantic Colors */
-  --destructive: 0 100% 80%;         /* Coral pink */
+  --destructive: 0 70% 75%;          /* Softer coral pink */
   --success: var(--forest-green);
   --warning: var(--golden-yellow);
   --info: var(--quebec-blue);
 
-  /* Borders & Inputs - Colorful */
-  --border: 45 30% 88%;              /* Warmer borders */
-  --input: 45 30% 92%;               /* Lighter, warmer inputs */
+  /* Borders & Inputs - Subtle, warm */
+  --border: 30 8% 90%;               /* Very subtle warm borders */
+  --input: 30 10% 92%;               /* Warm input backgrounds */
   --ring: var(--maple-orange);
 
   /* Chart Colors - Quebec palette */
@@ -173,6 +173,8 @@
   }
   body {
     @apply bg-background text-foreground;
+    font-size: 16px; /* Better readability for teachers */
+    line-height: 1.6;
   }
 
   /* Typography - Quebec warm & friendly */

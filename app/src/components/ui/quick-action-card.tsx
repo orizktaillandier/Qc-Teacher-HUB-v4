@@ -46,30 +46,28 @@ export function QuickActionCard({
   return (
     <Link href={href} className="block">
       <motion.div
-        whileHover={{ scale: 1.05, y: -5 }}
-        whileTap={{ scale: 0.98 }}
-        transition={{ type: "spring", stiffness: 300, damping: 20 }}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.2 }}
       >
         <Card className={cn(
-          "relative overflow-hidden transition-all duration-300 rounded-3xl",
-          "shadow-lg hover:shadow-2xl cursor-pointer backdrop-blur-sm",
-          "border-2",
+          "relative overflow-hidden transition-all duration-200 rounded-3xl",
+          "shadow-lg hover:shadow-xl cursor-pointer backdrop-blur-sm",
+          "border-2 hover:border-primary/50",
           colors.bg,
           colors.border,
           className
         )}>
           <div className="p-6 group">
             {/* Icon */}
-            <motion.div
+            <div
               className={cn(
-                "inline-flex p-4 rounded-2xl mb-4",
+                "inline-flex p-4 rounded-2xl mb-4 transition-opacity duration-200",
                 colors.icon
               )}
-              whileHover={{ rotate: [0, -10, 10, 0], scale: 1.1 }}
-              transition={{ duration: 0.3 }}
             >
               <Icon className="h-8 w-8" />
-            </motion.div>
+            </div>
 
           {/* Content */}
           <div className="space-y-2">

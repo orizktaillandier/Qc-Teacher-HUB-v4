@@ -67,7 +67,9 @@
       "Bash(del check-db.js)",
       "Bash(vercel:*)",
       "Bash(git pull:*)",
-      "Bash(git stash:*)"
+      "Bash(git stash:*)",
+      "Bash(set DATABASE_URL=postgresql://postgres.rzctixqtwygvsvsxmmdy:FOXks0QuLnsTFNlp@aws-1-us-east-2.pooler.supabase.com:5432/postgres)",
+      "Bash(del update-vercel-env.bat update-vercel-env.sh fix-nextauth-url.bat)"
     ],
     "deny": [],
     "ask": []

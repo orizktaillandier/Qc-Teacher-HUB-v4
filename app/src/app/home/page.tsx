@@ -60,40 +60,24 @@ export default function Home() {
     }
   ];
 
-  // Smooth animation variants
+  // Subtle animation variants - no scale, simple fades
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
       opacity: 1,
       transition: {
         staggerChildren: 0.1,
-        delayChildren: 0.2
+        delayChildren: 0.1
       }
     }
   }
 
   const itemVariants = {
-    hidden: { y: 20, opacity: 0 },
+    hidden: { opacity: 0 },
     visible: {
-      y: 0,
       opacity: 1,
       transition: {
-        type: "spring",
-        stiffness: 100,
-        damping: 12
-      }
-    }
-  }
-
-  const statsCardVariants = {
-    hidden: { scale: 0.8, opacity: 0 },
-    visible: {
-      scale: 1,
-      opacity: 1,
-      transition: {
-        type: "spring",
-        stiffness: 120,
-        damping: 15
+        duration: 0.2
       }
     }
   }
@@ -122,9 +106,9 @@ export default function Home() {
         <div className="container mx-auto max-w-7xl space-y-10">
           {/* Welcome Header */}
           <motion.div
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, ease: "easeOut" }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.2 }}
             className="text-center md:text-left"
           >
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-display font-bold mb-3 bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent">
@@ -139,9 +123,9 @@ export default function Home() {
 
           {/* Quick Actions */}
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.4 }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.2, delay: 0.1 }}
           >
             <h2 className="text-2xl md:text-3xl font-display font-semibold mb-6">Actions rapides</h2>
             <motion.div
@@ -227,13 +211,13 @@ export default function Home() {
                     Thèmes populaires cette semaine
                   </p>
                   <div className="flex flex-wrap gap-2">
-                    <span className="px-3 py-1.5 rounded-full bg-gradient-to-r from-primary/20 to-primary/10 border border-primary/30 text-primary text-xs font-medium hover:scale-105 hover:shadow-md transition-all duration-200 cursor-pointer">
+                    <span className="px-3 py-1.5 rounded-full bg-gradient-to-r from-primary/20 to-primary/10 border border-primary/30 text-primary text-xs font-medium hover:opacity-90 transition-opacity duration-200 cursor-pointer">
                       Minecraft Pixel
                     </span>
-                    <span className="px-3 py-1.5 rounded-full bg-gradient-to-r from-secondary/20 to-secondary/10 border border-secondary/30 text-secondary text-xs font-medium hover:scale-105 hover:shadow-md transition-all duration-200 cursor-pointer">
+                    <span className="px-3 py-1.5 rounded-full bg-gradient-to-r from-secondary/20 to-secondary/10 border border-secondary/30 text-secondary text-xs font-medium hover:opacity-90 transition-opacity duration-200 cursor-pointer">
                       Kawaii Pastel
                     </span>
-                    <span className="px-3 py-1.5 rounded-full bg-gradient-to-r from-accent/20 to-accent/10 border border-accent/30 text-accent text-xs font-medium hover:scale-105 hover:shadow-md transition-all duration-200 cursor-pointer">
+                    <span className="px-3 py-1.5 rounded-full bg-gradient-to-r from-accent/20 to-accent/10 border border-accent/30 text-accent text-xs font-medium hover:opacity-90 transition-opacity duration-200 cursor-pointer">
                       Scrapbook Vintage
                     </span>
                   </div>
