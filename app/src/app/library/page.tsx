@@ -3,14 +3,10 @@
 import { useState, useEffect } from 'react'
 import { useSession } from 'next-auth/react'
 import { Navigation } from '@/components/navigation'
-import { BackgroundPattern } from '@/components/ui/background-pattern'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import {
-  Library as LibraryIcon,
-  Download,
   Trash2,
   Eye,
   Calendar,
@@ -21,7 +17,6 @@ import {
   Share2
 } from 'lucide-react'
 import { toast } from 'sonner'
-import { motion } from 'framer-motion'
 
 interface CardGenerationItem {
   id: string
@@ -168,18 +163,15 @@ export default function LibraryPage() {
   // Unauthenticated state
   if (status === 'unauthenticated') {
     return (
-      <div className="min-h-screen relative overflow-hidden bg-gradient-to-br from-orange-50/80 via-amber-50/60 to-yellow-50/80 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
-        {/* Professional Educational Illustrations Background */}
-        <BackgroundPattern variant="illustrations" />
-
+      <div className="min-h-screen bg-background">
         <Navigation />
-        <div className="relative pt-20 pb-12 px-4">
+        <div className="pt-20 pb-12 px-4">
           <div className="container mx-auto max-w-4xl">
-            <Card className="text-center py-20 bg-background/85 backdrop-blur-md border-2 shadow-xl">
+            <Card className="text-center py-20 border shadow-sm">
               <CardContent>
                 <AlertCircle className="h-16 w-16 text-yellow-500 mx-auto mb-4" />
                 <h2 className="text-2xl font-display font-bold mb-2">Connexion requise</h2>
-                <p className="text-slate-600 dark:text-slate-400 mb-6">
+                <p className="text-muted-foreground mb-6">
                   Vous devez être connecté pour accéder à votre bibliothèque
                 </p>
                 <Button onClick={() => window.location.href = '/api/auth/signin'}>
@@ -194,97 +186,49 @@ export default function LibraryPage() {
   }
 
   return (
-    <div className="min-h-screen relative overflow-hidden bg-gradient-to-br from-orange-50/80 via-amber-50/60 to-yellow-50/80 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
-      {/* Professional Educational Illustrations Background */}
-      <BackgroundPattern variant="illustrations" />
-
-      {/* Floating Decorative Shapes */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute -top-24 -right-24 w-96 h-96 bg-primary/10 rounded-full blur-3xl" />
-        <div className="absolute top-1/3 -left-32 w-80 h-80 bg-secondary/10 rounded-full blur-3xl" />
-        <div className="absolute bottom-32 right-1/4 w-64 h-64 bg-accent/10 rounded-full blur-3xl" />
-      </div>
-
+    <div className="min-h-screen bg-background">
       <Navigation />
 
-      <div className="relative pt-20 pb-12 px-4">
+      <div className="pt-20 pb-12 px-4">
         <div className="container mx-auto max-w-7xl">
           {/* Header */}
-          <motion.div
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, ease: "easeOut" }}
-            className="mb-8"
-          >
-            <div className="flex items-center gap-3 mb-2">
-              <div className="p-3 rounded-2xl bg-gradient-to-br from-purple-500 to-pink-600 shadow-lg transition-transform hover:scale-110">
-                <LibraryIcon className="h-6 w-6 text-white" />
-              </div>
-              <h1 className="text-3xl md:text-4xl font-display font-bold bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent">
-                Ma Bibliothèque
-              </h1>
-            </div>
-            <p className="text-muted-foreground text-lg">
+          <div className="mb-8">
+            <h1 className="text-3xl font-display font-bold mb-2 text-foreground">
+              Ma Bibliothèque
+            </h1>
+            <p className="text-muted-foreground">
               Retrouvez toutes vos générations de cartes à tâches
             </p>
-          </motion.div>
+          </div>
 
           {/* Loading state */}
           {isLoading ? (
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.3 }}
-            >
-              <Card className="py-20 bg-background/85 backdrop-blur-md border-2 shadow-xl">
-                <CardContent className="flex flex-col items-center justify-center">
-                  <Loader2 className="h-12 w-12 animate-spin text-primary mb-4" />
-                  <p className="text-muted-foreground">Chargement de vos générations...</p>
-                </CardContent>
-              </Card>
-            </motion.div>
+            <Card className="py-20 border shadow-sm">
+              <CardContent className="flex flex-col items-center justify-center">
+                <Loader2 className="h-12 w-12 animate-spin text-primary mb-4" />
+                <p className="text-muted-foreground">Chargement de vos générations...</p>
+              </CardContent>
+            </Card>
           ) : generations.length === 0 ? (
             /* Empty state */
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.3 }}
-            >
-              <Card className="py-20 bg-background/85 backdrop-blur-md border-2 shadow-xl">
-                <CardContent className="flex flex-col items-center justify-center text-center">
-                  <FolderOpen className="h-16 w-16 text-slate-300 dark:text-slate-700 mb-4" />
-                  <h3 className="text-xl font-display font-semibold mb-2">Aucune génération</h3>
-                  <p className="text-muted-foreground mb-6 max-w-md">
-                    Vous n'avez pas encore créé de cartes à tâches. Commencez par générer votre première collection!
-                  </p>
-                  <Button
-                    onClick={() => window.location.href = '/generator'}
-                    className="shadow-lg hover:shadow-xl transition-shadow"
-                  >
-                    Créer des cartes
-                  </Button>
-                </CardContent>
-              </Card>
-            </motion.div>
+            <Card className="py-20 border shadow-sm">
+              <CardContent className="flex flex-col items-center justify-center text-center">
+                <FolderOpen className="h-16 w-16 text-slate-300 dark:text-slate-700 mb-4" />
+                <h3 className="text-xl font-display font-semibold mb-2">Aucune génération</h3>
+                <p className="text-muted-foreground mb-6 max-w-md">
+                  Vous n'avez pas encore créé de cartes à tâches. Commencez par générer votre première collection!
+                </p>
+                <Button onClick={() => window.location.href = '/generator'}>
+                  Créer des cartes
+                </Button>
+              </CardContent>
+            </Card>
           ) : (
             /* Generations grid */
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {generations.map((generation, index) => (
-                <motion.div
-                  key={generation.id}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{
-                    duration: 0.4,
-                    delay: index * 0.08,
-                    type: "spring",
-                    stiffness: 100,
-                    damping: 15
-                  }}
-                  whileHover={{ scale: 1.02, y: -4 }}
-                  whileTap={{ scale: 0.98 }}
-                >
-                  <Card className="h-full bg-background/85 backdrop-blur-md border-2 shadow-xl hover:shadow-2xl transition-all duration-300">
+              {generations.map((generation) => (
+                <div key={generation.id}>
+                  <Card className="h-full border shadow-sm hover:shadow-md hover:border-primary/50 transition-all">
                     <CardHeader>
                       <div className="flex items-start justify-between mb-2">
                         <Badge variant="outline" className="text-xs">
@@ -347,7 +291,7 @@ export default function LibraryPage() {
                       </div>
                     </CardContent>
                   </Card>
-                </motion.div>
+                </div>
               ))}
             </div>
           )}
