@@ -213,7 +213,33 @@ export default function LibraryPage() {
             /* Empty state */
             <Card className="py-20 border shadow-sm">
               <CardContent className="flex flex-col items-center justify-center text-center">
-                <FolderOpen className="h-16 w-16 text-slate-300 dark:text-slate-700 mb-4" />
+                {/* Friendly illustration */}
+                <div className="mb-6">
+                  <svg width="200" height="200" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    {/* Empty folder */}
+                    <path d="M30 60 L30 150 C30 155 32 160 40 160 L160 160 C168 160 170 155 170 150 L170 75 C170 70 168 65 160 65 L95 65 L85 55 L40 55 C32 55 30 57 30 60 Z"
+                          className="fill-blue-100 dark:fill-blue-950/50"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          className="stroke-blue-300 dark:stroke-blue-800"/>
+
+                    {/* Sparkle 1 */}
+                    <circle cx="60" cy="90" r="3" className="fill-orange-400 dark:fill-orange-500"/>
+                    <line x1="60" y1="82" x2="60" y2="98" strokeWidth="2" className="stroke-orange-400 dark:stroke-orange-500"/>
+                    <line x1="52" y1="90" x2="68" y2="90" strokeWidth="2" className="stroke-orange-400 dark:stroke-orange-500"/>
+
+                    {/* Sparkle 2 */}
+                    <circle cx="140" cy="100" r="2.5" className="fill-green-400 dark:fill-green-500"/>
+                    <line x1="140" y1="93" x2="140" y2="107" strokeWidth="2" className="stroke-green-400 dark:stroke-green-500"/>
+                    <line x1="133" y1="100" x2="147" y2="100" strokeWidth="2" className="stroke-green-400 dark:stroke-green-500"/>
+
+                    {/* Plus sign in center */}
+                    <circle cx="100" cy="110" r="20" className="fill-blue-200 dark:fill-blue-900/50"/>
+                    <line x1="100" y1="100" x2="100" y2="120" strokeWidth="3" strokeLinecap="round" className="stroke-blue-600 dark:stroke-blue-400"/>
+                    <line x1="90" y1="110" x2="110" y2="110" strokeWidth="3" strokeLinecap="round" className="stroke-blue-600 dark:stroke-blue-400"/>
+                  </svg>
+                </div>
+
                 <h3 className="text-xl font-display font-semibold mb-2">Aucune génération</h3>
                 <p className="text-muted-foreground mb-6 max-w-md">
                   Vous n'avez pas encore créé de cartes à tâches. Commencez par générer votre première collection!

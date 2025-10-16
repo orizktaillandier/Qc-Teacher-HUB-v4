@@ -43,14 +43,14 @@ export function Navigation() {
   const [commandOpen, setCommandOpen] = useState(false)
 
   const navItems = [
-    { href: '/home', label: 'Accueil', icon: Home, color: 'text-primary' },
-    { href: '/generator', label: 'Générateur', icon: Zap, color: 'text-secondary' },
-    { href: '/library', label: 'Bibliothèque', icon: Library, color: 'text-accent' },
-    { href: '/shared-library', label: 'Partagé', icon: Globe, color: 'text-primary' },
+    { href: '/home', label: 'Accueil', icon: Home, color: 'text-orange-500' },
+    { href: '/generator', label: 'Générateur', icon: Zap, color: 'text-blue-500' },
+    { href: '/library', label: 'Bibliothèque', icon: Library, color: 'text-green-500' },
+    { href: '/shared-library', label: 'Partagé', icon: Globe, color: 'text-purple-500' },
   ]
 
   return (
-    <nav className="fixed top-0 w-full bg-card/80 backdrop-blur-md z-50 border-b border-border">
+    <nav className="fixed top-0 w-full bg-card backdrop-blur-md z-50 border-b-2 border-border shadow-lg">
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           {/* Logo and Brand */}

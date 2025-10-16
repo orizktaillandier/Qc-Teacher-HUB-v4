@@ -67,10 +67,10 @@ export default function LandingPage() {
 
         {/* Quick Start Actions */}
         <div className="grid md:grid-cols-2 gap-4 mb-12">
-          <Card className="p-6 hover:border-primary/50 transition-colors">
+          <Card className="p-6 hover:border-orange-200 dark:hover:border-orange-800 transition-colors">
             <div className="flex items-start gap-4">
-              <div className="p-3 rounded-lg bg-primary/10">
-                <Wand2 className="h-6 w-6 text-primary" />
+              <div className="p-3 rounded-lg bg-orange-100 dark:bg-orange-950/50">
+                <Wand2 className="h-6 w-6 text-orange-600 dark:text-orange-400" />
               </div>
               <div>
                 <h3 className="font-display text-lg font-semibold mb-1">Créer une carte</h3>
@@ -79,10 +79,10 @@ export default function LandingPage() {
             </div>
           </Card>
 
-          <Card className="p-6 hover:border-primary/50 transition-colors">
+          <Card className="p-6 hover:border-blue-200 dark:hover:border-blue-800 transition-colors">
             <div className="flex items-start gap-4">
-              <div className="p-3 rounded-lg bg-secondary/10">
-                <Library className="h-6 w-6 text-secondary" />
+              <div className="p-3 rounded-lg bg-blue-100 dark:bg-blue-950/50">
+                <Library className="h-6 w-6 text-blue-600 dark:text-blue-400" />
               </div>
               <div>
                 <h3 className="font-display text-lg font-semibold mb-1">Ma bibliothèque</h3>
@@ -111,22 +111,22 @@ export default function LandingPage() {
         {/* Simple Features */}
         <div className="mt-16 grid md:grid-cols-3 gap-6 text-center">
           <div>
-            <div className="inline-flex p-3 rounded-lg bg-primary/10 mb-3">
-              <Sparkles className="h-6 w-6 text-primary" />
+            <div className="inline-flex p-3 rounded-lg bg-orange-100 dark:bg-orange-950/50 mb-3">
+              <Sparkles className="h-6 w-6 text-orange-600 dark:text-orange-400" />
             </div>
             <h4 className="font-display font-semibold mb-1">IA spécialisée</h4>
             <p className="text-sm text-muted-foreground">Aligné au PFEQ</p>
           </div>
           <div>
-            <div className="inline-flex p-3 rounded-lg bg-secondary/10 mb-3">
-              <Wand2 className="h-6 w-6 text-secondary" />
+            <div className="inline-flex p-3 rounded-lg bg-blue-100 dark:bg-blue-950/50 mb-3">
+              <Wand2 className="h-6 w-6 text-blue-600 dark:text-blue-400" />
             </div>
             <h4 className="font-display font-semibold mb-1">59+ thèmes</h4>
             <p className="text-sm text-muted-foreground">Designs variés</p>
           </div>
           <div>
-            <div className="inline-flex p-3 rounded-lg bg-accent/10 mb-3">
-              <Users className="h-6 w-6 text-accent" />
+            <div className="inline-flex p-3 rounded-lg bg-green-100 dark:bg-green-950/50 mb-3">
+              <Users className="h-6 w-6 text-green-600 dark:text-green-400" />
             </div>
             <h4 className="font-display font-semibold mb-1">Communauté</h4>
             <p className="text-sm text-muted-foreground">Partagez & découvrez</p>

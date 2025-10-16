@@ -259,8 +259,39 @@ export default function SharedLibraryPage() {
           {filteredGenerations.length === 0 ? (
             <Card className="border shadow-sm">
               <CardContent className="py-20">
-                <div className="text-center">
-                  <Globe className="h-12 w-12 mx-auto text-slate-400 mb-4" />
+                <div className="flex flex-col items-center justify-center text-center">
+                  {/* Friendly illustration */}
+                  <div className="mb-6">
+                    <svg width="180" height="180" viewBox="0 0 180 180" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      {/* Globe with connections */}
+                      <circle cx="90" cy="90" r="50" className="fill-green-100 dark:fill-green-950/50" stroke="currentColor" strokeWidth="2" className="stroke-green-300 dark:stroke-green-800"/>
+
+                      {/* Connection lines */}
+                      <line x1="90" y1="40" x2="90" y2="140" strokeWidth="2" className="stroke-green-300 dark:stroke-green-800"/>
+                      <ellipse cx="90" cy="90" rx="50" ry="20" fill="none" strokeWidth="2" className="stroke-green-300 dark:stroke-green-800"/>
+                      <ellipse cx="90" cy="90" rx="20" ry="50" fill="none" strokeWidth="2" className="stroke-green-300 dark:stroke-green-800"/>
+
+                      {/* People/nodes around globe */}
+                      <circle cx="50" cy="60" r="8" className="fill-orange-400 dark:fill-orange-500"/>
+                      <circle cx="130" cy="70" r="8" className="fill-blue-400 dark:fill-blue-500"/>
+                      <circle cx="60" cy="120" r="8" className="fill-purple-400 dark:fill-purple-500"/>
+                      <circle cx="120" cy="110" r="8" className="fill-green-400 dark:fill-green-500"/>
+
+                      {/* Sparkles for sharing */}
+                      <g className="animate-pulse">
+                        <circle cx="35" cy="45" r="2" className="fill-orange-400"/>
+                        <line x1="35" y1="40" x2="35" y2="50" strokeWidth="1.5" className="stroke-orange-400"/>
+                        <line x1="30" y1="45" x2="40" y2="45" strokeWidth="1.5" className="stroke-orange-400"/>
+                      </g>
+
+                      <g className="animate-pulse" style={{animationDelay: '0.4s'}}>
+                        <circle cx="145" cy="65" r="2" className="fill-blue-400"/>
+                        <line x1="145" y1="60" x2="145" y2="70" strokeWidth="1.5" className="stroke-blue-400"/>
+                        <line x1="140" y1="65" x2="150" y2="65" strokeWidth="1.5" className="stroke-blue-400"/>
+                      </g>
+                    </svg>
+                  </div>
+
                   <h3 className="text-lg font-display font-semibold mb-2">Aucune génération partagée</h3>
                   <p className="text-muted-foreground">
                     {filterSubject !== 'all' || filterGrade !== 'all'
