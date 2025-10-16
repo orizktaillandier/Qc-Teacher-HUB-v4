@@ -702,43 +702,22 @@ export default function GeneratorPage() {
   }
 
   return (
-    <div className="min-h-screen relative overflow-hidden bg-gradient-to-br from-orange-50/80 via-amber-50/60 to-yellow-50/80 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
-      {/* Professional Educational Illustrations Background */}
-      <BackgroundPattern variant="illustrations" />
-
-      {/* Floating Decorative Shapes */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute -top-24 -right-24 w-96 h-96 bg-primary/10 rounded-full blur-3xl" />
-        <div className="absolute top-1/3 -left-32 w-80 h-80 bg-secondary/10 rounded-full blur-3xl" />
-        <div className="absolute bottom-32 right-1/4 w-64 h-64 bg-accent/10 rounded-full blur-3xl" />
-      </div>
-
+    <div className="min-h-screen bg-background">
       <GoogleFontsLoader fontValue={selectedFont} weight={isBold ? 700 : 400} />
       <Navigation />
 
       {/* Main Content */}
       <div className="relative pt-20 pb-12 px-4">
         <div className="w-full max-w-full">
-          {/* Header */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.2 }}
-            className="container mx-auto max-w-7xl mb-8"
-          >
-            <div className="flex items-center gap-3 mb-2">
-              <div className="p-3 rounded-2xl bg-primary/10 shadow-lg">
-                <Wand2 className="h-6 w-6 text-primary" />
-              </div>
-              <h1 className="text-3xl md:text-4xl font-display font-bold bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent">
-                Générateur de Cartes à Tâches
-              </h1>
-              <Badge variant="outline" className="ml-2 border-primary/30">PFEQ Aligné</Badge>
-            </div>
-            <p className="text-muted-foreground text-lg">
-              Créez des cartes éducatives personnalisées alignées au Programme de formation de l'école québécoise
+          {/* Header - Clean and minimal */}
+          <div className="container mx-auto max-w-7xl mb-8">
+            <h1 className="text-3xl font-display font-bold mb-2 text-foreground">
+              Générateur de Cartes
+            </h1>
+            <p className="text-muted-foreground">
+              Créez des cartes éducatives alignées au PFEQ
             </p>
-          </motion.div>
+          </div>
 
           {/* Progressive Filters - Full width when active */}
           {!filtersCompleted && (
@@ -840,15 +819,10 @@ export default function GeneratorPage() {
 
           {/* Main Content Grid - Only show after filters completed */}
           {filtersCompleted && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.3 }}
-              className="flex flex-col lg:flex-row gap-6"
-            >
+            <div className="flex flex-col lg:flex-row gap-6">
               {/* Left Panel - Customization */}
-              <div className="no-print lg:w-96 flex-shrink-0">
-                <Card className="h-fit bg-background/85 backdrop-blur-md border-2 shadow-xl">
+              <div className="no-print lg:w-80 flex-shrink-0">
+                <Card className="h-fit border shadow-sm">
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2">
                       <Settings2 className="h-5 w-5" />
@@ -1010,7 +984,7 @@ export default function GeneratorPage() {
 
             {/* Right Panel - Preview and Results */}
             <div className="flex-1 min-w-0">
-              <Card className="h-full overflow-hidden bg-background/85 backdrop-blur-md border-2 shadow-xl">
+              <Card className="h-full overflow-hidden border shadow-sm">
                 <CardHeader className="no-print">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
@@ -1211,7 +1185,7 @@ export default function GeneratorPage() {
                 </CardContent>
               </Card>
             </div>
-          </motion.div>
+          </div>
           )}
         </div>
       </div>
