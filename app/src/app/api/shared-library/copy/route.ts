@@ -48,7 +48,7 @@ export async function POST(req: NextRequest) {
         cardCount: sharedGeneration.cardCount,
         theme: sharedGeneration.theme,
         fontFamily: sharedGeneration.fontFamily,
-        cards: sharedGeneration.cards,
+        cards: sharedGeneration.cards as any, // Prisma Json type
         textPositions: sharedGeneration.textPositions,
         editedTexts: sharedGeneration.editedTexts,
         fontSize: sharedGeneration.fontSize,

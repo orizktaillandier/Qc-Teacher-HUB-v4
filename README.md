@@ -1,6 +1,8 @@
 # Quebec Teacher Hub v5
 
-Production-ready educational card generator for Quebec teachers, fully aligned with PFEQ (Programme de formation de l'école québécoise).
+Production-ready educational tools for Quebec teachers:
+- **Task Card Generator**: Create custom educational cards aligned with PFEQ
+- **Drill Sheet Generator (NEW)**: Generate printable exercise worksheets with customizable layouts
 
 ## 🚀 Quick Start
 
@@ -63,39 +65,62 @@ v5/
 └── docs/         # Documentation
 ```
 
-## 📝 Current Status (Oct 12, 2025)
+## 📝 Current Status
 
-✅ **Completed**:
-- **Quebec Creative Studio UI/UX** (v5.0 redesign)
+### ✅ v5.0 - Quebec Creative Studio (Oct 12, 2025)
+- **UI/UX Redesign**:
   - 12 professional background illustrations
   - Warm color palette with gradients
   - Smooth Framer Motion animations
   - Command palette (Ctrl+K)
   - Glass-morphism card effects
+  - Dark mode support
 - PFEQ-compliant cascading filters
-- Dark mode support with smooth transitions
-- Responsive navigation
 - Google OAuth authentication
 - Card generation with GPT-5/GPT-5-mini
-- 120+ illustrations (4 libraries: Kawaii, Phosphor, Emoji, Game Icons)
+- 120+ illustrations (4 libraries)
 - 59+ Quebec themes
 - PDF export functionality
 - Library system (save/load generations)
 - Shared community library
-- TypeScript strict mode (all errors resolved)
-- Production build working (with Turbopack workaround)
+- TypeScript strict mode
+- Production build working
 
-🚧 **Not Yet Implemented**:
+### ✅ v5.1 - Drill Sheet Generator (Oct 25, 2025)
+- **Complete drill sheet feature** for generating exercise worksheets
+- **Knowledge base integration**: Fixed - Now retrieves 14 chunks for fractions (vs 0 before)
+- **Pre-generation customization**:
+  - Exercise count (5-30 exercises)
+  - Difficulty strategy (uniform/progressive/mixed)
+  - Show difficulty badges option
+  - Include answer key option
+- **Post-generation styling**:
+  - Theme selection (simple/colorful/minimal)
+  - Font family and size (10-16pt)
+  - Custom title and instructions
+- **Smart features**:
+  - **Dynamic height-based pagination**: Automatically adjusts based on content & font size
+  - **Space-optimized layout**: Reduced padding, smaller title, tighter spacing
+  - **Enhanced fraction formatting**: Handles all formats - `3/5`, `___/20`, `_/24`, etc.
+  - **Improved GPT prompt**: Groups questions with same instructions, maintains content coherence
+  - Real-time preview updates
+  - Dual view: Exercises and Corrigé (answer key)
+- **PDF export** with font preservation and CORS-safe Google Fonts handling
+- **Database integration** for saving to library
+
+### 🚧 Not Yet Implemented
 - Templates page (placeholder only)
 - Resources page (placeholder only)
 - Image export (PNG/JPG)
 - Batch generation
+- Drill sheet community sharing
 
 ## 🔗 Navigation
 
 - **Landing** (/) - Google OAuth sign-in
 - **Home** (/home) - Dashboard with features (auth required)
-- **Générateur** (/generator) - PFEQ-compliant card generator (auth required)
+- **Générateur de Cartes** (/generator) - Task card generator (auth required)
+- **Générateur de Fiches** (/drill-generator) - Drill sheet generator (auth required) **NEW**
 - **Library** (/library) - Saved generations (auth required)
 - **Shared Library** (/shared-library) - Community cards (auth required)
 - **Modèles** - Template library (coming soon)

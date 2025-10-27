@@ -69,7 +69,14 @@
       "Bash(git pull:*)",
       "Bash(git stash:*)",
       "Bash(set DATABASE_URL=postgresql://postgres.rzctixqtwygvsvsxmmdy:FOXks0QuLnsTFNlp@aws-1-us-east-2.pooler.supabase.com:5432/postgres)",
-      "Bash(del update-vercel-env.bat update-vercel-env.sh fix-nextauth-url.bat)"
+      "Bash(del update-vercel-env.bat update-vercel-env.sh fix-nextauth-url.bat)",
+      "WebFetch(domain:mathslibres.com)",
+      "Bash(tasklist:*)",
+      "Bash(wmic process where \"name=''node.exe''\" get processid,commandline)",
+      "Bash(del inspect-kb.js check-math-chunks.js check-plural-notions.js find-fractions.js)",
+      "Bash(timeout /t 5 /nobreak)",
+      "Bash(del apptest-kb.js)",
+      "Bash(git check-ignore .env.local)"
     ],
     "deny": [],
     "ask": []

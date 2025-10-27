@@ -45,7 +45,7 @@ export async function POST(request: Request) {
 
     // Map frontend keys to database keys
     const subjectKeyMapping: Record<string, string> = {
-      'mathematiques': 'mathematique',  // Database uses singular form
+      'mathematiques': 'mathematiques',  // Keep plural - database has 43 chunks vs 2 in singular
       'francais-langue-enseignement': 'francais-langue-enseignement',
       'science-et-technologie': 'science-et-technologie',
       'univers-social': 'univers-social'
@@ -53,18 +53,18 @@ export async function POST(request: Request) {
 
     // Map frontend notion keys to database notion keys
     const notionKeyMapping: Record<string, string> = {
-      // Math notions - map to available database keys
-      'arithmetique': 'nombres-operations-arithmetique',
+      // Math notions (for mathematiques PLURAL - database has: operations, geometrie-mesure, nombres-naturels)
+      'arithmetique': 'nombres-naturels',  // General arithmetic in natural numbers
       'nombres-naturels': 'nombres-naturels',
       'operations': 'operations',
-      'fractions': 'nombres-operations-arithmetique',
-      'decimaux': 'nombres-operations-arithmetique',
-      'patterns-algebre': 'nombres-operations-arithmetique',
+      'fractions': 'nombres-naturels',  // Fractions content is in nombres-naturels chunks
+      'decimaux': 'nombres-naturels',  // Decimals also in natural numbers
+      'patterns-algebre': 'operations',  // Patterns/algebra in operations
       'geometrie': 'geometrie-mesure',
       'mesure': 'geometrie-mesure',
-      'statistique': 'nombres-operations-arithmetique',
-      'probabilite': 'nombres-operations-arithmetique',
-      'resolution-problemes': 'nombres-operations-arithmetique',
+      'statistique': 'operations',  // Stats likely in operations
+      'probabilite': 'operations',  // Probability in operations
+      'resolution-problemes': '',  // Empty = broader search across all math notions
 
       // French notions
       'lecture': 'francais-lecture-comprehension',

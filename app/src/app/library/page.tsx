@@ -6,6 +6,17 @@ import { Navigation } from '@/components/navigation'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
+import { Skeleton } from '@/components/ui/skeleton'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog"
 import {
   Trash2,
   Eye,
@@ -14,7 +25,8 @@ import {
   Loader2,
   FolderOpen,
   AlertCircle,
-  Share2
+  Share2,
+  RefreshCw
 } from 'lucide-react'
 import { toast } from 'sonner'
 
@@ -37,7 +49,13 @@ export default function LibraryPage() {
   const { data: session, status } = useSession()
   const [generations, setGenerations] = useState<CardGenerationItem[]>([])
   const [isLoading, setIsLoading] = useState(true)
+  const [hasError, setHasError] = useState(false)
   const [filter, setFilter] = useState<'all' | 'recent' | 'subject'>('all')
+
+  // AlertDialog state
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
+  const [shareDialogOpen, setShareDialogOpen] = useState(false)
+  const [selectedGenerationId, setSelectedGenerationId] = useState<string | null>(null)
 
   // Fetch user's card generations
   useEffect(() => {
@@ -51,41 +69,53 @@ export default function LibraryPage() {
   const fetchGenerations = async () => {
     try {
       setIsLoading(true)
+      setHasError(false)
       const response = await fetch('/api/library/generations')
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`)
+      }
+
       const data = await response.json()
+      console.log('Library API response:', data)
 
       if (data.success) {
-        setGenerations(data.generations)
+        setGenerations(data.generations || [])
       } else {
         throw new Error(data.error || 'Failed to fetch generations')
       }
     } catch (error) {
       console.error('Error fetching generations:', error)
+      setHasError(true)
       toast.error('Erreur', {
-        description: 'Impossible de charger vos générations'
+        description: error instanceof Error ? error.message : 'Impossible de charger vos générations'
       })
     } finally {
       setIsLoading(false)
     }
   }
 
-  const handleDelete = async (id: string) => {
-    if (!confirm('Êtes-vous sûr de vouloir supprimer cette génération?')) {
-      return
-    }
+  const openDeleteDialog = (id: string) => {
+    setSelectedGenerationId(id)
+    setDeleteDialogOpen(true)
+  }
+
+  const handleDelete = async () => {
+    if (!selectedGenerationId) return
 
     try {
-      const response = await fetch(`/api/library/generations/${id}`, {
+      const response = await fetch(`/api/library/generations/${selectedGenerationId}`, {
         method: 'DELETE'
       })
 
       const data = await response.json()
 
       if (data.success) {
-        setGenerations(prev => prev.filter(gen => gen.id !== id))
+        setGenerations(prev => prev.filter(gen => gen.id !== selectedGenerationId))
         toast.success('Supprimé!', {
           description: 'Génération supprimée avec succès'
         })
+        setDeleteDialogOpen(false)
       } else {
         throw new Error(data.error)
       }
@@ -103,10 +133,13 @@ export default function LibraryPage() {
     window.location.href = '/generator?view=library'
   }
 
-  const handleShare = async (generationId: string) => {
-    if (!confirm('Partager cette génération avec tous les utilisateurs?')) {
-      return
-    }
+  const openShareDialog = (id: string) => {
+    setSelectedGenerationId(id)
+    setShareDialogOpen(true)
+  }
+
+  const handleShare = async () => {
+    if (!selectedGenerationId) return
 
     try {
       const response = await fetch('/api/shared-library/share', {
@@ -115,7 +148,7 @@ export default function LibraryPage() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          generationId
+          generationId: selectedGenerationId
         }),
       })
 
@@ -125,6 +158,7 @@ export default function LibraryPage() {
         toast.success('Partagé!', {
           description: 'Votre génération est maintenant visible dans la bibliothèque partagée'
         })
+        setShareDialogOpen(false)
       } else {
         throw new Error(data.error)
       }
@@ -201,12 +235,48 @@ export default function LibraryPage() {
             </p>
           </div>
 
-          {/* Loading state */}
+          {/* Loading state with skeletons */}
           {isLoading ? (
-            <Card className="py-20 border shadow-sm">
-              <CardContent className="flex flex-col items-center justify-center">
-                <Loader2 className="h-12 w-12 animate-spin text-primary mb-4" />
-                <p className="text-muted-foreground">Chargement de vos générations...</p>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {[1, 2, 3, 4, 5, 6].map((i) => (
+                <Card key={i} className="h-full border shadow-sm">
+                  <CardHeader>
+                    <div className="flex items-start justify-between mb-2">
+                      <Skeleton className="h-5 w-20" />
+                      <Skeleton className="h-4 w-32" />
+                    </div>
+                    <Skeleton className="h-6 w-3/4 mb-2" />
+                    <Skeleton className="h-4 w-1/2" />
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-3">
+                      <div className="flex flex-wrap gap-2">
+                        <Skeleton className="h-6 w-24" />
+                        <Skeleton className="h-6 w-32" />
+                      </div>
+                      <div className="flex gap-2 pt-2">
+                        <Skeleton className="h-9 flex-1" />
+                        <Skeleton className="h-9 w-9" />
+                        <Skeleton className="h-9 w-9" />
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          ) : hasError ? (
+            /* Error state with retry */
+            <Card className="py-20 border shadow-sm border-red-200 dark:border-red-900">
+              <CardContent className="flex flex-col items-center justify-center text-center">
+                <AlertCircle className="h-16 w-16 text-red-500 dark:text-red-400 mb-4" />
+                <h3 className="text-xl font-display font-semibold mb-2">Erreur de chargement</h3>
+                <p className="text-muted-foreground mb-6 max-w-md">
+                  Une erreur est survenue lors du chargement de vos générations. Veuillez réessayer.
+                </p>
+                <Button onClick={fetchGenerations} variant="default">
+                  <RefreshCw className="h-4 w-4 mr-2" />
+                  Réessayer
+                </Button>
               </CardContent>
             </Card>
           ) : generations.length === 0 ? (
@@ -218,10 +288,9 @@ export default function LibraryPage() {
                   <svg width="200" height="200" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
                     {/* Empty folder */}
                     <path d="M30 60 L30 150 C30 155 32 160 40 160 L160 160 C168 160 170 155 170 150 L170 75 C170 70 168 65 160 65 L95 65 L85 55 L40 55 C32 55 30 57 30 60 Z"
-                          className="fill-blue-100 dark:fill-blue-950/50"
+                          className="fill-blue-100 dark:fill-blue-950/50 stroke-blue-300 dark:stroke-blue-800"
                           stroke="currentColor"
-                          strokeWidth="2"
-                          className="stroke-blue-300 dark:stroke-blue-800"/>
+                          strokeWidth="2"/>
 
                     {/* Sparkle 1 */}
                     <circle cx="60" cy="90" r="3" className="fill-orange-400 dark:fill-orange-500"/>
@@ -301,7 +370,7 @@ export default function LibraryPage() {
                           <Button
                             variant="outline"
                             size="sm"
-                            onClick={() => handleShare(generation.id)}
+                            onClick={() => openShareDialog(generation.id)}
                             title="Partager avec la communauté"
                           >
                             <Share2 className="h-4 w-4" />
@@ -309,7 +378,7 @@ export default function LibraryPage() {
                           <Button
                             variant="outline"
                             size="sm"
-                            onClick={() => handleDelete(generation.id)}
+                            onClick={() => openDeleteDialog(generation.id)}
                           >
                             <Trash2 className="h-4 w-4" />
                           </Button>
@@ -323,6 +392,42 @@ export default function LibraryPage() {
           )}
         </div>
       </div>
+
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Confirmer la suppression</AlertDialogTitle>
+            <AlertDialogDescription>
+              Êtes-vous sûr de vouloir supprimer cette génération? Cette action est irréversible.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Annuler</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDelete} className="bg-red-600 hover:bg-red-700">
+              Supprimer
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Share Confirmation Dialog */}
+      <AlertDialog open={shareDialogOpen} onOpenChange={setShareDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Partager avec la communauté</AlertDialogTitle>
+            <AlertDialogDescription>
+              Votre génération sera visible par tous les utilisateurs dans la bibliothèque partagée. Voulez-vous continuer?
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Annuler</AlertDialogCancel>
+            <AlertDialogAction onClick={handleShare}>
+              Partager
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   )
 }

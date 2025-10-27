@@ -264,7 +264,7 @@ export default function SharedLibraryPage() {
                   <div className="mb-6">
                     <svg width="180" height="180" viewBox="0 0 180 180" fill="none" xmlns="http://www.w3.org/2000/svg">
                       {/* Globe with connections */}
-                      <circle cx="90" cy="90" r="50" className="fill-green-100 dark:fill-green-950/50" stroke="currentColor" strokeWidth="2" className="stroke-green-300 dark:stroke-green-800"/>
+                      <circle cx="90" cy="90" r="50" className="fill-green-100 dark:fill-green-950/50 stroke-green-300 dark:stroke-green-800" stroke="currentColor" strokeWidth="2"/>
 
                       {/* Connection lines */}
                       <line x1="90" y1="40" x2="90" y2="140" strokeWidth="2" className="stroke-green-300 dark:stroke-green-800"/>

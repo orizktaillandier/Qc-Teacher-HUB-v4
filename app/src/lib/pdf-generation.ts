@@ -13,6 +13,12 @@ export interface PDFGenerationOptions {
   displayMode: 'studentCards' | 'answerSheet' | 'corriger';
 }
 
+export interface DrillSheetPDFOptions {
+  selectedSubject: string;
+  selectedNotion: string;
+  showAnswers: boolean;
+}
+
 /**
  * Generate PDF for student cards (2x2 grid, A4 landscape)
  */
@@ -283,6 +289,135 @@ export async function generateAnswerSheetPDF(options: PDFGenerationOptions) {
     console.error('❌ PDF generation error:', error);
     toast.error('Erreur lors de la génération', {
       description: error instanceof Error ? error.message : 'Une erreur est survenue',
+      duration: 5000
+    });
+    return false;
+  }
+}
+
+/**
+ * Generate PDF for drill sheet (A4 portrait, multiple pages)
+ */
+export async function generateDrillSheetPDF(options: DrillSheetPDFOptions) {
+  try {
+    const { selectedSubject, selectedNotion, showAnswers } = options;
+    console.log(`📄 Starting drill sheet PDF generation (${showAnswers ? 'with answers' : 'exercises only'})...`);
+
+    // Wait for fonts to load
+    await document.fonts.ready;
+    await new Promise(resolve => setTimeout(resolve, 300));
+
+    // Find all drill sheet pages (each .print-page is one A4 page)
+    const allPages = Array.from(document.querySelectorAll('.drill-sheet-container .print-page')) as HTMLElement[];
+
+    if (allPages.length === 0) {
+      throw new Error('No drill sheet pages found. Please generate a drill sheet first.');
+    }
+
+    console.log(`📦 Found ${allPages.length} drill sheet page(s)`);
+
+    // Create PDF in A4 portrait format
+    const pdf = new jsPDF({
+      orientation: 'portrait',
+      unit: 'mm',
+      format: 'a4'
+    });
+
+    // A4 portrait dimensions: 210mm x 297mm
+    const pdfWidth = 210;
+    const pdfHeight = 297;
+
+    // Wait for fonts to load before capturing
+    if (document.fonts && document.fonts.ready) {
+      await document.fonts.ready;
+      console.log('✅ Fonts loaded and ready');
+    }
+
+    // Intercept Google Fonts fetches to prevent CORS errors
+    // html-to-image tries to fetch Google Fonts CSS, which fails due to CORS
+    // We intercept and return empty CSS since fonts are already loaded in DOM
+    const originalFetch = window.fetch;
+    window.fetch = async (...args) => {
+      const url = args[0]?.toString() || '';
+      if (url.includes('fonts.googleapis.com')) {
+        // Return empty CSS response for Google Fonts (fonts already loaded)
+        return new Response('/* fonts already loaded */', {
+          status: 200,
+          headers: { 'Content-Type': 'text/css' }
+        });
+      }
+      return originalFetch(...args);
+    };
+
+    // Silence console during capture
+    const originalConsole = {
+      error: console.error,
+      warn: console.warn,
+      log: console.log
+    };
+    console.error = () => {};
+    console.warn = () => {};
+    console.log = () => {};
+
+    // Capture each page separately
+    for (let pageIndex = 0; pageIndex < allPages.length; pageIndex++) {
+      const page = allPages[pageIndex];
+
+      // Add new page (except for first page)
+      if (pageIndex > 0) {
+        pdf.addPage();
+      }
+
+      console.log(`📸 Capturing page ${pageIndex + 1}/${allPages.length}...`);
+
+      // Capture the page as JPEG for much smaller file size
+      const dataUrl = await htmlToImage.toJpeg(page, {
+        quality: 0.92,  // High quality JPEG (balance between quality and size)
+        width: page.offsetWidth,
+        height: page.offsetHeight,
+        cacheBust: true,
+        pixelRatio: 1,  // Normal resolution (reduced from 2 to save 75% file size)
+        backgroundColor: '#ffffff',  // White background for JPEG
+        // Note: We don't skip fonts here - html-to-image will try to embed them
+        // This causes CORS errors (Google Fonts blocks cross-origin CSS fetching)
+        // BUT the fonts still work because they're already loaded in the DOM
+        // The CORS errors are suppressed by console.error = () => {} above
+        style: {
+          WebkitFontSmoothing: 'antialiased',
+        } as any
+      });
+
+      if (!dataUrl) {
+        throw new Error(`Failed to capture page ${pageIndex + 1}`);
+      }
+
+      // Add image to PDF, fitting to A4 portrait
+      pdf.addImage(dataUrl, 'JPEG', 0, 0, pdfWidth, pdfHeight, undefined, 'FAST');
+    }
+
+    // Restore console and fetch
+    console.error = originalConsole.error;
+    console.warn = originalConsole.warn;
+    console.log = originalConsole.log;
+    window.fetch = originalFetch;
+
+    // Save the PDF
+    const timestamp = new Date().toISOString().slice(0, 10).replace(/-/g, '');
+    const answerSuffix = showAnswers ? '-corrige' : '';
+    const filename = `fiche-exercices-${selectedSubject}-${selectedNotion}${answerSuffix}-${timestamp}.pdf`;
+
+    pdf.save(filename);
+
+    console.log('✅ Drill sheet PDF downloaded successfully');
+    toast.success(showAnswers ? 'Corrigé généré!' : 'Fiche d\'exercices générée!', {
+      description: `${allPages.length} page(s) exportée(s)`
+    });
+
+    return true;
+  } catch (error) {
+    console.error('❌ Drill sheet PDF generation error:', error);
+    toast.error('Erreur lors de la génération du PDF', {
+      description: error instanceof Error ? error.message : 'Une erreur inconnue est survenue',
       duration: 5000
     });
     return false;

@@ -300,6 +300,11 @@
   .delay-2000 {
     animation-delay: 2000ms;
   }
+
+  /* Force hidden attribute to work */
+  [hidden] {
+    display: none !important;
+  }
 }
 
 /* Print styles for PDF generation */

@@ -7,6 +7,15 @@ import { Badge } from '@/components/ui/badge'
 import { Card } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { Checkbox } from '@/components/ui/checkbox'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
+import { Slider } from '@/components/ui/slider'
 import {
   ChevronRight,
   ChevronLeft,
@@ -39,10 +48,16 @@ interface ProgressiveFiltersProps {
     notion: string
     subNotions: string[]
     cardCount: number
+    // Drill sheet specific options
+    exerciseCount?: number
+    difficulty?: string
+    showDifficulty?: boolean
+    includeAnswerKey?: boolean
   }) => void
+  mode?: 'cards' | 'drillSheet'
 }
 
-export function ProgressiveFilters({ onFiltersComplete }: ProgressiveFiltersProps) {
+export function ProgressiveFilters({ onFiltersComplete, mode = 'cards' }: ProgressiveFiltersProps) {
   const [currentStep, setCurrentStep] = useState(0)
   const [selectedCycle, setSelectedCycle] = useState('')
   const [selectedGrade, setSelectedGrade] = useState('')
@@ -50,6 +65,12 @@ export function ProgressiveFilters({ onFiltersComplete }: ProgressiveFiltersProp
   const [selectedNotion, setSelectedNotion] = useState('')
   const [selectedSubNotions, setSelectedSubNotions] = useState<string[]>([])
   const [cardCount, setCardCount] = useState(8)
+
+  // Drill sheet specific state
+  const [exerciseCount, setExerciseCount] = useState(15)
+  const [difficulty, setDifficulty] = useState('uniform')
+  const [showDifficulty, setShowDifficulty] = useState(false)
+  const [includeAnswerKey, setIncludeAnswerKey] = useState(true)
 
   const [availableGrades, setAvailableGrades] = useState<Grade[]>([])
   const [availableSubjects, setAvailableSubjects] = useState<Subject[]>([])
@@ -172,14 +193,26 @@ export function ProgressiveFilters({ onFiltersComplete }: ProgressiveFiltersProp
   }
 
   const handleComplete = () => {
-    onFiltersComplete({
+    const filters = {
       cycle: selectedCycle,
       grade: selectedGrade,
       subject: selectedSubject,
       notion: selectedNotion,
       subNotions: selectedSubNotions,
       cardCount
-    })
+    }
+
+    // Add drill sheet specific options if in drill sheet mode
+    if (mode === 'drillSheet') {
+      Object.assign(filters, {
+        exerciseCount,
+        difficulty,
+        showDifficulty,
+        includeAnswerKey
+      })
+    }
+
+    onFiltersComplete(filters)
   }
 
   const resetStep = (stepIndex: number) => {
@@ -496,37 +529,111 @@ export function ProgressiveFilters({ onFiltersComplete }: ProgressiveFiltersProp
                       </p>
                     )}
 
-                    {/* Number of cards selection */}
-                    <div className="mt-6 space-y-2">
-                      <Label htmlFor="card-count" className="text-center block">Nombre de cartes à générer</Label>
-                      <div className="flex items-center justify-center gap-4">
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => setCardCount(Math.max(1, cardCount - 1))}
-                          disabled={cardCount <= 1}
-                        >
-                          -
-                        </Button>
-                        <Input
-                          id="card-count"
-                          type="number"
-                          value={cardCount}
-                          onChange={(e) => setCardCount(parseInt(e.target.value) || 8)}
-                          min="1"
-                          max="20"
-                          className="w-20 text-center"
-                        />
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => setCardCount(Math.min(20, cardCount + 1))}
-                          disabled={cardCount >= 20}
-                        >
-                          +
-                        </Button>
+                    {/* Number of cards selection - only for card generator */}
+                    {mode === 'cards' && (
+                      <div className="mt-6 space-y-2">
+                        <Label htmlFor="card-count" className="text-center block">Nombre de cartes à générer</Label>
+                        <div className="flex items-center justify-center gap-4">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => setCardCount(Math.max(1, cardCount - 1))}
+                            disabled={cardCount <= 1}
+                          >
+                            -
+                          </Button>
+                          <Input
+                            id="card-count"
+                            type="number"
+                            value={cardCount}
+                            onChange={(e) => setCardCount(parseInt(e.target.value) || 8)}
+                            min="1"
+                            max="20"
+                            className="w-20 text-center"
+                          />
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => setCardCount(Math.min(20, cardCount + 1))}
+                            disabled={cardCount >= 20}
+                          >
+                            +
+                          </Button>
+                        </div>
                       </div>
-                    </div>
+                    )}
+
+                    {/* Drill sheet options - only for drill sheet generator */}
+                    {mode === 'drillSheet' && (
+                      <div className="mt-6 space-y-6 p-6 border-2 border-primary/20 rounded-lg bg-gradient-to-br from-blue-50/50 to-purple-50/50 dark:from-blue-950/10 dark:to-purple-950/10">
+                        <h3 className="font-semibold text-lg text-center">Paramètres de la fiche</h3>
+
+                        {/* Exercise Count */}
+                        <div className="space-y-3">
+                          <div className="flex justify-between items-center">
+                            <Label htmlFor="exercise-count">Nombre d'exercices</Label>
+                            <span className="text-2xl font-bold text-primary">{exerciseCount}</span>
+                          </div>
+                          <Slider
+                            id="exercise-count"
+                            value={[exerciseCount]}
+                            onValueChange={(value) => setExerciseCount(value[0])}
+                            min={5}
+                            max={30}
+                            step={1}
+                            className="w-full"
+                          />
+                          <p className="text-xs text-muted-foreground text-center">
+                            Plage recommandée: 10-30 exercices
+                          </p>
+                        </div>
+
+                        {/* Difficulty Strategy */}
+                        <div className="space-y-2">
+                          <Label htmlFor="difficulty">Stratégie de difficulté</Label>
+                          <Select value={difficulty} onValueChange={setDifficulty}>
+                            <SelectTrigger id="difficulty">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="uniform">Uniforme - Même niveau partout</SelectItem>
+                              <SelectItem value="progressive">Progressive - Commence facile, devient difficile</SelectItem>
+                              <SelectItem value="mixed">Mixte - Combinaison aléatoire</SelectItem>
+                            </SelectContent>
+                          </Select>
+                          <p className="text-xs text-muted-foreground">
+                            {difficulty === 'uniform' && 'Tous les exercices auront le même niveau de difficulté'}
+                            {difficulty === 'progressive' && 'Les exercices commencent faciles et deviennent plus difficiles'}
+                            {difficulty === 'mixed' && 'Les exercices ont différents niveaux de difficulté'}
+                          </p>
+                        </div>
+
+                        {/* Checkboxes */}
+                        <div className="space-y-4">
+                          <div className="flex items-center space-x-2">
+                            <Checkbox
+                              id="show-difficulty"
+                              checked={showDifficulty}
+                              onCheckedChange={(checked) => setShowDifficulty(checked as boolean)}
+                            />
+                            <Label htmlFor="show-difficulty" className="cursor-pointer">
+                              Afficher les badges de difficulté
+                            </Label>
+                          </div>
+
+                          <div className="flex items-center space-x-2">
+                            <Checkbox
+                              id="include-answer-key"
+                              checked={includeAnswerKey}
+                              onCheckedChange={(checked) => setIncludeAnswerKey(checked as boolean)}
+                            />
+                            <Label htmlFor="include-answer-key" className="cursor-pointer">
+                              Inclure le corrigé
+                            </Label>
+                          </div>
+                        </div>
+                      </div>
+                    )}
 
                     <motion.div
                       initial={{ opacity: 0 }}
@@ -540,7 +647,10 @@ export function ProgressiveFilters({ onFiltersComplete }: ProgressiveFiltersProp
                         onClick={handleComplete}
                       >
                         <Sparkles className="mr-2 h-5 w-5" />
-                        Générer {cardCount} carte{cardCount > 1 ? 's' : ''}
+                        {mode === 'drillSheet'
+                          ? 'Générer la fiche'
+                          : `Générer ${cardCount} carte${cardCount > 1 ? 's' : ''}`
+                        }
                         <ChevronRight className="ml-2 h-5 w-5" />
                       </Button>
                     </motion.div>

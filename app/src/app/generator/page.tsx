@@ -688,15 +688,47 @@ export default function GeneratorPage() {
 
       if (data.success) {
         toast.success('Sauvegardé!', {
-          description: 'Génération ajoutée à votre bibliothèque'
+          description: 'Génération ajoutée à votre bibliothèque',
+          action: {
+            label: 'Voir dans la bibliothèque →',
+            onClick: () => window.location.href = '/library'
+          },
+          duration: 5000
         })
       } else {
         throw new Error(data.error)
       }
     } catch (error) {
       console.error('Error saving to library:', error)
+
+      // Determine specific error type
+      let errorMessage = 'Impossible de sauvegarder'
+      let errorDescription = ''
+
+      if (error instanceof Error) {
+        errorMessage = error.message
+
+        // Network error
+        if (error.message.includes('fetch') || error.message.includes('Network')) {
+          errorDescription = 'Vérifiez votre connexion internet et réessayez'
+        }
+        // Server error
+        else if (error.message.includes('500') || error.message.includes('server')) {
+          errorDescription = 'Le serveur a rencontré une erreur. Réessayez dans quelques instants'
+        }
+        // Authentication error
+        else if (error.message.includes('auth') || error.message.includes('Unauthorized')) {
+          errorDescription = 'Veuillez vous reconnecter'
+        }
+        // Validation error
+        else if (error.message.includes('validation') || error.message.includes('invalid')) {
+          errorDescription = 'Vérifiez que toutes les informations sont correctes'
+        }
+      }
+
       toast.error('Erreur', {
-        description: error instanceof Error ? error.message : 'Impossible de sauvegarder'
+        description: errorDescription || errorMessage,
+        duration: 6000
       })
     }
   }

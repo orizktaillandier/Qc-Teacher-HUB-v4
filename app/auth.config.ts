@@ -22,8 +22,6 @@ export const authConfig = {
   pages: {
     signIn: '/',  // Redirect to homepage for sign-in
   },
-  // Experimental: Skip PKCE verification
-  skipCSRFCheck: false,
   callbacks: {
     authorized({ auth, request: { nextUrl } }) {
       const isLoggedIn = !!auth?.user;

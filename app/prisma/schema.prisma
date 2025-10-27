@@ -53,6 +53,8 @@ model User {
   sessions      Session[]
   cardGenerations CardGeneration[]
   sharedGenerations SharedGeneration[]
+  drillSheetGenerations DrillSheetGeneration[]
+  sharedDrillSheets SharedDrillSheet[]
 
   @@map("users")
 }
@@ -184,4 +186,99 @@ model SharedGeneration {
   @@index([subject])
   @@index([grade])
   @@map("shared_generations")
+}
+
+// Drill Sheet Generation Models
+
+model DrillSheetGeneration {
+  id          String   @id @default(cuid())
+  userId      String   @map("user_id")
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // PFEQ metadata (same as task cards)
+  cycle       String
+  grade       String
+  subject     String
+  notion      String
+  subNotions  String   // JSON stringified array
+
+  // Drill sheet specific settings
+  exerciseCount     Int      @map("exercise_count")      // 10-30 exercises
+  difficulty        String?  @default("uniform")         // 'uniform', 'progressive', 'mixed'
+  includeAnswerKey  Boolean  @default(true) @map("include_answer_key")
+
+  // Styling
+  theme             String?  @default("simple")          // 'simple', 'colorful', 'minimal'
+  fontFamily        String?  @map("font_family")
+  fontSize          Int?     @default(12)
+  headerStyle       String?  @map("header_style")        // JSON: { color, bold, etc. }
+
+  // THE CRITICAL FIELD - Raw drill sheet data
+  exercises   Json     // Array of exercise objects
+
+  // Optional customization
+  customTitle         String?  @map("custom_title")
+  customInstructions  String?  @map("custom_instructions")
+  showDifficulty      Boolean? @default(false) @map("show_difficulty")
+
+  // Timestamps
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  @@index([userId])
+  @@index([createdAt])
+  @@index([subject])
+  @@index([notion])
+  @@map("drill_sheet_generations")
+}
+
+model SharedDrillSheet {
+  id          String   @id @default(cuid())
+  userId      String   @map("user_id")
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // User info for display
+  authorName  String?  @map("author_name")
+  authorEmail String?  @map("author_email")
+
+  // PFEQ metadata
+  cycle       String
+  grade       String
+  subject     String
+  notion      String
+  subNotions  String   // JSON stringified array
+
+  // Drill sheet specific settings
+  exerciseCount     Int      @map("exercise_count")
+  difficulty        String?  @default("uniform")
+  includeAnswerKey  Boolean  @default(true) @map("include_answer_key")
+
+  // Styling
+  theme             String?  @default("simple")
+  fontFamily        String?  @map("font_family")
+  fontSize          Int?     @default(12)
+  headerStyle       String?  @map("header_style")
+
+  // Generated drill sheet data
+  exercises   Json     // Array of exercise objects
+
+  // Optional customization
+  customTitle         String?  @map("custom_title")
+  customInstructions  String?  @map("custom_instructions")
+  showDifficulty      Boolean? @default(false) @map("show_difficulty")
+
+  // Sharing metadata
+  views       Int      @default(0)
+  copies      Int      @default(0)
+
+  // Timestamps
+  createdAt   DateTime @default(now()) @map("created_at")
+  sharedAt    DateTime @default(now()) @map("shared_at")
+
+  @@index([userId])
+  @@index([sharedAt])
+  @@index([subject])
+  @@index([grade])
+  @@index([views])
+  @@map("shared_drill_sheets")
 }

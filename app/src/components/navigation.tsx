@@ -22,7 +22,8 @@ import {
   Clock,
   Star,
   Keyboard,
-  Sparkles
+  Sparkles,
+  FileText
 } from "lucide-react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
@@ -44,7 +45,8 @@ export function Navigation() {
 
   const navItems = [
     { href: '/home', label: 'Accueil', icon: Home, color: 'text-orange-500' },
-    { href: '/generator', label: 'Générateur', icon: Zap, color: 'text-blue-500' },
+    { href: '/generator', label: 'Cartes', icon: Zap, color: 'text-blue-500' },
+    { href: '/drill-generator', label: 'Exercices', icon: FileText, color: 'text-indigo-500' },
     { href: '/library', label: 'Bibliothèque', icon: Library, color: 'text-green-500' },
     { href: '/shared-library', label: 'Partagé', icon: Globe, color: 'text-purple-500' },
   ]

@@ -9,7 +9,7 @@ export async function GET(req: NextRequest) {
     const session = await auth();
     if (!session?.user?.id) {
       return NextResponse.json(
-        { error: 'Unauthorized' },
+        { success: false, error: 'Unauthorized' },
         { status: 401 }
       );
     }
@@ -89,6 +89,7 @@ export async function GET(req: NextRequest) {
     }));
 
     return NextResponse.json({
+      success: true,
       generations: parsedGenerations,
       pagination: {
         total,
@@ -101,7 +102,7 @@ export async function GET(req: NextRequest) {
   } catch (error) {
     console.error('Error fetching generations:', error);
     return NextResponse.json(
-      { error: 'Failed to fetch generations' },
+      { success: false, error: 'Failed to fetch generations' },
       { status: 500 }
     );
   }
