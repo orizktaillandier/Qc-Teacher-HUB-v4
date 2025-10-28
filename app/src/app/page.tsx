@@ -47,7 +47,7 @@ export default function LandingPage() {
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center gap-2">
               <GraduationCap className="h-6 w-6 text-primary" />
-              <span className="font-display font-semibold text-lg">Studio PFEQ</span>
+              <span className="font-display font-semibold text-lg">ProfStudio</span>
             </div>
             <ThemeToggle />
           </div>
@@ -137,7 +137,7 @@ export default function LandingPage() {
       {/* Minimal Footer */}
       <footer className="py-8 px-6 border-t border-border mt-20">
         <div className="container mx-auto text-center text-sm text-muted-foreground">
-          <p>© 2025 Studio PFEQ · Fait au Québec</p>
+          <p>© 2025 ProfStudio · Fait au Québec</p>
         </div>
       </footer>
     </div>

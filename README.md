@@ -1,4 +1,4 @@
-# Quebec Teacher Hub v5
+# ProfStudio
 
 Production-ready educational tools for Quebec teachers:
 - **Task Card Generator**: Create custom educational cards aligned with PFEQ

@@ -55,6 +55,7 @@ model User {
   sharedGenerations SharedGeneration[]
   drillSheetGenerations DrillSheetGeneration[]
   sharedDrillSheets SharedDrillSheet[]
+  betaFeedback  BetaFeedback[]
 
   @@map("users")
 }
@@ -281,4 +282,24 @@ model SharedDrillSheet {
   @@index([grade])
   @@index([views])
   @@map("shared_drill_sheets")
+}
+
+model BetaFeedback {
+  id          String   @id @default(cuid())
+  userId      String   @map("user_id")
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // Feedback content
+  feedback    String   @db.Text
+
+  // Context information
+  userAgent   String?  @map("user_agent")
+  currentPage String?  @map("current_page")
+
+  // Timestamps
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  @@index([userId])
+  @@index([createdAt])
+  @@map("beta_feedback")
 }

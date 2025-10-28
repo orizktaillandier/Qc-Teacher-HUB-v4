@@ -1,6 +1,6 @@
 /**
  * TypeScript Type Definitions for Drill Sheets (Fiches d'exercices)
- * Quebec Teacher Hub v5 - Drill Sheet Feature
+ * ProfStudio - Drill Sheet Feature
  */
 
 // =============================================================================

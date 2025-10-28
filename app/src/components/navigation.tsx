@@ -23,7 +23,8 @@ import {
   Star,
   Keyboard,
   Sparkles,
-  FileText
+  FileText,
+  Shield
 } from "lucide-react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
@@ -45,8 +46,7 @@ export function Navigation() {
 
   const navItems = [
     { href: '/home', label: 'Accueil', icon: Home, color: 'text-orange-500' },
-    { href: '/generator', label: 'Cartes', icon: Zap, color: 'text-blue-500' },
-    { href: '/drill-generator', label: 'Exercices', icon: FileText, color: 'text-indigo-500' },
+    { href: '/generators', label: 'Générateurs', icon: Zap, color: 'text-blue-500' },
     { href: '/library', label: 'Bibliothèque', icon: Library, color: 'text-green-500' },
     { href: '/shared-library', label: 'Partagé', icon: Globe, color: 'text-purple-500' },
   ]
@@ -61,10 +61,10 @@ export function Navigation() {
               <div className="p-2 rounded-xl bg-primary/10 transition-all group-hover:scale-110">
                 <GraduationCap className="h-6 w-6 text-primary" />
               </div>
-              <span className="font-display font-bold text-xl hidden sm:inline">Quebec Teacher Hub</span>
-              <span className="font-display font-bold text-xl sm:hidden">QTH</span>
+              <span className="font-display font-bold text-xl hidden sm:inline">ProfStudio</span>
+              <span className="font-display font-bold text-xl sm:hidden">PS</span>
             </Link>
-            <Badge variant="outline" className="ml-2 border-primary/30">v5.0</Badge>
+            <Badge variant="outline" className="ml-2 border-primary/30">Beta</Badge>
           </div>
 
           {/* Desktop Navigation */}
@@ -85,6 +85,19 @@ export function Navigation() {
                 </Link>
               )
             })}
+
+            {/* Admin Link - Only for qcteachhub@gmail.com */}
+            {session?.user?.email === 'qcteachhub@gmail.com' && (
+              <Link href="/admin">
+                <Button
+                  variant={pathname?.startsWith('/admin') ? "default" : "ghost"}
+                  className="transition-all hover:scale-105 active:scale-95"
+                >
+                  <Shield className={`mr-2 h-4 w-4 ${pathname?.startsWith('/admin') ? '' : 'text-orange-500'}`} />
+                  Admin
+                </Button>
+              </Link>
+            )}
 
             <Separator orientation="vertical" className="h-8 mx-2" />
 
@@ -145,6 +158,23 @@ export function Navigation() {
                   </DropdownMenuGroup>
 
                   <DropdownMenuSeparator />
+
+                  {session.user?.email === 'qcteachhub@gmail.com' && (
+                    <>
+                      <DropdownMenuGroup>
+                        <DropdownMenuLabel className="text-xs font-normal text-muted-foreground">
+                          Administration
+                        </DropdownMenuLabel>
+                        <Link href="/admin/feedback">
+                          <DropdownMenuItem className="cursor-pointer">
+                            <Shield className="mr-2 h-4 w-4 text-orange-500" />
+                            <span>Feedback Beta</span>
+                          </DropdownMenuItem>
+                        </Link>
+                      </DropdownMenuGroup>
+                      <DropdownMenuSeparator />
+                    </>
+                  )}
 
                   <DropdownMenuItem className="cursor-pointer">
                     <User className="mr-2 h-4 w-4" />
@@ -244,6 +274,21 @@ export function Navigation() {
                 })}
 
                 <DropdownMenuSeparator />
+
+                {session && session.user?.email === 'qcteachhub@gmail.com' && (
+                  <>
+                    <DropdownMenuLabel className="text-xs font-normal text-muted-foreground px-2">
+                      Administration
+                    </DropdownMenuLabel>
+                    <Link href="/admin/feedback">
+                      <DropdownMenuItem className="cursor-pointer">
+                        <Shield className="mr-2 h-4 w-4 text-orange-500" />
+                        Feedback Beta
+                      </DropdownMenuItem>
+                    </Link>
+                    <DropdownMenuSeparator />
+                  </>
+                )}
 
                 {session ? (
                   <>

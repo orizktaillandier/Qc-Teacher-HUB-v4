@@ -2,10 +2,10 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-## Project: Quebec Teacher Hub v5
+## Project: ProfStudio
 Educational card generator for Quebec teachers, fully aligned with PFEQ (Programme de formation de l'école québécoise) curriculum standards.
 
-**Design Philosophy**: Quebec Creative Studio - A warm, colorful, and professional design language inspired by educational tools like Canva, featuring custom illustrations, smooth animations, and a Quebec-themed color palette.
+**Design Philosophy**: A warm, colorful, and professional design language inspired by educational tools like Canva, featuring custom illustrations, smooth animations, and a Quebec-themed color palette.
 
 ## Commands
 

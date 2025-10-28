@@ -76,7 +76,10 @@
       "Bash(del inspect-kb.js check-math-chunks.js check-plural-notions.js find-fractions.js)",
       "Bash(timeout /t 5 /nobreak)",
       "Bash(del apptest-kb.js)",
-      "Bash(git check-ignore .env.local)"
+      "Bash(git check-ignore .env.local)",
+      "Bash(cmd //c \"if exist .next rmdir /s /q .next\")",
+      "Bash(del test-db-connection.js)",
+      "Bash(set DATABASE_URL=postgresql://postgres.rzctixqtwygvsvsxmmdy:%23%5D%5D235O2hm%27%3C@aws-1-us-east-2.pooler.supabase.com:6543/postgres?pgbouncer=true)"
     ],
     "deny": [],
     "ask": []

@@ -992,7 +992,7 @@ export default function DrillSheetRenderer({
                 className="mt-6 pt-4 border-t text-center text-sm"
                 style={{ borderColor: '#d1d5db', color: '#6b7280' }}
               >
-                Généré avec Quebec Teacher Hub - Programme de formation de l'école québécoise
+                Généré avec ProfStudio - Programme de formation de l'école québécoise
               </div>
             )}
 

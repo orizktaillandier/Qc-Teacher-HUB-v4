@@ -2348,7 +2348,7 @@ export default function CardsV2Page() {
           </div>
 
           <div className="mt-auto text-center text-gray-600" style={{ position: 'absolute', bottom: '15mm', left: 0, right: 0 }}>
-            <p className="text-sm">© {new Date().getFullYear()} - Généré avec Quebec Teacher Hub</p>
+            <p className="text-sm">© {new Date().getFullYear()} - Généré avec ProfStudio</p>
           </div>
         </div>
       </>
