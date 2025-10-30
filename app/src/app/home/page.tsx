@@ -1,6 +1,7 @@
 'use client'
 
 import { Navigation } from "@/components/navigation"
+import { BetaTesterBanner } from "@/components/BetaTesterBanner"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -54,7 +55,12 @@ export default function Home() {
     <div className="min-h-screen bg-background">
       <Navigation />
 
-      <div className="relative pt-24 pb-12 px-6">
+      {/* Beta Tester Banner - with top padding to clear fixed nav */}
+      <div className="pt-20">
+        <BetaTesterBanner />
+      </div>
+
+      <div className="relative pt-6 pb-12 px-6">
         <div className="container mx-auto max-w-5xl">
           {/* Welcome Header with Illustration */}
           <Card className="mb-8 border-2 shadow-lg bg-gradient-to-br from-blue-50/50 to-purple-50/50 dark:from-blue-950/10 dark:to-purple-950/10">
@@ -307,19 +313,6 @@ export default function Home() {
                 </div>
               </div>
             </Card>
-          </div>
-
-          {/* Quick CTA */}
-          <div className="text-center pt-8 border-t border-border">
-            <p className="text-muted-foreground mb-4">
-              Prêt à créer du matériel pédagogique?
-            </p>
-            <Link href="/generator">
-              <Button size="lg" className="gap-2">
-                <Wand2 className="h-5 w-5" />
-                Générer des cartes
-              </Button>
-            </Link>
           </div>
         </div>
       </div>

@@ -14,8 +14,7 @@ export function BetaFeedbackButton() {
   const [feedback, setFeedback] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
 
-  // Only show to logged-in users
-  if (!session) return null
+  // Show to everyone (logged in or not) - anonymous feedback is welcome!
 
   const handleSubmit = async () => {
     if (!feedback.trim()) {

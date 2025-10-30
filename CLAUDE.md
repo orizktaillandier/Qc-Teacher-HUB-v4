@@ -488,6 +488,194 @@ DATABASE_URL=postgresql://...      # PostgreSQL connection string for production
 4. Run `npx prisma generate` to create Prisma client
 5. Run `npx prisma db push` to create database tables
 
+## Vercel Deployment
+
+### Critical: DATABASE_URL Special Characters
+**IMPORTANT**: When deploying to Vercel, `DATABASE_URL` with special characters in the password **MUST be URL-encoded**, otherwise NextAuth will fail with "Configuration" error.
+
+**Common special characters and their URL encoding**:
+- `#` → `%23`
+- `]` → `%5D`
+- `'` → `%27`
+- `<` → `%3C`
+- `>` → `%3E`
+- `&` → `%26`
+- `@` → `%40` (only in password, not host)
+
+**Example**:
+```bash
+# ❌ Local .env.local (works)
+DATABASE_URL=postgresql://user:pass#word]'<@host:5432/db
+
+# ✅ Vercel (requires URL-encoding)
+DATABASE_URL=postgresql://user:pass%23word%5D%27%3C@host:5432/db
+```
+
+**Why**: Vercel's environment variable parser treats special characters differently than local Node.js environment. Without URL-encoding, database connection fails silently during authentication.
+
+### Required Vercel Environment Variables
+Set these in Vercel **Settings** → **Environment Variables** for **Production**:
+
+1. **NEXTAUTH_URL** = `https://your-app.vercel.app` (your actual Vercel domain)
+2. **NEXTAUTH_SECRET** = (generate with `openssl rand -base64 32`)
+3. **GOOGLE_CLIENT_ID** = (from Google Cloud Console)
+4. **GOOGLE_CLIENT_SECRET** = (from Google Cloud Console)
+5. **DATABASE_URL** = (PostgreSQL connection string with URL-encoded password)
+6. **OPENAI_API_KEY** = (your OpenAI API key)
+7. **AI_MODEL** = `gpt-5`
+8. **AI_MODEL_SMALL** = `gpt-5-mini`
+
+### Google OAuth Configuration
+After deploying to Vercel, add this redirect URI to Google Cloud Console:
+```
+https://your-app.vercel.app/api/auth/callback/google
+```
+
+**Steps**:
+1. Go to [Google Cloud Console](https://console.cloud.google.com/apis/credentials)
+2. Select your OAuth 2.0 Client ID
+3. Add to **Authorized redirect URIs**
+4. Click **Save**
+5. Wait 30 seconds for changes to propagate
+
+### Deployment Workflow
+After initial setup, deployments are automatic:
+
+1. **Local development**: Work normally with `npm run dev`
+2. **Commit changes**: `git add . && git commit -m "Description"`
+3. **Push to deploy remote**: `git push deploy main` (or `git push origin main` if origin is connected)
+4. **Vercel auto-deploys**: Builds and deploys automatically (~2-3 minutes)
+5. **No manual intervention needed**: Environment variables are reused
+
+### Troubleshooting Deployment Issues
+
+**"Configuration" error on sign-in**:
+- Check DATABASE_URL has URL-encoded special characters
+- Verify all 5 required environment variables are set for Production
+- Redeploy after adding/changing environment variables
+
+**"redirect_uri_mismatch" error**:
+- Add `https://your-app.vercel.app/api/auth/callback/google` to Google Cloud Console
+- Verify NEXTAUTH_URL matches your Vercel domain exactly
+
+**Build succeeds but runtime errors**:
+- Environment variables are applied at BUILD TIME
+- After changing env vars, trigger a fresh deployment (not from cache)
+- Go to Vercel Deployments → Three dots → Redeploy (uncheck "Use existing cache")
+
+## Google OAuth Verification (For Production)
+
+### Why Verification is Needed
+
+**Current Issue**: School Google Workspace accounts (e.g., `@csslaval.gouv.qc.ca`) are blocked by `admin_policy_enforced` error. Only personal Gmail accounts can sign in.
+
+**Solution**: Submit app for Google OAuth verification to allow all Google Workspace accounts (school emails) to access ProfStudio.
+
+**Timeline**: 1-4 weeks after submission
+
+### Verification Process
+
+#### Step 1: Create or Select Project
+- Already completed: Project exists in Google Cloud Console
+- OAuth Client ID: `177624531350-uqtuchkvrnu7clpf74d5tr2kj6fim4q9.apps.googleusercontent.com`
+
+#### Step 2: Enable APIs & Services
+1. Open [API Library](https://console.cloud.google.com/apis/library)
+2. Select your project
+3. Enable required APIs:
+   - Google OAuth 2.0 API
+   - Google People API (for profile info)
+4. Read API documentation to understand required scopes
+
+#### Step 3: Setup OAuth Consent Screen
+1. Open [Google API Console](https://console.cloud.google.com)
+2. Navigate to **OAuth Consent Screen**
+3. For existing app: Click **"Edit App"**
+4. Complete all screens, click **"Save and Continue"** to proceed
+
+**Key Components**:
+- **App Name**: ProfStudio
+- **App Domain**: Your production domain (e.g., `profstudio.ca`)
+- **Developer Contact**: Your email address
+- **App Logo**: ProfStudio logo (120x120px minimum)
+- **Privacy Policy URL**: Required (must host privacy policy)
+- **Terms of Service URL**: Required (must host ToS)
+- **Authorized Domains**: Add your production domain
+
+**Scopes to Request**:
+- `email` - User's email address
+- `profile` - User's basic profile info (name, picture)
+- `openid` - OpenID Connect authentication
+
+**IMPORTANT**: Only request the narrowest scopes needed. Do NOT request access to Drive, Calendar, etc. unless absolutely necessary.
+
+#### Step 4: Create Client Credentials
+Already completed - credentials exist in Google Cloud Console
+
+#### Step 5: Prepare and Submit for Verification
+
+**Before Submitting**:
+1. **Publish to Production**:
+   - App must be live on production (not testing/staging)
+   - Change OAuth Consent Screen from "Testing" to "Production"
+   - Click **"Publish App"** button
+
+2. **Click "Prepare for Verification"**:
+   - Review all configured details
+   - Ensure everything is correct and up-to-date
+   - Click **"Save and Continue"**
+
+3. **Scope Justification** (if requesting sensitive/restricted scopes):
+   - Explain how your app uses each scope
+   - Be specific and detailed
+   - Focus on user benefit
+
+4. **Demo Video** (REQUIRED):
+   - Create a video demonstrating:
+     - App functionality
+     - OAuth sign-in flow
+     - How scopes are used in the app
+   - Show the complete user journey
+   - Upload to YouTube (can be unlisted)
+   - Provide YouTube link in submission
+
+**Demo Video Requirements**:
+- Length: 2-5 minutes
+- Quality: 720p or higher
+- Show actual app usage, not mockups
+- Demonstrate OAuth consent screen
+- Show how user data is used
+- Include narration explaining what's happening
+
+5. **Submit for Verification**:
+   - Click **"Submit for Verification"**
+   - OAuth review team will review against all requirements
+   - All communications via email to project owners/editors
+
+**What to Expect**:
+- Review process: 1-4 weeks
+- Email communications from Google OAuth team
+- May request additional information or clarifications
+- If requesting restricted scopes: Security assessment required
+
+**After Approval**:
+- App shows Google's verified badge
+- All Google Workspace accounts can sign in
+- No more "admin_policy_enforced" errors
+- School teachers can use their work emails
+
+### Temporary Workaround (Current Beta)
+
+For beta testing, users must sign in with **personal Gmail accounts** (`@gmail.com`). School Google Workspace accounts will not work until app is verified.
+
+**Alternative**: School IT admins can manually whitelist the app in their Google Workspace Admin Console under **Security → API Controls → Manage Third-Party App Access**.
+
+### Documentation Links
+
+- [Google OAuth Verification Overview](https://support.google.com/cloud/answer/9110914)
+- [OAuth Consent Screen Configuration](https://support.google.com/cloud/answer/10311615)
+- [OAuth API Verification FAQ](https://support.google.com/cloud/answer/9110914)
+
 ## Import Path Strategy
 
 From app layer to core layer, use relative paths:
